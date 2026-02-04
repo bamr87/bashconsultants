@@ -14,7 +14,8 @@ tags:
     - project-management
 featured: false
 excerpt: Imagine a bombastic Broadway ensemble number with frantic developers and a giant spinning wheel labeled 'Circle of Fix'—a look at the complexities of modern software delivery.
-lastmod: 2026-01-31T19:41:38.025Z
+lastmod: 2026-02-01T03:41:53.856Z
+draft: true
 ---
 
 ## The Circle of Fix
