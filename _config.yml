@@ -1,26 +1,18 @@
-# Welcome to the configuration file for Jekyll.
-# Full docs at: http://jekyllrb.com/docs/configuration/
-# YAML docs at: https://yaml.org/spec/1.2.2/
-# ---------------------------------------------------------------------------------
+# ==============================================================================
+# BASH Consultants — Site Configuration (USER-OWNED)
+# ==============================================================================
 #
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
+# This file contains YOUR site-specific settings: identity, branding, analytics,
+# collections, front-matter defaults, and deployment config.
 #
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server.
+# Theme infrastructure (plugins, kramdown, sass, exclude, mermaid) lives in
+# _config.theme.yml which is managed by the theme and updated automatically.
 #
-# If you need help with YAML syntax, here are some quick references for you: 
-# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
-# https://learnxinyminutes.com/docs/yaml/
+# Config merge order (later files win):
+#   _config.theme.yml → _config.yml → _config_dev.yml
 #
-# You can find config options at: https://jekyllrb.com/docs/configuration/options/
-#
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
+# Docs: http://jekyllrb.com/docs/configuration/
+# ==============================================================================
 
 
 # Site Settings ###################################################################
@@ -247,24 +239,7 @@ powered_by:
     icon: "bi-filetype-js"
 
 
-### Plugins 
-# https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/about-github-pages-and-jekyll#plugins
-# http://jekyllrb.com/docs/plugins/
-
-# All plugins are enabled by default for GitHub Pages. https://pages.github.com/versions/
-
-plugins:
-  - github-pages
-  - jekyll-include-cache
-  - jekyll-remote-theme
-  - jekyll-feed
-  - jekyll-sitemap
-  - jekyll-seo-tag
-  - jekyll-paginate
-  - jekyll-relative-links
-  # Note: jekyll-mermaid is NOT in GitHub Pages whitelist - it only provides {% mermaid %} Liquid tag
-  # Mermaid diagrams work without this plugin via client-side JavaScript (see _includes/components/mermaid.html)
-  - jekyll-mermaid
+# Plugins: theme-managed — see _config.theme.yml
 
 ## Gisgus Plugin #################################################################
 
@@ -282,39 +257,7 @@ resources:
     image: [ *github_user, '/', *github_repository ]
     hub_url: [ 'https://hub.docker.com/r/', *github_user, '/', *github_repository ]
 
-## Mermaid Diagram Configuration #################################################
-# Usage: Add 'mermaid: true' to page front matter and use ```mermaid code blocks
-# GitHub Pages Compatible: Yes (client-side rendering)
-# Distribution: The theme ships mermaid.min.js in assets/vendor/mermaid/ via the
-# gem (gemspec includes assets/) and remote_theme (served from theme's GitHub repo).
-# Local dev: npm install && npm run vendor:mermaid (copies from node_modules/)
-
-mermaid:
-  src: '/assets/vendor/mermaid/mermaid.min.js'
-
-# https://github.blog/2022-02-14-include-diagrams-markdown-files-mermaid/
-
-## Conversion
-# Markdown Options https://jekyllrb.com/docs/configuration/markdown/
-# https://github.com/github/jekyll-commonmark-ghpages
-
-markdown: kramdown
-# highlighter: rouge
-# lsi: false
-# excerpt_separator: "\n\n"
-# incremental: false
-
-# Markdown Processing https://jekyllrb.com/docs/configuration/markdown/
-kramdown: # https://kramdown.gettalong.org/options.html
-  input: GFM
-  header_offset: 0
-  # hard_wrap: false
-  # auto_ids: true
-  # footnote_nr: 1
-  # entity_output: as_char
-  toc_levels: 1..6
-  # smart_quotes: lsquo,rsquo,ldquo,rdquo
-  # enable_coderay: false
+# Mermaid, Markdown, Kramdown: theme-managed — see _config.theme.yml
 
 # Collections: https://jekyllrb.com/docs/collections/
   # Permalinks: https://jekyllrb.com/docs/permalinks/
@@ -457,45 +400,7 @@ defaults:
   #     sidebar:
   #       nav: dynamic
 
-# Exclude from processing.
-# The following items will not be processed, by default.
-# Any item listed under the `exclude:` key here will be automatically added to
-# the internal "default list".
-#
-# Excluded items can be processed by explicitly listing the directories or
-# their entries' file path in the `include:` list.
-
-exclude:
-  - .sass-cache/
-  - .jekyll-cache/
-  - .obsidian
-  - Gemfile.lock
-  - gemfiles/
-  - Gemfile
-  - node_modules/
-  # Exclude Bundler's vendor dir (Ruby gems). assets/vendor/ is a different path
-  # and is intentionally committed for GitHub Pages (Bootstrap, jQuery, etc.).
-  - vendor/bundle/
-  - vendor/cache/
-  - vendor/gems/
-  - vendor/ruby/
-  # - "*.sh"
-  - submodules/
-  - docs/
-  - templates/
-  - MERMAID-*.md
-  - MERMAID-*/
-  - test/
-  - _site/lib/
-
-# Sass/SCSS
-sass:
-  sass_dir: _sass
-  style: expanded
-
-#  TODO: Fix bootstrap plugin
-  # load_paths:
-  #   - /usr/local/bundle/gems/bootstrap-5.3.3/assets/stylesheets
+# Exclude & Sass: theme-managed — see _config.theme.yml
 
 algolia:
   application_id: 'SP02Z3YYL4'

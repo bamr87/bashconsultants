@@ -1,20 +1,21 @@
 source "https://rubygems.org"
 
-# Gemfile for Azure builds: omit jekyll-remote-theme so builds use the local gem theme
+# Gemfile for Azure builds: uses the local gem theme instead of remote_theme
 
 gem 'github-pages'
 
-gem 'jekyll-theme-zer0', '~> 0.21.2'
+# Theme loaded as a local gem for Azure (no remote_theme)
+gem 'jekyll-theme-zer0'
 
 group :jekyll_plugins do
   # Keep other plugins, but omit jekyll-remote-theme for Azure
-  gem 'jekyll-feed', "~> 0.17"
-  gem 'jekyll-sitemap' , "~> 1.4.0"
-  gem 'jekyll-seo-tag', "~> 2.8.0"
-  gem 'jekyll-paginate', '~> 1.1'
+  gem 'jekyll-feed'
+  gem 'jekyll-sitemap'
+  gem 'jekyll-seo-tag'
+  gem 'jekyll-paginate'
 end
 
 # Docker support
-gem "ffi", "~> 1.17.0"
-gem 'webrick', "~> 1.7"
+gem "ffi"
+gem 'webrick'
 gem 'commonmarker', '0.23.10'

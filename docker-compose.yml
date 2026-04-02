@@ -1,18 +1,49 @@
-services:
+# ==============================================================================
+# Docker Compose - Development
+# ==============================================================================
+#
+# Based on zer0-mistakes theme Docker architecture
+#
+# Usage:
+#   docker compose up              # Start development server
+#   docker compose up --build      # Rebuild with latest dependencies
+#   docker compose exec jekyll bash  # Access container shell
+# ==============================================================================
 
+services:
   jekyll:
-    image: jekyll/jekyll:latest
-    command: bash -c "bundle install && jekyll serve --watch --force_polling --port 4042 --config '_config.yml,_config_dev.yml'"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+
+    # Platform specification for Apple Silicon compatibility
+    platform: linux/amd64
+
+    # Run bundle install first since volume mount overwrites container's /site
+    # Also configure git safe.directory to avoid ownership warnings
+    command: ["sh", "-c", "git config --global --add safe.directory /site 2>/dev/null || true && bundle install --jobs 4 --retry 3 && bundle exec jekyll serve --watch --force_polling --port 4042 --config '_config.theme.yml,_config.yml,_config_dev.yml' --host 0.0.0.0 --livereload"]
 
     volumes:
-      - ./:/app
+      - .:/site
+      # Named volume for bundle cache (faster rebuilds)
       - bundle_cache:/usr/local/bundle
+
     ports:
       - "4042:4042"
-    working_dir: /app
+      - "35729:35729"  # LiveReload port
+
+    working_dir: /site
+
     environment:
-      JEKYLL_ENV: development
-      BUNDLE_PATH: /usr/local/bundle
+      - JEKYLL_ENV=${JEKYLL_ENV:-development}
+      - BUNDLE_PATH=/usr/local/bundle
+      - PAGES_REPO_NWO=${PAGES_REPO_NWO:-bamr87/bashconsultants}
+
+    # Enable TTY for interactive commands
+    stdin_open: true
+    tty: true
 
 volumes:
   bundle_cache:
+    driver: local

@@ -1,18 +1,62 @@
-# Use an official Ruby runtime as a parent image
-# docker build -t ${GIT_REPO} .
-# docker run -d -p 4000:4000 -v ${ZREPO}:/app --name ${GIT_REPO}-container ${GIT_REPO}
-# docker exec -it ${GIT_REPO}-container /bin/bash
+# ==============================================================================
+# BASH Consultants - Docker-First Jekyll Development
+# ==============================================================================
+#
+# Based on zer0-mistakes theme Docker architecture
+#
+# Usage:
+#   docker build -t bashconsultants .
+#   docker run -d -p 4042:4042 -v $(pwd):/site --name bashconsultants bashconsultants
+#   docker exec -it bashconsultants /bin/bash
+#
+# Multi-stage build:
+#   - base: Ruby 3.3 slim + minimal build deps
+#   - dev: Development tools + test gems
+# ==============================================================================
 
-FROM ruby:2.7.4
-# escape=\
-ENV GITHUB_GEM_VERSION 231
-ENV JSON_GEM_VERSION 1.8.6
-ENV GIT_REPO zer0-mistakes
-WORKDIR /app
-ADD . /app
-RUN gem update --system 3.3.22
-RUN bundle update
-RUN bundle install
-RUN bundle clean --force
+# ------------------------------------------------------------------------------
+# Stage 1: Base - Ruby 3.3 with minimal build dependencies
+# ------------------------------------------------------------------------------
+FROM ruby:3.3-slim AS base
+
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        libyaml-dev \
+        zlib1g-dev \
+        git && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
+WORKDIR /site
+
+RUN gem install bundler -v '~> 2.3'
+
+# Copy dependency files first for better caching
+COPY Gemfile Gemfile.lock* ./
+
+RUN bundle config set --local deployment false && \
+    bundle config set --local without '' && \
+    bundle install --jobs 4 --retry 3
+
+# ------------------------------------------------------------------------------
+# Stage 2: Development & Test
+# ------------------------------------------------------------------------------
+FROM base AS dev
+
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+        nodejs \
+        npm \
+        curl \
+        jq && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
+RUN bundle config set --local with 'development test' && \
+    bundle install --jobs 4 --retry 3
+
+COPY . .
+
 EXPOSE 4042
-CMD ["bundle", "exec", "jekyll", "serve", "--config", "_config.yml,_config_dev.yml", "--host", "0.0.0.0", "--port", "4042"]
+CMD ["bundle", "exec", "jekyll", "serve", "--config", "_config.yml,_config_dev.yml", "--host", "0.0.0.0", "--port", "4042", "--watch", "--force_polling"]
