@@ -311,13 +311,15 @@ Each phase ends with something usable and is sized for incremental PRs (per AGEN
 
 ---
 
-## 12. Open Questions (to resolve before/within Phase 0)
+## 12. Resolved Decisions
 
-1. **`CLAUDE.md` vs `AGENTS.md`:** keep both (Claude-specific + cross-tool) or symlink one to the other?
-2. **CLI language:** Node (shares tooling with the extension, first-class Agent SDK) — confirm over Python.
-3. **Private data home:** private sibling repo (recommended) vs. git-crypt in-repo — confirm in Phase 3.
-4. **Eval depth:** lightweight golden-set assertions vs. a fuller LLM-graded eval — start light.
-5. **Branding of the product:** ship the framework as "BASH OS" publicly, or a neutral name so other consultants don't ship BASH branding? (Affects §8 naming.)
+These were the open questions; all five are now decided (2026-06-02) and the plan above reflects them.
+
+1. **Agent docs:** **`AGENTS.md` is the single source of truth; `CLAUDE.md` is a symlink to it.** Zero drift, one canonical file, satisfies tools that auto-load `CLAUDE.md`. (See §3.2, §5.)
+2. **CLI language:** **Node/TypeScript.** Shares tooling and types with the existing VS Code extension and has first-class Claude Agent SDK + Anthropic SDK support — one ecosystem, not two. (See §3.2, §5, §10.)
+3. **Private data home:** **Private sibling repo** (`bashconsultants-ops`) mounted at `_data/private/` and excluded from the Jekyll build. Cleanest blast radius; client data can never leak into the public site. (See §6.)
+4. **Eval depth:** **Start light** — golden-set assertions (valid frontmatter, on-voice tone, required sections) in CI. Upgrade to LLM-graded evals only if model-upgrade drift proves to be a real problem. (See §7.)
+5. **Product branding:** **Neutral product name (BASH OS), decoupled from the practice.** Framework code carries zero BASH-specific facts (those live only in `_data/`), so other consultants adopt it without inheriting BASH branding — and it doubles as a clean BASH lead-magnet/product. (See §8.)
 
 ---
 
