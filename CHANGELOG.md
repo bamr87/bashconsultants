@@ -7,6 +7,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 ### Added
+- **BASH OS Phase 0 — AI engine & governance foundation:**
+  - **`tools/bashos/`** — Node/TypeScript CLI (the AI engine). `bashos prompts` lists the prompt library, `bashos classify` reports the blast-radius autonomy verdict for the working tree, `bashos run <prompt> <file>` runs a prompt against a file with Claude (prompt-cached instruction context, opus/sonnet/haiku tiers). `run` never commits; committing is policy-gated.
+  - **`tools/bashos/policy/blast-radius.yml`** + **`docs/ai-framework/AUTONOMY-POLICY.md`** — The semi-autonomous governance model: Green (auto-commit) / Yellow (open PR) / Red (human-only), most-restrictive-wins, draft condition, and a secret-pattern backstop.
+  - **`tools/bashos/evals/validate-prompts.mjs`** + **`.github/workflows/ai-prompt-evals.yml`** — Dependency-free structural eval that validates every `.prompt.md`/`.instructions.md` against the canonical frontmatter schema and body-style rules; runs in CI to catch prompt drift.
+  - **`CLAUDE.md`** — Symlink to `AGENTS.md` (single source of truth for agent guidance).
+  - **`.claude/skills/`** — Claude-native skills (`content-article`, `content-review`) that thinly wrap the existing prompts without duplicating them.
 - **`docs/ai-framework/PLAN.md`** + **`docs/ai-framework/README.md`** — Comprehensive plan for "BASH OS", an AI-augmented consulting operating system layered on the static site (Claude overlay on a deterministic git/Jekyll foundation). Covers the layered architecture, five capability modules (Content Studio, Idea Vault, Marketing Engine, Comms Hub, Site Ops), a semi-autonomous governance/blast-radius model, a reusable distribution model for other consultants, and a phased roadmap (Phase 1 = Content Studio).
 - **`pages/_posts/muses/2025-01-24-bash-consulting-breaking.md`** — New satirical press-release post ("If a press release about ethical capitalism wrote itself") covering ESG accounting for Denver SMBs; includes a straight practical section on what's buildable on QuickBooks today.
 - **`.github/prompts/article-write.prompt.md`** — New `/article-write` agent prompt for drafting new bashconsultants.com posts end-to-end.

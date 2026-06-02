@@ -21,6 +21,10 @@ extension/dist/
 extension/.vscode-test/
 extension/*.vsix
 
+# bashos CLI (tools/bashos/)
+tools/bashos/node_modules/
+tools/bashos/dist/
+
 # Lock files (generated)
 package-lock.json
 logs/

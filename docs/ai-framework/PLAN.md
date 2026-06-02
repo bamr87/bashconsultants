@@ -240,12 +240,12 @@ The goal: a consultant clones, runs a setup wizard, and is live.
 
 Each phase ends with something usable and is sized for incremental PRs (per AGENTS.md: minimal, validated, conventional commits, changelog updated).
 
-### Phase 0 — Foundations & Claude engine *(enabler)*
-- Add `CLAUDE.md` (or reconcile with `AGENTS.md`); add `.claude/skills/` wrapping existing prompts.
-- Scaffold `tools/bashos/` CLI with the Claude client (Agent SDK + caching), prompt loader, and audit logger.
-- Write `AUTONOMY-POLICY.md` + blast-radius config; add `ANTHROPIC_API_KEY` handling.
-- Stand up the prompt eval harness + a CI job.
-- **Deliverable:** `bashos run <prompt> <file>` works locally and in CI with full audit logging.
+### Phase 0 — Foundations & Claude engine *(enabler)* — ✅ done (2026-06-02)
+- ✅ `CLAUDE.md` symlinks `AGENTS.md`; `.claude/skills/` thinly wraps existing prompts.
+- ✅ `tools/bashos/` CLI: Claude client with prompt caching, prompt loader, policy engine, audit logger; `prompts` / `classify` / `run` commands. (Commands beyond `run` build on this.)
+- ✅ `AUTONOMY-POLICY.md` + `tools/bashos/policy/blast-radius.yml`; `ANTHROPIC_API_KEY` handling.
+- ✅ Prompt eval harness (`tools/bashos/evals/`) + CI job (`ai-prompt-evals.yml`).
+- **Deliverable met:** `bashos run <prompt> <file>` runs locally with cached context + audit provenance; `bashos classify` enforces the policy (exits non-zero when not auto-committable) for CI to branch on.
 
 ### Phase 1 — Content Studio *(focus, deepest)*
 - Formalize pipeline states in frontmatter + `_data/pipeline.yml`; build the `/studio/` status board page.

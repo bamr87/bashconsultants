@@ -1,0 +1,34 @@
+# BASH OS — structural eval for the prompt/instruction/skill libraries.
+# Dependency-free: just Node. Guards against prompt drift on every change to
+# the AI asset libraries. See tools/bashos/evals/validate-prompts.mjs.
+name: ai-prompt-evals
+
+on:
+  pull_request:
+    paths:
+      - ".github/prompts/**"
+      - ".github/instructions/**"
+      - ".claude/skills/**"
+      - "tools/bashos/evals/**"
+  push:
+    branches: [main]
+    paths:
+      - ".github/prompts/**"
+      - ".github/instructions/**"
+      - ".claude/skills/**"
+      - "tools/bashos/evals/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate prompt & instruction schema
+        run: node tools/bashos/evals/validate-prompts.mjs

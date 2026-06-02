@@ -1,0 +1,30 @@
+{
+  "name": "@bashos/cli",
+  "version": "0.0.1",
+  "private": true,
+  "description": "BASH OS — AI engine CLI: runs the prompt library against the working tree with Claude, gated by the autonomy policy.",
+  "type": "module",
+  "bin": {
+    "bashos": "dist/index.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --experimental-strip-types src/index.ts",
+    "lint": "tsc --noEmit",
+    "evals": "node evals/validate-prompts.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "commander": "^13.0.0",
+    "minimatch": "^10.0.0",
+    "yaml": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  },
+  "license": "MIT"
+}

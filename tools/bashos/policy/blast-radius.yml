@@ -1,0 +1,75 @@
+# BASH OS — Blast-radius / autonomy policy (machine-readable)
+#
+# Classifies every AI-proposed change by the path it touches into one of:
+#   green  -> AI may auto-commit (bot branch + auto-merge after CI passes)
+#   yellow -> AI must open a PR for human review
+#   red    -> AI may draft only; never commit. Surface for a human to act.
+#
+# Evaluation order: a path is matched against `red` globs first, then `yellow`,
+# then `green`. First match wins. Anything unmatched falls back to `default`.
+# A change that touches paths in MORE THAN ONE class is escalated to the
+# highest (most restrictive) class among them.
+#
+# Human-readable rationale: docs/ai-framework/AUTONOMY-POLICY.md
+# Consumed by: tools/bashos (CLI) and .github/workflows/ai-*.yml (CI agents)
+
+version: 1
+default: yellow # unknown paths are treated as review-required, never auto-committed
+
+classes:
+  green:
+    description: Low-risk. Auto-commit to a bot branch and auto-merge once CI is green.
+    globs:
+      - "pages/_posts/**/*.md" # drafts only — see require_draft below
+      - "assets/images/**" # generated preview images
+      - "docs/**"
+      - "CHANGELOG.md"
+      - "**/*.lock"
+      - "Gemfile.lock"
+      - "package-lock.json"
+    conditions:
+      # A post under pages/_posts only stays green while it is an unpublished draft.
+      # Publishing it (draft:false / removing draft) reclassifies the change as yellow.
+      require_draft:
+        - "pages/_posts/**/*.md"
+
+  yellow:
+    description: Customer-facing or structurally significant. Open a PR for review.
+    globs:
+      - "index.md"
+      - "about.md"
+      - "contact.md"
+      - "pages/_services/**"
+      - "pages/**" # any other customer-facing page
+      - "_data/entity/**" # practice identity / service catalog
+      - "_layouts/**"
+      - "_includes/**"
+      - "_sass/**"
+      - "_plugins/**"
+      - ".github/prompts/**"
+      - ".github/instructions/**"
+      - ".claude/**"
+
+  red:
+    description: Human-only. AI drafts but never commits. Touching these blocks auto-commit entirely.
+    globs:
+      - "_data/private/**" # clients / leads / proposals (private sibling repo)
+      - "_data/clients/**"
+      - "_data/leads/**"
+      - "_data/proposals/**"
+      - "**/pricing*.{yml,yaml,md}"
+      - ".env"
+      - ".env.*"
+      - "**/secrets*"
+      - "_config*.yml" # deploy / build config
+      - ".github/workflows/**" # CI / deploy pipelines
+      - "**/Gemfile" # build dependency manifests (not the lock)
+      - "package.json"
+
+# Patterns that, if found in a DIFF (added lines), force escalation regardless of path.
+# A defensive backstop against committing obvious secrets.
+secret_patterns:
+  - "sk-[A-Za-z0-9]" # OpenAI / Anthropic-style keys
+  - "ghp_[A-Za-z0-9]" # GitHub PATs
+  - "AKIA[0-9A-Z]" # AWS access keys
+  - "-----BEGIN .*PRIVATE KEY-----"
