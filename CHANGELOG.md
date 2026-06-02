@@ -7,6 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 ### Added
+- **`docs/ai-framework/PLAN.md`** + **`docs/ai-framework/README.md`** — Comprehensive plan for "BASH OS", an AI-augmented consulting operating system layered on the static site (Claude overlay on a deterministic git/Jekyll foundation). Covers the layered architecture, five capability modules (Content Studio, Idea Vault, Marketing Engine, Comms Hub, Site Ops), a semi-autonomous governance/blast-radius model, a reusable distribution model for other consultants, and a phased roadmap (Phase 1 = Content Studio).
 - **`pages/_posts/muses/2025-01-24-bash-consulting-breaking.md`** — New satirical press-release post ("If a press release about ethical capitalism wrote itself") covering ESG accounting for Denver SMBs; includes a straight practical section on what's buildable on QuickBooks today.
 - **`.github/prompts/article-write.prompt.md`** — New `/article-write` agent prompt for drafting new bashconsultants.com posts end-to-end.
 
