@@ -2,7 +2,7 @@
 applyTo: "pages/_posts/**/*.md"
 description: "Blog post standards for bashconsultants.com — frontmatter, voice, and SEO rules for the _posts collection"
 date: 2026-05-18T12:00:00.000Z
-lastmod: 2026-05-18T12:00:00.000Z
+lastmod: 2026-06-03T12:00:00.000Z
 ---
 
 # Blog Post Instructions
@@ -54,9 +54,18 @@ A typical post should follow this skeleton (skip sections that don't apply, don'
 5. **Watch-outs** — the 2–3 things that go wrong in practice
 6. **Next step** — link to the relevant `/services/...` page or `/contact/`
 
+## Content Studio pipeline (optional)
+
+Posts authored through the BASH OS Content Studio carry two extra fields:
+
+- `stage:` — pipeline position (`idea`→`outline`→`drafting`→`review`→`seo`→`scheduled`→`published`). See [`_data/pipeline.yml`](../../_data/pipeline.yml).
+- `published:` — **Jekyll-native build flag.** `published: false` excludes the post from the build (genuinely not live); `published: true` (or omitting it) puts it live. This is the real publish gate, **not** `draft:`.
+
+> ⚠ `draft: true` is **decorative** here — Jekyll still builds and publishes it. To keep an in-progress post off the live site use `published: false`. Promoting to `published: true` is the human-gated (🟡 Yellow) act; see [`docs/ai-framework/AUTONOMY-POLICY.md`](../../docs/ai-framework/AUTONOMY-POLICY.md).
+
 ## Hard don'ts
 
-- Don't commit posts with `draft: true` to `main` — Pages will publish them.
+- Don't set `published: true` (or remove it) on an in-progress post — that puts it live. Keep `published: false` until a human approves.
 - Don't reference internal URLs that don't exist; verify with the local build.
 - Don't include literal API keys, even as examples — use `${env:VAR}` placeholders.
 - Don't bump `date:` on edits — bump `lastmod:` instead.

@@ -22,7 +22,24 @@ export ANTHROPIC_API_KEY=sk-...   # required for `run`; not for classify/prompts
 bashos prompts                       # list available prompts
 bashos classify [--json]             # blast-radius verdict for the working tree
 bashos run <prompt> <file> [opts]    # run a prompt against a file with Claude
+bashos content <verb> ...            # Content Studio pipeline (see below)
 ```
+
+### Content Studio (`bashos content`)
+
+The idea→publish pipeline. Stages and prompt mappings live in [`_data/pipeline.yml`](../../_data/pipeline.yml).
+
+```bash
+bashos content board                              # status of every post by stage (no API key)
+bashos content new -s tech -T "My title"          # scaffold a post at stage:idea, published:false
+bashos content outline <file> --write             # run the outline prompt (Claude)
+bashos content draft   <file> --write             # flesh out the draft (article-write)
+bashos content review  <file>                     # editorial/voice review
+bashos content seo     <file>                     # SEO + metadata pass
+bashos content stage   <file> <stage>             # move a post to a stage (sets published flag)
+```
+
+**Safety:** pre-publish posts carry `published: false` — Jekyll-native build exclusion, so they are **not live** even on `main` (unlike the decorative `draft:` field). Promoting to `published` is a 🟡 Yellow action and must go through human PR review; the board flags any post that is `published: true` while still in a pre-publish stage.
 
 `run` options:
 

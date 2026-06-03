@@ -7,6 +7,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 ### Added
+- **BASH OS Phase 1 — Content Studio (in progress):**
+  - **`_data/pipeline.yml`** — Content pipeline definition (idea→outline→drafting→review→seo→scheduled→published), each stage with its build-safety (`published`) and risk class.
+  - **`bashos content` command group** — `board` (pipeline status of every post, no API key), `new` (scaffold a post at `stage:idea`, `published:false`), `outline`/`draft`/`review`/`seo` (run the stage's prompt via Claude), `stage` (move a post + set the `published` flag, with a publish-gate warning).
+  - **`.github/prompts/outline.prompt.md`** + **`.github/prompts/seo-audit.prompt.md`** — New `/outline` and `/seo-audit` prompts for the drafting and SEO stages.
+  - **`.github/workflows/ai-draft.yml`** — Content Studio draft agent: label an issue `ai-draft` → Claude scaffolds + outlines + drafts a `published:false` post → **opens a PR** for review (never pushes to main, never auto-merges; a hard gate asserts the post stays `published:false`). Requires an `ANTHROPIC_API_KEY` repo secret.
+  - **`.github/instructions/posts.instructions.md`** — Documents the `stage:`/`published:` pipeline fields and corrects the publish guidance: `draft:` is decorative; `published: false` is the real build-exclusion gate.
+
+### Changed
+- **`tools/bashos/policy/blast-radius.yml`** + autonomy policy/engine — Green/Yellow gate for posts now keys on the build-real `published: false` (not the decorative `draft: true`), and the blanket `pages/**` yellow glob was removed so it no longer shadows the green post rule (unmatched pages fall through to `default: yellow`).
+
+### Added
 - **BASH OS Phase 0 — AI engine & governance foundation:**
   - **`tools/bashos/`** — Node/TypeScript CLI (the AI engine). `bashos prompts` lists the prompt library, `bashos classify` reports the blast-radius autonomy verdict for the working tree, `bashos run <prompt> <file>` runs a prompt against a file with Claude (prompt-cached instruction context, opus/sonnet/haiku tiers). `run` never commits; committing is policy-gated.
   - **`tools/bashos/policy/blast-radius.yml`** + **`docs/ai-framework/AUTONOMY-POLICY.md`** — The semi-autonomous governance model: Green (auto-commit) / Yellow (open PR) / Red (human-only), most-restrictive-wins, draft condition, and a secret-pattern backstop.

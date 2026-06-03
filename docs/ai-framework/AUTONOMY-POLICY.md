@@ -33,7 +33,7 @@ auditor will ever see.
 
 1. **Path match, most-restrictive-wins.** Each changed path is tested against `red` globs, then `yellow`, then `green` (first match wins). If a single changeset touches paths in more than one class, the **whole changeset is escalated to the highest class present**. (One Red file makes the entire change Red.)
 2. **Unknown paths → Yellow.** The `default` is `yellow`, never `green`. New, unclassified paths are never auto-committed.
-3. **Draft condition.** Posts under `pages/_posts/**` are Green **only while `draft: true`**. Flipping to `draft: false` (or removing it) is the act of publishing and reclassifies the change to Yellow.
+3. **Unpublished condition.** Posts under `pages/_posts/**` are Green **only while `published: false`** (Jekyll-native, build-excluded). Promoting to `published: true` (or removing it) is the act of publishing and reclassifies the change to Yellow. ⚠ In this repo `draft: true` is *decorative* — Jekyll still publishes it — so the real gate is `published: false`, not `draft`.
 4. **Secret backstop.** If the diff's *added lines* match any `secret_patterns` (e.g. `sk-…`, `ghp_…`, `AKIA…`, private-key blocks), the change is force-escalated and blocked from auto-commit regardless of path. This complements AGENTS.md rule #5.
 
 ## Enforcement points

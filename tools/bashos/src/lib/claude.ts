@@ -2,7 +2,10 @@
 // stable instruction context (we pay full price for it once, then cache-read it
 // on subsequent calls). Model abstraction kept deliberately thin to avoid
 // vendor lock-in (PLAN.md principle).
-import Anthropic from "@anthropic-ai/sdk";
+//
+// The SDK is imported lazily inside run() so that no-API commands (board,
+// classify, prompts) don't pay to load it.
+import type Anthropic from "@anthropic-ai/sdk";
 
 export type Tier = "opus" | "sonnet" | "haiku";
 
@@ -46,6 +49,7 @@ export async function run(args: RunArgs): Promise<RunResult> {
 
   const tier = args.tier ?? "opus";
   const model = MODELS[tier];
+  const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic();
 
   // System is split so the bulk (instruction context + prompt body) is marked

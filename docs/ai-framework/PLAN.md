@@ -247,12 +247,15 @@ Each phase ends with something usable and is sized for incremental PRs (per AGEN
 - ✅ Prompt eval harness (`tools/bashos/evals/`) + CI job (`ai-prompt-evals.yml`).
 - **Deliverable met:** `bashos run <prompt> <file>` runs locally with cached context + audit provenance; `bashos classify` enforces the policy (exits non-zero when not auto-committable) for CI to branch on.
 
-### Phase 1 — Content Studio *(focus, deepest)*
-- Formalize pipeline states in frontmatter + `_data/pipeline.yml`; build the `/studio/` status board page.
-- CLI verbs: `bashos content {idea,outline,draft,review,seo,publish}`; new prompts `outline`, `seo-audit`.
-- CI: `ai-draft.yml` (label an idea issue → Claude drafts a `draft:true` post → PR), `ai-maintenance.yml` (link/SEO/freshness, Green auto-commits).
-- Upgrade VS Code extension to a Claude provider.
-- **Deliverable:** idea → AI draft (auto-committed draft) → human review/merge → published, end to end.
+### Phase 1 — Content Studio *(focus, deepest)* — 🟡 in progress
+- ✅ Pipeline states formalized in `_data/pipeline.yml` + `stage:` / `published:` frontmatter.
+- ✅ CLI verbs: `bashos content {board,new,outline,draft,review,seo,stage}`; new prompts `outline`, `seo-audit`.
+- ✅ CI: `ai-draft.yml` — label an issue `ai-draft` → Claude scaffolds + outlines + drafts a `published:false` post → **opens a PR** (never auto-merged; hard gate asserts it stays `published:false`).
+- ⏳ Studio status board: shipped as a **CLI view** (`bashos content board`), not a Jekyll page — pre-publish posts carry `published:false`, which removes them from `site.posts`, so Liquid can't see them. A build-excluded admin page is deferred until there's a safe drafts mechanism.
+- ⏳ `ai-maintenance.yml` (link/SEO/freshness, Green auto-commits) — not yet built.
+- ⏳ Upgrade VS Code extension to a Claude provider — not yet built (separate sub-project).
+- **Key correction (discovered in build):** `draft: true` is *decorative* in this repo — Jekyll publishes it. The real not-live primitive is Jekyll-native `published: false`; the pipeline and autonomy policy were updated to gate on it.
+- **Deliverable status:** idea → AI outline+draft (`published:false`) → PR → human review → publish is wired end to end via `ai-draft.yml` + `bashos content`. Requires an `ANTHROPIC_API_KEY` repo secret to run live.
 
 ### Phase 2 — Idea Vault + Marketing Engine
 - `_data/ideas/` + weekly `ai-content-ideas.yml` (5 ranked ideas as an issue).

@@ -20,7 +20,7 @@ classes:
   green:
     description: Low-risk. Auto-commit to a bot branch and auto-merge once CI is green.
     globs:
-      - "pages/_posts/**/*.md" # drafts only — see require_draft below
+      - "pages/_posts/**/*.md" # unpublished only — see require_unpublished below
       - "assets/images/**" # generated preview images
       - "docs/**"
       - "CHANGELOG.md"
@@ -28,19 +28,22 @@ classes:
       - "Gemfile.lock"
       - "package-lock.json"
     conditions:
-      # A post under pages/_posts only stays green while it is an unpublished draft.
-      # Publishing it (draft:false / removing draft) reclassifies the change as yellow.
-      require_draft:
+      # A post under pages/_posts stays green ONLY while it is build-excluded
+      # (`published: false`). NOTE: in this repo `draft: true` is decorative —
+      # Jekyll still publishes it — so the gate is the native `published: false`.
+      # Promoting (published:true / removing it) reclassifies the change as yellow.
+      require_unpublished:
         - "pages/_posts/**/*.md"
 
   yellow:
     description: Customer-facing or structurally significant. Open a PR for review.
+    # Note: no blanket "pages/**" here — it would shadow the green post rule.
+    # Any customer-facing page not matched below falls through to `default: yellow`.
     globs:
       - "index.md"
       - "about.md"
       - "contact.md"
       - "pages/_services/**"
-      - "pages/**" # any other customer-facing page
       - "_data/entity/**" # practice identity / service catalog
       - "_layouts/**"
       - "_includes/**"

@@ -13,7 +13,7 @@ const ORDER: Record<RiskClass, number> = { green: 0, yellow: 1, red: 2 };
 interface PolicyFile {
   version: number;
   default: RiskClass;
-  classes: Record<RiskClass, { globs?: string[]; conditions?: { require_draft?: string[] } }>;
+  classes: Record<RiskClass, { globs?: string[]; conditions?: { require_unpublished?: string[] } }>;
   secret_patterns?: string[];
 }
 
@@ -46,13 +46,14 @@ function classifyPath(repoRoot: string, policy: PolicyFile, path: string): PathV
   }
   const greenHit = matchesAny(path, policy.classes.green?.globs);
   if (greenHit) {
-    // Draft condition: a green post stays green only while draft: true.
-    const requiresDraft = matchesAny(path, policy.classes.green?.conditions?.require_draft);
-    if (requiresDraft) {
+    // Unpublished condition: a green post stays green only while it is
+    // build-excluded (`published: false`). Otherwise it is live-facing → yellow.
+    const requiresUnpublished = matchesAny(path, policy.classes.green?.conditions?.require_unpublished);
+    if (requiresUnpublished) {
       const body = readFileSafe(join(repoRoot, path));
-      const isDraft = /^\s*draft:\s*true\s*$/m.test(body);
-      if (!isDraft)
-        return { path, cls: "yellow", reason: `published (not draft) — escalated from green` };
+      const isUnpublished = /^\s*published:\s*false\s*$/m.test(body);
+      if (!isUnpublished)
+        return { path, cls: "yellow", reason: `live (published not false) — escalated from green` };
     }
     return { path, cls: "green", reason: `matches green glob "${greenHit}"` };
   }

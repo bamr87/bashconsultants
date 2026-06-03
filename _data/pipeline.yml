@@ -1,0 +1,68 @@
+# BASH OS — Content Studio pipeline definition.
+# The states a post moves through from idea to live, and the safety rules that
+# govern each. Read by the bashos CLI (`bashos content board|stage`) and by
+# humans. See docs/ai-framework/PLAN.md §4.1.
+#
+# IMPORTANT safety note: in this repo `draft: true` is DECORATIVE — Jekyll still
+# builds and publishes it. The only build-safe "not live yet" primitive is the
+# Jekyll-native `published: false`. Every pre-publish stage therefore carries
+# `published: false`; reaching `published` is the single Yellow (human-gated) act.
+
+version: 1
+
+# Frontmatter field that records pipeline position.
+field: stage
+
+stages:
+  - id: idea
+    label: Idea
+    description: Captured topic, not yet outlined.
+    published: false
+    risk: green
+  - id: outline
+    label: Outline
+    description: Structure drafted (headings + angle), no prose yet.
+    published: false
+    risk: green
+  - id: drafting
+    label: Drafting
+    description: Full draft being written to house voice.
+    published: false
+    risk: green
+  - id: review
+    label: Review
+    description: Draft complete, in editorial/voice review.
+    published: false
+    risk: green
+  - id: seo
+    label: SEO
+    description: Content locked, running SEO/metadata pass.
+    published: false
+    risk: green
+  - id: scheduled
+    label: Scheduled
+    description: Approved by a human, queued for a publish date.
+    published: false
+    risk: yellow
+  - id: published
+    label: Published
+    description: Live on bashconsultants.com. Customer-facing.
+    published: true
+    risk: yellow # the transition into this stage is the human gate
+
+# Allowed forward transitions (a human may always move backward).
+transitions:
+  idea: [outline]
+  outline: [drafting]
+  drafting: [review]
+  review: [seo, drafting] # may bounce back for rework
+  seo: [scheduled, review]
+  scheduled: [published]
+  published: []
+
+# Which prompt each `bashos content <verb>` helper runs (keyed by CLI verb).
+prompts:
+  outline: outline
+  draft: article-write
+  review: article-review
+  seo: seo-audit
