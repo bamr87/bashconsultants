@@ -47,13 +47,35 @@ Open Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`):
 - **Prompt Orchestrator: Generate Tests** - Run test-generation prompt
 - **Prompt Orchestrator: Generate Documentation** - Run documentation prompt
 - **Prompt Orchestrator: Debug Code** - Run debugging prompt
+- **Prompt Orchestrator: Set Anthropic API Key** - Store your Claude key in VS Code Secret Storage
+- **Prompt Orchestrator: Clear Anthropic API Key** - Remove the stored key
 
 ### Execution Methods
 
 When executing a prompt, choose:
-1. **Send to Chat (Copilot)** - Opens in Chat panel with prompt ready to paste
-2. **Execute with Language Model** - Directly calls GPT-4o and shows results
-3. **Copy to Clipboard** - Copies formatted prompt for manual use
+1. **Execute with Claude (Anthropic)** - First-class Claude provider (see below)
+2. **Send to Chat (Copilot)** - Opens in Chat panel with prompt ready to paste
+3. **Execute with Language Model** - Directly calls the VS Code LM API (Copilot)
+4. **Copy to Clipboard** - Copies formatted prompt for manual use
+
+### Claude (Anthropic) provider
+
+The first-class provider calls the Anthropic Messages API directly — the same
+engine as the [`bashos` CLI](../tools/bashos/) — so it shares the prompt library
+**and** the instruction library:
+
+- **House rules, automatically:** before each call it loads the
+  `.github/instructions/*.instructions.md` files whose `applyTo` matches the
+  active file and sends them as **cached** system context. Editing a post obeys
+  `content-style` + `posts` rules without you pasting anything.
+- **Prompt caching:** the stable instruction + prompt context is marked
+  cacheable, so repeat runs only pay full price for the variable file content.
+- **Model tiers:** `promptOrchestrator.claudeModelTier` = `opus` (default) /
+  `sonnet` / `haiku`; `promptOrchestrator.claudeMaxTokens` caps output.
+- **Key storage:** your `ANTHROPIC_API_KEY` lives in VS Code **Secret Storage**
+  (set it via the command above), never in `settings.json`. The env var is used
+  as a fallback. Results open in a new editor — the extension never writes files
+  silently.
 
 ## Prompt Template Format
 

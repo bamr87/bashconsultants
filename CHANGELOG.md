@@ -16,6 +16,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Changed
 - **`tools/bashos/policy/blast-radius.yml`** + autonomy policy/engine — Green/Yellow gate for posts now keys on the build-real `published: false` (not the decorative `draft: true`), and the blanket `pages/**` yellow glob was removed so it no longer shadows the green post rule (unmatched pages fall through to `default: yellow`).
+- **`extension/` (Prompt Orchestrator)** — Added a first-class **Claude (Anthropic) provider**: a new "Execute with Claude (Anthropic)" run method that calls the Anthropic Messages API directly with prompt caching and `opus`/`sonnet`/`haiku` tiers, automatically loading the matching `.github/instructions/*` files as cached house-style context (the same engine as the `bashos` CLI). API key is stored in VS Code Secret Storage via new "Set/Clear Anthropic API Key" commands (`promptOrchestrator.claudeModelTier` / `claudeMaxTokens` settings). The existing Copilot/LM and clipboard methods are unchanged.
 
 ### Added
 - **BASH OS Phase 0 — AI engine & governance foundation:**

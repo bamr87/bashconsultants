@@ -53,6 +53,16 @@
         "command": "prompt-orchestrator.debug",
         "title": "Debug Code",
         "category": "Prompt Orchestrator"
+      },
+      {
+        "command": "prompt-orchestrator.setClaudeApiKey",
+        "title": "Set Anthropic API Key",
+        "category": "Prompt Orchestrator"
+      },
+      {
+        "command": "prompt-orchestrator.clearClaudeApiKey",
+        "title": "Clear Anthropic API Key",
+        "category": "Prompt Orchestrator"
       }
     ],
     "configuration": {
@@ -67,6 +77,17 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically refresh prompts when files change"
+        },
+        "promptOrchestrator.claudeModelTier": {
+          "type": "string",
+          "enum": ["opus", "sonnet", "haiku"],
+          "default": "opus",
+          "description": "Claude model tier for the Anthropic provider: opus (hard reasoning/drafting), sonnet (balanced), haiku (fast/cheap chores)"
+        },
+        "promptOrchestrator.claudeMaxTokens": {
+          "type": "number",
+          "default": 4096,
+          "description": "Maximum output tokens for Claude (Anthropic) requests"
         }
       }
     },
@@ -122,6 +143,7 @@
     "typescript-eslint": "^8.46.3"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "js-yaml": "^4.1.0"
   },
   "repository": {

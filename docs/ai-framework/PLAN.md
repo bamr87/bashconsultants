@@ -253,7 +253,7 @@ Each phase ends with something usable and is sized for incremental PRs (per AGEN
 - ✅ CI: `ai-draft.yml` — label an issue `ai-draft` → Claude scaffolds + outlines + drafts a `published:false` post → **opens a PR** (never auto-merged; hard gate asserts it stays `published:false`).
 - ⏳ Studio status board: shipped as a **CLI view** (`bashos content board`), not a Jekyll page — pre-publish posts carry `published:false`, which removes them from `site.posts`, so Liquid can't see them. A build-excluded admin page is deferred until there's a safe drafts mechanism.
 - ⏳ `ai-maintenance.yml` (link/SEO/freshness, Green auto-commits) — not yet built.
-- ⏳ Upgrade VS Code extension to a Claude provider — not yet built (separate sub-project).
+- ✅ VS Code extension upgraded to a first-class Claude provider (Anthropic Messages API + prompt caching + tiers), wired to the same prompt **and** instruction libraries; API key in Secret Storage.
 - **Key correction (discovered in build):** `draft: true` is *decorative* in this repo — Jekyll publishes it. The real not-live primitive is Jekyll-native `published: false`; the pipeline and autonomy policy were updated to gate on it.
 - **Deliverable status:** idea → AI outline+draft (`published:false`) → PR → human review → publish is wired end to end via `ai-draft.yml` + `bashos content`. Requires an `ANTHROPIC_API_KEY` repo secret to run live.
 
