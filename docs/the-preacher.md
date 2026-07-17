@@ -56,9 +56,11 @@ wolf gets tuned out.
 
 ### 3. One of two modes
 
-**Mode A — violations found → one GitHub issue.** Grouped by principle, most severe
-first, each with the fix. One issue per run; if an open `Preacher:` issue already
-exists it is updated, not duplicated. A human triages.
+**Mode A — violations found → one findings PR.** Issues are disabled on this
+repository, so violations arrive as a pull request carrying
+`docs/preacher-findings.md` — grouped by principle, most severe first, each with the
+fix. One PR per run; if an open `Preacher:` PR already exists it gets a comment, not
+a duplicate. A human triages: fix and close, or merge to keep the record.
 
 **Mode B — repo clean → mechanize one thing → a PR.** This is the mode that matters.
 The preacher picks the single highest-value recurring AI-review burden and converts it
@@ -68,7 +70,7 @@ pass is a little cheaper. **The deterministic floor rises over time; the weekly 
 shrinks.** That is the design goal, stated plainly: automate an AI responsibility until
 it is no longer one.
 
-The preacher **never pushes to main.** Issues and PRs only; a human approves. That is
+The preacher **never pushes to main.** PRs only; a human approves. That is
 AIPD, not a limitation.
 
 ## Running it

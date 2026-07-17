@@ -1,9 +1,11 @@
 # The preacher — weekly "do we practice what we preach" enforcement.
 #
 # Every Saturday, Claude adopts the preacher charter (.claude/agents/preacher.md)
-# and either (A) opens ONE GitHub issue enumerating doctrine violations, or (B) if
-# the repo is clean, mechanizes one recurring AI-review burden into a deterministic
-# check in scripts/doctrine_check.py and opens a PR. It never pushes to main.
+# and either (A) opens ONE findings PR enumerating doctrine violations (Issues
+# are disabled on this repository, so issues are not an available channel), or
+# (B) if the repo is clean, mechanizes one recurring AI-review burden into a
+# deterministic check in scripts/doctrine_check.py and opens a PR. It never
+# pushes to main.
 #
 # See docs/the-preacher.md for the full canon and how it works.
 #
@@ -12,8 +14,8 @@
 #   2. ANTHROPIC_API_KEY — workspace API key. Fallback.
 # With neither set the workflow skips gracefully with a notice instead of failing.
 #
-# Optional: PREACHER_GITHUB_TOKEN — a fine-grained PAT with Contents + Issues +
-# Pull requests read/write on this repo. PRs/issues opened with the default
+# Optional: PREACHER_GITHUB_TOKEN — a fine-grained PAT with Contents +
+# Pull requests read/write on this repo. PRs opened with the default
 # GITHUB_TOKEN cannot trigger other workflows; set this if you want the preacher's
 # PRs to kick off the normal build checks automatically.
 
@@ -31,7 +33,6 @@ on:
 
 permissions:
   contents: write
-  issues: write
   pull-requests: write
   id-token: write
 
@@ -87,7 +88,9 @@ jobs:
             You are THE PREACHER for the bashconsultants repository. Your charter
             is `.claude/agents/preacher.md` and the full canon + procedure is in
             `docs/the-preacher.md`. Read BOTH first, then execute your weekly run.
-            You never push to main — you open ONE issue or ONE pull request.
+            You never push to main — you open ONE pull request (or comment on the
+            existing preacher PR). Issues are DISABLED on this repository: never
+            call `gh issue` anything; it will fail.
 
             Optional focus for this run (ignore if blank): "${{ inputs.focus }}"
 
@@ -105,15 +108,20 @@ jobs:
             unsure, drop it — or note it as a mechanization candidate.
 
             Step 3 — choose ONE mode:
-            • VIOLATIONS FOUND (from gates or judgment): open ONE issue with
-              `gh issue create`, titled exactly:
+            • VIOLATIONS FOUND (from gates or judgment): report them through ONE
+              findings PR (Issues are disabled here). If an open PR whose title
+              starts with "Preacher:" already exists (`gh pr list --search "Preacher:"`),
+              add the new findings as a comment with `gh pr comment` instead of
+              opening a duplicate. Otherwise: write the findings to
+              `docs/preacher-findings.md`, commit it to a new branch
+              `chore/preacher-violations-<YYYY-MM-DD>`, and open a PR against main
+              with `gh pr create`, titled exactly:
                 Preacher: <N> doctrine violation(s) — week of <YYYY-MM-DD>
-              (use `date -u +%Y-%m-%d`). Group findings by principle, most severe
-              first, each with `path:line` and the fix. If an open issue whose title
-              starts with "Preacher:" already exists (`gh issue list --search "Preacher:"`),
-              update that one instead of opening a duplicate. End with a
-              "Mechanization candidate" note if any violation class could become a
-              deterministic check.
+              (use `date -u +%Y-%m-%d`), with the same findings in the PR body.
+              Group findings by principle, most severe first, each with `path:line`
+              and the fix. A human triages: fix the violations and close (or merge
+              to keep the record). End with a "Mechanization candidate" note if any
+              violation class could become a deterministic check.
             • CLEAN (no violations): this is the important path. Mechanize the single
               highest-value recurring AI-review burden into a NEW `@check(...)` in
               `scripts/doctrine_check.py`, WITH a self-test fixture, keeping it
@@ -124,7 +132,7 @@ jobs:
               check retires and why it is safe.
 
             Step 4 — print a short summary: gate results, the mode you chose, and the
-            issue or PR URL.
+            PR URL.
           claude_args: |
             --max-turns 40
-            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(python3 scripts/doctrine_check.py:*),Bash(python3 scripts/content_lint.py:*),Bash(date:*),Bash(ls:*),Bash(git:*),Bash(gh issue create:*),Bash(gh issue list:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh pr create:*),Bash(gh pr list:*)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(python3 scripts/doctrine_check.py:*),Bash(python3 scripts/content_lint.py:*),Bash(date:*),Bash(ls:*),Bash(git:*),Bash(gh pr create:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr comment:*)"
