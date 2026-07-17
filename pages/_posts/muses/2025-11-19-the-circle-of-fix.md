@@ -21,65 +21,37 @@ preview: /images/previews/the-circle-of-fix-how-to-escape-the-bug-rework-loo.png
 
 *(to the tune of a rising perfect fifth, slightly off-key)*
 
-We shipped the code to Bangalore at night,
-Thought we'd wake up to features shining bright!
-But every patch they send comes back with flair,
-A brand-new bug in every layer!
+We shipped the code to Bangalore at night, Thought we'd wake up to features shining bright! But every patch they send comes back with flair, A brand-new bug in every layer!
 
 ### Offshore support choir, sunny and upbeat
 
-Namaste, sir! Your ticket is resolved!
-We fixed the null by making three evolve!
-Please to be closing, rate us five out of five,
-Regression suite? We keep that barely alive!
+Namaste, sir! Your ticket is resolved! We fixed the null by making three evolve! Please to be closing, rate us five out of five, Regression suite? We keep that barely alive!
 
 ### The circle of fix, full company
 
 *(sung in overlapping rounds, like a fugue that never resolves)*
 
-It goes C to G to D to A,
-Then E fixes B which breaks yesterday!
-Every dominant bug spawns a subdominant twin,
-We modulate keys but the crashes stay in!
+It goes C to G to D to A, Then E fixes B which breaks yesterday! Every dominant bug spawns a subdominant twin, We modulate keys but the crashes stay in!
 
-Round and round in the Circle of Fix,
-Every perfect fifth costs us sixty-six!
-We outsource the patch, they outsource the blame,
-And the circle keeps turning, it's always the same!
+Round and round in the Circle of Fix, Every perfect fifth costs us sixty-six! We outsource the patch, they outsource the blame, And the circle keeps turning, it's always the same!
 
 ### Verse, the senior dev, world-weary baritone
 
-I once wrote clean code in the key of C-sharp,
-Now I'm chasing stack traces through functions that warp.
-They "refactored" my function to save fourteen lines,
-Now it sings in twelve tones and summons daemons at runtime.
+I once wrote clean code in the key of C-sharp, Now I'm chasing stack traces through functions that warp. They "refactored" my function to save fourteen lines, Now it sings in twelve tones and summons daemons at runtime.
 
 ### Verse, the offshore lead, cheerful soprano
 
-We work for one-fifth of your Silicon pay,
-So you get one-fifth quality, fair trade, I'd say!
-We fix it in React, then port it to Flask,
-Then wrap it in COBOL because PM asked!
+We work for one-fifth of your Silicon pay, So you get one-fifth quality, fair trade, I'd say! We fix it in React, then port it to Flask, Then wrap it in COBOL because PM asked!
 
 ### Bridge, the product manager, spoken over chaotic jazz chords
 
-"Scope is fixed, deadline is fixed, budget is fixed,
-Everything else is flexible!"
-*(Beat.)*
-"Why is nothing working?!"
+"Scope is fixed, deadline is fixed, budget is fixed, Everything else is flexible!" *(Beat.)* "Why is nothing working?!"
 
 ### Final chorus, everyone, descending into glorious chaos
 
-Circle of Fix, modulating pain!
-Every tritone resolved births a bug once again!
-We'll be here forever in seven-sharp hell,
-Pushing hotfixes nightly while stakeholders yell!
+Circle of Fix, modulating pain! Every tritone resolved births a bug once again! We'll be here forever in seven-sharp hell, Pushing hotfixes nightly while stakeholders yell!
 
-Round and round in the Circle of Fix,
-The bugs go marching four by four, hurrah? Hurrah?
-We modulate up but the quality dips,
-And the circle keeps spinning…
-*(whisper)* …send it to the Philippines.
+Round and round in the Circle of Fix, The bugs go marching four by four, hurrah? Hurrah? We modulate up but the quality dips, And the circle keeps spinning… *(whisper)* …send it to the Philippines.
 
 ### Blackout on a single unresolved dominant seventh chord. A lone support rep from the dark:
 

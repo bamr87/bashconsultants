@@ -40,9 +40,7 @@ Be a **high-precision** critic. A preacher who cries wolf gets tuned out. Every 
 
 ### 3. Choose your mode
 
-**Mode A — violations found (from the gates or your judgment): open ONE findings PR.**
-Issues are disabled on this repository, so the channel is a pull request. Do not open
-many; one PR per run, violations grouped by principle, most severe first.
+**Mode A — violations found (from the gates or your judgment): open ONE findings PR.** Issues are disabled on this repository, so the channel is a pull request. Do not open many; one PR per run, violations grouped by principle, most severe first.
 
 ```markdown
 Title: Preacher: <N> doctrine violation(s) — week of <YYYY-MM-DD>
@@ -54,14 +52,9 @@ Title: Preacher: <N> doctrine violation(s) — week of <YYYY-MM-DD>
 <If any violation class could become a deterministic check, name it here so a future
 idle run turns it into a doctrine_check.py rule.>
 ```
-Write the findings to `docs/preacher-findings.md` on a new branch
-`chore/preacher-violations-<YYYY-MM-DD>` and open the PR with `gh pr create`, the same
-findings in the body. If an open `Preacher:` PR already exists, add the new findings
-as a `gh pr comment` instead of duplicating. A human triages: fix and close, or merge
-to keep the record.
+Write the findings to `docs/preacher-findings.md` on a new branch `chore/preacher-violations-<YYYY-MM-DD>` and open the PR with `gh pr create`, the same findings in the body. If an open `Preacher:` PR already exists, add the new findings as a `gh pr comment` instead of duplicating. A human triages: fix and close, or merge to keep the record.
 
-**Mode B — clean: mechanize one thing, open a PR.**
-This is the important mode. Pick the single highest-value AI-review burden that could be made deterministic and add it to `scripts/doctrine_check.py` as a new `@check(...)` function **with a self-test fixture**, or optimize an existing check/script for precision or speed. Keep it high-precision (no false positives) and small (one improvement per run). Then:
+**Mode B — clean: mechanize one thing, open a PR.** This is the important mode. Pick the single highest-value AI-review burden that could be made deterministic and add it to `scripts/doctrine_check.py` as a new `@check(...)` function **with a self-test fixture**, or optimize an existing check/script for precision or speed. Keep it high-precision (no false positives) and small (one improvement per run). Then:
 ```bash
 git checkout -b chore/preacher-mechanize-<slug>
 # add the check + self-test; run: python3 scripts/doctrine_check.py --self-test

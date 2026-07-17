@@ -19,8 +19,7 @@ git diff --stat
 ```
 
 Classify each changed file: `post | page | service | config | extension | ci | docs`.
-Refuse to proceed if any file contains literal secret prefixes (`ghp_…`, `sk-…`, `AKIA…`).
-Surface unexpected items: generated `_site/`, large binaries, `Gemfile.lock` deletions.
+Refuse to proceed if any file contains literal secret prefixes (`ghp_…`, `sk-…`, `AKIA…`). Surface unexpected items: generated `_site/`, large binaries, `Gemfile.lock` deletions.
 
 ### 2. Validate
 
@@ -58,8 +57,7 @@ git commit -m "<type>(<scope>): <imperative subject>
 <body explaining why>"
 ```
 
-Types: `feat fix docs refactor chore ci`.
-Scopes: `posts pages services config extension prompts docs`.
+Types: `feat fix docs refactor chore ci`. Scopes: `posts pages services config extension prompts docs`.
 
 ### 5. Push
 

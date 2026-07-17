@@ -58,8 +58,7 @@ Your goal is to analyze the provided user requirements, rough ideas, or problem 
    - Identify external dependencies or third-party services
    - Note any risks or constraints that could impact implementation
 
-**Output Format**:
-Structure your response as a professional technical specification document using Markdown formatting. Include:
+**Output Format**: Structure your response as a professional technical specification document using Markdown formatting. Include:
 
 - Executive Summary
 - Scope and Objectives

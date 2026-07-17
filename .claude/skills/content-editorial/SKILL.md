@@ -5,9 +5,7 @@ description: Apply the BASH house editorial standards and run the content lint g
 
 # Content editorial gate
 
-The governed way to bring any customer-facing content to publishable quality. This is the procedure
-the site describes at `/ai-operations/` — the editorial scrutiny is written down, so the tenth page
-gets the same rigor as the first. Follow it in order; do not skip the lint.
+The governed way to bring any customer-facing content to publishable quality. This is the procedure the site describes at `/ai-operations/` — the editorial scrutiny is written down, so the tenth page gets the same rigor as the first. Follow it in order; do not skip the lint.
 
 ## Sources of truth (read, don't restate)
 
@@ -20,8 +18,7 @@ gets the same rigor as the first. Follow it in order; do not skip the lint.
 ## Procedure
 
 1. **Identify the page type** from the path and frontmatter: post (`pages/_posts/<section>/`),
-   service (`pages/_services/`), toolkit doc (`pages/_toolkit/`), or root page. Load the matching
-   instruction file(s). For a post, read its section's voice profile in `taxonomy.yml`.
+service (`pages/_services/`), toolkit doc (`pages/_toolkit/`), or root page. Load the matching instruction file(s). For a post, read its section's voice profile in `taxonomy.yml`.
 
 2. **Apply the checklist** (from `content-style.instructions.md` — the authoritative version):
    - One `H1`, rendered from `title:`. Body starts at `H2`. Headings **sentence case**, sequential
@@ -52,8 +49,7 @@ gets the same rigor as the first. Follow it in order; do not skip the lint.
    python3 scripts/content_lint.py             # lints the whole repo, exit 1 on errors
    python3 scripts/content_lint.py --warn-only # report without failing
    ```
-   It mechanically catches banned phrases, description length, heading case, undefined acronyms, and
-   trailing-period descriptions across all content. Zero errors is the bar.
+It mechanically catches banned phrases, description length, heading case, undefined acronyms, and trailing-period descriptions across all content. Zero errors is the bar.
 
 5. **Validate the build** if structure/frontmatter changed:
    ```bash
@@ -65,7 +61,4 @@ gets the same rigor as the first. Follow it in order; do not skip the lint.
 
 ## Output
 
-Report readiness as **Ready / Needs minor edits / Needs significant work**, list what you changed,
-and paste corrected frontmatter and any rewritten passages ready to drop in. For a full editorial +
-SEO + frontmatter review of a draft, delegate to the `article-reviewer-editor` agent instead — it
-carries editorial memory across sessions.
+Report readiness as **Ready / Needs minor edits / Needs significant work**, list what you changed, and paste corrected frontmatter and any rewritten passages ready to drop in. For a full editorial + SEO + frontmatter review of a draft, delegate to the `article-reviewer-editor` agent instead — it carries editorial memory across sessions.

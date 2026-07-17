@@ -32,19 +32,10 @@ Type what you're looking for — a system name like QuickBooks or QAD, a problem
 </div>
 
 <script>
-(function () {
-  'use strict';
-  // Consumes the same /search.json index as the theme's search modal
-  // (assets/js/search-modal.js) and the ?q= handoff from 404.html.
-  var form = document.querySelector('[data-page-search-form]');
-  var input = document.querySelector('[data-page-search-input]');
-  var resultsBox = document.querySelector('[data-page-search-results]');
-  var status = document.querySelector('[data-page-search-status]');
+(function () { 'use strict'; // Consumes the same /search.json index as the theme's search modal // (assets/js/search-modal.js) and the ?q= handoff from 404.html. var form = document.querySelector('[data-page-search-form]'); var input = document.querySelector('[data-page-search-input]'); var resultsBox = document.querySelector('[data-page-search-results]'); var status = document.querySelector('[data-page-search-status]');
   if (!form || !input || !resultsBox) return;
 
-  var index = null;
-  var indexPromise = null;
-  var indexAvailable = true;
+var index = null; var indexPromise = null; var indexAvailable = true;
 
   function loadIndex() {
     if (index) return Promise.resolve(index);
@@ -189,19 +180,15 @@ Type what you're looking for — a system name like QuickBooks or QAD, a problem
     runSearch(input.value, true);
   });
 
-  var debounce = null;
-  input.addEventListener('input', function () {
+var debounce = null; input.addEventListener('input', function () {
     clearTimeout(debounce);
     debounce = setTimeout(function () { runSearch(input.value, true); }, 250);
   });
 
-  // Consume the ?q= handoff (from 404.html or shared links).
-  var initial = new URLSearchParams(window.location.search).get('q');
-  if (initial) {
+// Consume the ?q= handoff (from 404.html or shared links). var initial = new URLSearchParams(window.location.search).get('q'); if (initial) {
     input.value = initial;
     runSearch(initial, false);
-  }
-})();
+} })();
 </script>
 
 ## Can't find what you need

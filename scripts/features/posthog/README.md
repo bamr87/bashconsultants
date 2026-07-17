@@ -1,10 +1,6 @@
 # `features/posthog` — server-side PostHog integration
 
-Talks to the PostHog REST API with the **personal API key** (`POSTHOG_API_KEY`,
-prefix `phx_`) held in `.env` / Actions secrets — distinct from the public
-project (write) key the site ships in `_config.yml` (`posthog.api_key`, prefix
-`phc_`, used client-side to send events). Stdlib-only Python, same discipline as
-`scripts/content_lint.py`.
+Talks to the PostHog REST API with the **personal API key** (`POSTHOG_API_KEY`, prefix `phx_`) held in `.env` / Actions secrets — distinct from the public project (write) key the site ships in `_config.yml` (`posthog.api_key`, prefix `phc_`, used client-side to send events). Stdlib-only Python, same discipline as `scripts/content_lint.py`.
 
 ## Run it
 
@@ -24,11 +20,7 @@ python3 scripts/features/posthog annotate --content "Deployed <sha>" [--dry-run]
 
 ## Config
 
-Non-secret values come from `_config.yml`'s `posthog:` block (`api_key`,
-`project_id`, `api_region`) so there is one source of truth; override with
-`POSTHOG_PROJECT_ID` / `POSTHOG_API_REGION` / `POSTHOG_PROJECT_KEY`. The secret
-personal key comes only from `POSTHOG_API_KEY` in the environment — never a
-tracked file, never logged. Create one at
+Non-secret values come from `_config.yml`'s `posthog:` block (`api_key`, `project_id`, `api_region`) so there is one source of truth; override with `POSTHOG_PROJECT_ID` / `POSTHOG_API_REGION` / `POSTHOG_PROJECT_KEY`. The secret personal key comes only from `POSTHOG_API_KEY` in the environment — never a tracked file, never logged. Create one at
 <https://us.posthog.com/settings/user-api-keys>.
 
 ## Notes

@@ -1,12 +1,8 @@
 # `features/linkedin` — company-page publisher
 
-Publishes to the BASH Consulting LinkedIn **company page**
-(`urn:li:organization:64517157`) from this repo: article link-shares of blog
-posts and standalone text updates. Stdlib-only Python (no `pip install`), same
-zero-dependency discipline as `scripts/content_lint.py`.
+Publishes to the BASH Consulting LinkedIn **company page** (`urn:li:organization:64517157`) from this repo: article link-shares of blog posts and standalone text updates. Stdlib-only Python (no `pip install`), same zero-dependency discipline as `scripts/content_lint.py`.
 
-It is the mechanical half of a **governed** pipeline — *agents draft, a human
-approves, the script posts*:
+It is the mechanical half of a **governed** pipeline — *agents draft, a human approves, the script posts*:
 
 ```
 /linkedin-draft  →  PR with a drafts/linkedin/*.md  →  human edits + merges  →  publish
@@ -25,9 +21,7 @@ python3 scripts/features/linkedin check-token                   # validate + war
 python3 scripts/features/linkedin verify --urn urn:li:share:123 # read a post back
 ```
 
-Drop `--dry-run` to post for real. `--dry-run` renders the exact JSON payload,
-resolves the canonical URL and thumbnail file, makes **zero** API calls, and
-writes nothing to the ledger — always dry-run first.
+Drop `--dry-run` to post for real. `--dry-run` renders the exact JSON payload, resolves the canonical URL and thumbnail file, makes **zero** API calls, and writes nothing to the ledger — always dry-run first.
 
 ## Commands
 
@@ -43,9 +37,7 @@ writes nothing to the ledger — always dry-run first.
 
 ## Secrets & config
 
-Secrets come from the environment **only** — local `.env` (gitignored) for dev,
-GitHub Actions secrets in CI. Never committed, never logged, never on a command
-line. See `.env.example`.
+Secrets come from the environment **only** — local `.env` (gitignored) for dev, GitHub Actions secrets in CI. Never committed, never logged, never on a command line. See `.env.example`.
 
 | Variable | Kind | Notes |
 | --- | --- | --- |
@@ -58,17 +50,11 @@ line. See `.env.example`.
 
 ## Idempotency
 
-Every published share is recorded in `.github/linkedin-log.json`, keyed by
-canonical URL. A source already in the ledger is skipped (pass `--force` to
-override). The ledger lives under `.github/` so writing it never triggers a
-Jekyll rebuild.
+Every published share is recorded in `.github/linkedin-log.json`, keyed by canonical URL. A source already in the ledger is skipped (pass `--force` to override). The ledger lives under `.github/` so writing it never triggers a Jekyll rebuild.
 
 ## Layout
 
-`config.py` settings · `net.py` HTTP + retry · `auth.py` token resolve/refresh ·
-`images.py` thumbnail upload · `posts.py` payloads + create/get · `content.py`
-frontmatter → payload (reuses `content_lint.py`'s reader + banned-phrase list) ·
-`ledger.py` idempotency · `__main__.py` CLI.
+`config.py` settings · `net.py` HTTP + retry · `auth.py` token resolve/refresh · `images.py` thumbnail upload · `posts.py` payloads + create/get · `content.py` frontmatter → payload (reuses `content_lint.py`'s reader + banned-phrase list) · `ledger.py` idempotency · `__main__.py` CLI.
 
 > Articles here are **link-shares** to site posts. The LinkedIn API cannot
 > publish native long-form LinkedIn Articles.

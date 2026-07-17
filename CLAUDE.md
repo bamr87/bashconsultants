@@ -16,9 +16,7 @@ A dual-purpose repository. Treat the two sub-projects independently — **never 
 2. **VS Code extension** (`extension/`) — *Prompt Orchestrator*, a self-contained TypeScript
    sub-project that runs the shared `.github/prompts/` library from inside the editor.
 
-The site builds **Docker-first** (host Ruby is usually too old). See [`AGENTS.md`](./AGENTS.md) for
-the cross-tool overview and [`.github/copilot-instructions.md`](./.github/copilot-instructions.md)
-for the full project reference. This file does not repeat them — it adds the Claude-native layer.
+The site builds **Docker-first** (host Ruby is usually too old). See [`AGENTS.md`](./AGENTS.md) for the cross-tool overview and [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) for the full project reference. This file does not repeat them — it adds the Claude-native layer.
 
 ## The context framework — where guidance lives
 
@@ -46,15 +44,11 @@ Four primitives, one job each. See [`.claude/README.md`](./.claude/README.md) fo
 | **Commands** | `.claude/commands/*.md` | You want a discoverable `/`-entry point that runs a common workflow (`/lint-content`, `/new-toolkit-doc`, `/brand-check`). |
 | **Memory + hooks** | `.claude/agent-memory/`, `.claude/hooks/`, `.claude/settings.json` | Agents carry decisions across sessions; hooks enforce policy automatically. |
 
-**Skills vs. prompts:** `.github/prompts/*.prompt.md` are the *cross-tool* library (Copilot, the
-extension, Cursor). `.claude/skills/` are the *Claude-native* equivalents — richer, with optional
-scripts. When both exist, prefer the skill inside Claude Code; keep the two in sync when you change a
-shared workflow.
+**Skills vs. prompts:** `.github/prompts/*.prompt.md` are the *cross-tool* library (Copilot, the extension, Cursor). `.claude/skills/` are the *Claude-native* equivalents — richer, with optional scripts. When both exist, prefer the skill inside Claude Code; keep the two in sync when you change a shared workflow.
 
 ## Operating rules
 
-These are the hard rules for working in this repo. The brand and content-style files add detail;
-these are the ones you cannot skip.
+These are the hard rules for working in this repo. The brand and content-style files add detail; these are the ones you cannot skip.
 
 1. **Minimal, surgical changes.** Match the surrounding style. Do not refactor adjacent code, and do
    not restructure the remote theme — override via `_includes/`, `_layouts/`, `_sass/`, `_data/`.
@@ -64,14 +58,11 @@ these are the ones you cannot skip.
    - Content changes → run the editorial gate (lints the whole repo, exit 1 on errors): `python3 scripts/content_lint.py`
    - Extension changes → `cd extension && npm run lint && npm run compile`
 3. **Governed content.** Customer-facing copy obeys `content-style.instructions.md` and
-   `brand.instructions.md`: no banned phrases, acronyms expanded on first use, sentence-case
-   headings, one H1, `description` 120–155 chars with no trailing period, one CTA. **Enact, don't
-   announce** — never name a piece's own creative device in reader-facing text.
+`brand.instructions.md`: no banned phrases, acronyms expanded on first use, sentence-case headings, one H1, `description` 120–155 chars with no trailing period, one CTA. **Enact, don't announce** — never name a piece's own creative device in reader-facing text.
 4. **Never invent** metrics, client names, logos, or certifications. Describe categories of work and
    what compliance frameworks require; never claim BASH is certified.
 5. **Deterministic-first.** If a step can be a script, it is a script (`scripts/`). Spend the model
-   where judgment is needed. Generated data (`_data/playbook.yml`, tool tables) comes from scripts,
-   not hand-editing — change the source, regenerate.
+where judgment is needed. Generated data (`_data/playbook.yml`, tool tables) comes from scripts, not hand-editing — change the source, regenerate.
 6. **Author is `Amr Abdel-Motaleb`.** Conventional commits: `<type>(<scope>): <subject>`
    (type ∈ `feat fix docs refactor chore ci`; scope ∈ `posts pages services config extension prompts docs toolkit`).
 7. **Update `CHANGELOG.md`** (`[Unreleased]`) for user-visible changes.
@@ -88,8 +79,7 @@ Internal cross-links use Obsidian `[[Page Title]]` syntax, resolved client-side.
 - **Pipeless only.** `[[Page Title]]` survives the kramdown GFM parser; the aliased form `[[a|b]]`
   gets mangled into a table. Reword instead of aliasing.
 - **Collection docs + non-root pages only.** The wiki index covers collection docs and pages with an
-  `output_ext` of `.html`; it does **not** index root-level pages (`tools.md`, `ai-operations.md`).
-  Link to those with a normal markdown link. Full detail: the `wikilinks` skill.
+`output_ext` of `.html`; it does **not** index root-level pages (`tools.md`, `ai-operations.md`). Link to those with a normal markdown link. Full detail: the `wikilinks` skill.
 
 ## Build stacks (know which config you're in)
 
@@ -99,5 +89,4 @@ Internal cross-links use Obsidian `[[Page Title]]` syntax, resolved client-side.
 | **GitHub Pages** | `_config.yml` alone | **Safe mode** — local `_plugins/` do **not** run in production. |
 | **Azure Static Web Apps** | `_config.yml,_config.azure.yml` | `Gemfile.azure` pins the theme as a gem. |
 
-Anything that depends on a local plugin (e.g. server-side wikilink resolution) must also work in
-Pages safe mode, or it is broken in production. Validate the change against the stack it ships on.
+Anything that depends on a local plugin (e.g. server-side wikilink resolution) must also work in Pages safe mode, or it is broken in production. Validate the change against the stack it ships on.

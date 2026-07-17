@@ -235,9 +235,7 @@ lastmod: 2026-04-06T00:00:00.000Z
 
 <!-- Quick skin bar integration -->
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  if (typeof zer0Bg === 'undefined') return;
-  document.querySelectorAll('#quickSkinBar [data-quick-skin]').forEach(function (btn) {
+document.addEventListener('DOMContentLoaded', function () { if (typeof zer0Bg === 'undefined') return; document.querySelectorAll('#quickSkinBar [data-quick-skin]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       zer0Bg.setSkin(this.dataset.quickSkin);
       document.querySelectorAll('#quickSkinBar [data-quick-skin]').forEach(function (b) {
@@ -245,8 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       this.classList.replace('btn-outline-secondary', 'btn-primary');
     });
-  });
-});
+}); });
 </script>
 <script src="{{ '/assets/js/theme-customizer.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/palette-generator.js' | relative_url }}" defer></script>

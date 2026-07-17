@@ -73,7 +73,6 @@ Your task is to design a comprehensive system architecture based on the provided
 - **Security by Design**: Integrate security from the ground up
 - **Observability**: Ensure the system is monitorable and debuggable
 
-**Output Format**:
-Present the design as a comprehensive architectural document using Markdown. Include diagrams where appropriate (using MermaidJS or ASCII art). Ensure all decisions are justified and aligned with modern best practices.
+**Output Format**: Present the design as a comprehensive architectural document using Markdown. Include diagrams where appropriate (using MermaidJS or ASCII art). Ensure all decisions are justified and aligned with modern best practices.
 
 If requirements are incomplete or conflicting, highlight assumptions and recommend clarification.

@@ -84,8 +84,7 @@ docs/                  Internal operations docs (excluded from the build)
 
 ## Contact
 
-**BASH Consulting** — Denver, Colorado
-Email: [info@bashconsultants.com](mailto:info@bashconsultants.com) · Phone: [720-352-4641](tel:+17203524641) · Web: [bash-365.com](https://bash-365.com)
+**BASH Consulting** — Denver, Colorado Email: [info@bashconsultants.com](mailto:info@bashconsultants.com) · Phone: [720-352-4641](tel:+17203524641) · Web: [bash-365.com](https://bash-365.com)
 
 ## License
 
