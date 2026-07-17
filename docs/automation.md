@@ -170,12 +170,15 @@ Steps, all with the built-in `GITHUB_TOKEN` — no extra secrets needed:
 2. **Content lint** — runs `scripts/content_lint.py --warn-only` when the
    script exists; otherwise prints a notice and moves on.
 3. **Link check** — runs `htmlproofer` against the built `_site`, internal
-   links only (`--disable-external`), ignoring `/api/` URLs since those only
-   resolve on the SWA host.
-4. **On failure** — opens a GitHub issue titled "Site health check failed"
-   with the `site-health` label, or comments on the existing open one, so
-   repeated failures never pile up duplicate issues. Close the issue after
-   fixing the underlying problem.
+   links only (`--disable-external`). Ignores `/api/` URLs (those only resolve
+   on the SWA host), the theme-emitted `/tags/…`, `/archives/…`, and bare
+   `#<tag>` anchor links (the site publishes no tag/archive index pages yet),
+   and the published `CLAUDE`/`AGENTS` agent-context pages (their relative
+   repo-file links are not site URLs).
+4. **On failure** — writes an error annotation and a step summary describing
+   the failure. Issues are disabled on this repository, so no issue is filed;
+   check the Actions tab (or the failure notification email) for red nightly
+   runs.
 
 ## Workflow: Content gardener (weekly)
 
@@ -246,8 +249,9 @@ Files:
   ledger and the flipped draft status back with `[skip ci]` so the write never
   retriggers the workflow.
 - `.github/workflows/linkedin-token-health.yml` — weekly; validates the token
-  with a cheap authenticated call and opens a `linkedin`-labeled issue when it is
-  rejected or within 7 days of its 60-day expiry.
+  with a cheap authenticated call and fails the run with an error annotation and
+  step summary when it is rejected or within 7 days of its 60-day expiry
+  (Issues are disabled on this repository, so no issue is filed).
 
 ### Activating LinkedIn publishing
 
@@ -290,13 +294,16 @@ gardener grows breadth, the curator reviews everything and chooses between depth
 breadth. Activate it the same way (a `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY`
 secret; optional `CONTENT_REVIEW_GITHUB_TOKEN`).
 
-## Workflow: PR to upstream (on push to main)
+## Workflow: PR to upstream (weekly)
 
 File: `.github/workflows/pr-to-upstream.yml`
-Trigger: every push to `main`, plus manual dispatch.
+Trigger: Mondays 15:00 UTC, plus manual dispatch. (Once the PR is open it tracks
+`main` and updates itself on every push, so a per-push trigger only re-confirmed a
+PR GitHub already keeps fresh — the weekly probe just re-opens it after a
+merge/close.)
 
 Opens (and keeps) a pull request from this fork up to the repository it was forked
-from, `amr-bash/bashconsultants`. Idempotent — it won't duplicate an already-open PR
+from, `amr-bash/bash-365.com`. Idempotent — it won't duplicate an already-open PR
 and skips when upstream is already in sync — and safe: it skips cleanly when the
 `UPSTREAM_PR_TOKEN` secret is absent (the default `GITHUB_TOKEN` can't open cross-repo
 PRs). Add a fine-grained PAT with Pull requests + Contents on the upstream repo as
@@ -310,8 +317,9 @@ an optional `focus` lens.
 
 The reflexive "practice what we preach" enforcer. It runs the deterministic gates
 (`scripts/doctrine_check.py`, `scripts/content_lint.py`) first, then does an AI
-judgment pass against the canon, and either opens ONE issue listing doctrine
-violations (Mode A) or — when the repo is clean — mechanizes one recurring AI-review
+judgment pass against the canon, and either opens ONE findings PR listing doctrine
+violations (Mode A — Issues are disabled on this repository, so the channel is a PR)
+or — when the repo is clean — mechanizes one recurring AI-review
 burden into a new check in `doctrine_check.py` and opens a PR (Mode B). It never pushes
 to `main`. Full canon and design: [`the-preacher.md`](./the-preacher.md). Activate it
 the same way as the gardener (a `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` secret;
@@ -324,7 +332,7 @@ optional `PREACHER_GITHUB_TOKEN`).
 - The chat function enforces model, token, origin, body-size, and rate
   limits server-side; a modified client can't raise them.
 - The gardener writes only to `drafts/` on a new branch, and the preacher only
-  opens issues or PRs — neither ever pushes to `main`; a human merges or closes
-  every PR. The site-health workflow has read-only repo access plus issue write.
+  opens PRs — neither ever pushes to `main`; a human merges or closes
+  every PR. The site-health workflow has read-only repo access.
 - Scheduled workflows run only from the default branch, so changes to them
   take effect after merge to `main`.
