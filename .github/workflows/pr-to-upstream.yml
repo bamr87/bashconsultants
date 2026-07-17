@@ -1,5 +1,10 @@
 # Opens (and keeps) a pull request from this fork up to the repository it was
-# forked from — amr-bash/bash-365.com — on every push to main.
+# forked from — amr-bash/bash-365.com — checked weekly.
+#
+# Once the PR is open it tracks main and updates itself on every push, so a
+# per-push trigger only re-confirms a PR that GitHub already keeps fresh. A
+# weekly probe (plus manual dispatch) is enough to re-open it after it gets
+# merged or closed.
 #
 # Why a PAT: GITHUB_TOKEN cannot create a pull request on a *different* repo, so
 # this needs a personal access token with permission to open PRs on the upstream
@@ -22,8 +27,8 @@
 name: PR to upstream (amr-bash)
 
 on:
-  push:
-    branches: [main]
+  schedule:
+    - cron: '0 15 * * 1' # Mondays 15:00 UTC — weekly probe that the upstream PR is still open
   workflow_dispatch:
 
 concurrency:
@@ -71,5 +76,5 @@ jobs:
 
           url="$(gh pr create --repo "$UPSTREAM" --base "$BRANCH" --head "${FORK_OWNER}:${BRANCH}" \
             --title "Sync from ${FORK_OWNER}/bashconsultants" \
-            --body "Automated sync from \`${FORK_OWNER}:${BRANCH}\`, opened by the \`pr-to-upstream\` workflow on a push to \`main\`. It tracks \`main\` and updates as new commits land. Merge to bring ${UPSTREAM} up to date with the fork.")"
+            --body "Automated sync from \`${FORK_OWNER}:${BRANCH}\`, opened by the \`pr-to-upstream\` workflow (weekly probe). It tracks \`main\` and updates as new commits land. Merge to bring ${UPSTREAM} up to date with the fork.")"
           echo "::notice title=Upstream PR opened::${url}"
