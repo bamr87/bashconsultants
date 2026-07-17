@@ -3,8 +3,10 @@
 # LinkedIn access tokens expire 60 days after generation, and programmatic
 # refresh is gated to approved partners — so the realistic failure mode is a
 # silently dead token. This validates the token with a cheap authenticated call
-# and, when it is rejected or within a week of expiry, opens (or comments on) a
-# single deduplicated issue so a human can regenerate it before publishing breaks.
+# and, when it is rejected or within a week of expiry, fails the run with an
+# error annotation and step summary so a human can regenerate it before
+# publishing breaks. (Issues are disabled on this repository, so an
+# issue-based alert can never land here.)
 #
 # Needs LINKEDIN_ACCESS_TOKEN; skips gracefully when it is absent.
 
@@ -17,7 +19,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   group: linkedin-token-health
@@ -62,25 +63,22 @@ jobs:
           LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION }}
         run: python3 scripts/features/linkedin check-token --warn-days 7
 
-      - name: Open or update token-expiry issue
+      # Issues are disabled on this fork, so a `gh issue create` alert would
+      # fail exactly when the token dies. Annotate + summarize instead;
+      # restore an issue alert only if Issues are ever enabled.
+      - name: Report token problem in the run summary
         if: failure() && steps.gate.outputs.ready == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          title="LinkedIn token needs attention"
           run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           stamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          gh label create linkedin --color 0A66C2 --description "LinkedIn automation" --force 2>/dev/null || true
-          existing="$(gh issue list --state open --label linkedin \
-            --search "\"$title\" in:title" --json number --jq '.[0].number // empty')"
-          body="The LinkedIn access token is rejected or within 7 days of its 60-day expiry (checked ${stamp}).
-
-          Fix: generate a new token at https://www.linkedin.com/developers/tools/oauth/token-generator (scopes w_organization_social r_organization_social, authorized by a page admin) and update the LINKEDIN_ACCESS_TOKEN secret — or, if programmatic refresh is enabled for the app, run \`python3 scripts/features/linkedin refresh-token\`.
-
-          Run: ${run_url}"
-          if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body "Still needs attention at ${stamp}: ${run_url}"
-          else
-            gh issue create --title "$title" --label linkedin --body "$body"
-          fi
+          echo "::error title=LinkedIn token needs attention::Token rejected or within 7 days of its 60-day expiry (checked ${stamp}) — see ${run_url}"
+          {
+            echo "## LinkedIn token needs attention"
+            echo
+            echo "The LinkedIn access token is rejected or within 7 days of its 60-day expiry (checked ${stamp})."
+            echo
+            echo "Fix: generate a new token at https://www.linkedin.com/developers/tools/oauth/token-generator (scopes w_organization_social r_organization_social, authorized by a page admin) and update the LINKEDIN_ACCESS_TOKEN secret — or, if programmatic refresh is enabled for the app, run \`python3 scripts/features/linkedin refresh-token\`."
+            echo
+            echo "Issues are disabled on this repository, so no issue is filed."
+          } >> "$GITHUB_STEP_SUMMARY"

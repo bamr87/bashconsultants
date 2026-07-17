@@ -40,7 +40,6 @@ on:
 
 permissions:
   contents: write   # commit the ledger + flipped draft status back
-  issues: write     # open a failure issue
 
 concurrency:
   group: linkedin-publish
@@ -123,25 +122,22 @@ jobs:
             git push
           fi
 
-      - name: Open or update failure issue
+      # Issues are disabled on this fork, so a `gh issue create` alert would
+      # fail exactly when publishing breaks. Annotate + summarize instead;
+      # restore an issue alert only if Issues are ever enabled.
+      - name: Report failure in the run summary
         if: failure() && steps.gate.outputs.ready == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          title="LinkedIn publish failed"
           run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           stamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          gh label create linkedin --color 0A66C2 --description "LinkedIn automation" --force 2>/dev/null || true
-          existing="$(gh issue list --state open --label linkedin \
-            --search "\"$title\" in:title" --json number --jq '.[0].number // empty')"
-          if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body "Still failing at ${stamp}: ${run_url}"
-          else
-            gh issue create --title "$title" --label linkedin \
-              --body "LinkedIn publish run failed at ${stamp}.
-
-          Run: ${run_url}
-
-          Common causes: an expired 60-day access token (regenerate it, or run the LinkedIn token health workflow), a banned phrase in the commentary, or a LinkedIn API error. See the run log."
-          fi
+          echo "::error title=LinkedIn publish failed::Publish run failed at ${stamp} — see ${run_url}"
+          {
+            echo "## LinkedIn publish failed"
+            echo
+            echo "Failed at ${stamp}."
+            echo
+            echo "Common causes: an expired 60-day access token (regenerate it, or run the LinkedIn token health workflow), a banned phrase in the commentary, or a LinkedIn API error. See the run log."
+            echo
+            echo "Issues are disabled on this repository, so no issue is filed."
+          } >> "$GITHUB_STEP_SUMMARY"
