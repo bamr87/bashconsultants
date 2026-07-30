@@ -1,8 +1,8 @@
-"""Config, frontmatter, and on-disk state for shiplog.
+"""Config, frontmatter, and on-disk state for zer0-distribute.
 
-Everything shiplog knows lives in files inside the user's own repository:
-config in `shiplog.toml`, pending drafts in `.shiplog/queue/`, and the
-published record in `.shiplog/ledger.json`. There is no server and no account,
+Everything zer0-distribute knows lives in files inside the user's own repository:
+config in `zer0-distribute.toml`, pending drafts in `.zer0-distribute/queue/`, and the
+published record in `.zer0-distribute/ledger.json`. There is no server and no account,
 so there is nothing to sign into and nothing to migrate off.
 """
 
@@ -14,8 +14,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 QUEUE_DIRNAME = "queue"
-STATE_DIRNAME = ".shiplog"
-CONFIG_NAME = "shiplog.toml"
+STATE_DIRNAME = ".zer0-distribute"
+CONFIG_NAME = "zer0-distribute.toml"
 
 # A draft moves pending -> approved -> published. `publish` only ever reads
 # `approved`, which is the whole point: the gate is a state a person sets.
@@ -25,7 +25,7 @@ STATUS_PUBLISHED = "published"
 STATUS_ORDER = [STATUS_PENDING, STATUS_APPROVED, STATUS_PUBLISHED]
 
 STARTER_CONFIG = '''\
-# shiplog — publish what you ship.
+# zer0-distribute — publish what you ship.
 # Everything here is yours to edit; nothing is inferred from LinkedIn.
 
 [author]
@@ -45,7 +45,7 @@ include_tags = true
 include_commits = true
 commit_types = ["feat", "fix", "perf"]
 
-# Audience profiles are DECLARED, not derived. shiplog never reads your
+# Audience profiles are DECLARED, not derived. zer0-distribute never reads your
 # connections or anyone's profile to guess who you are writing for.
 [[audience]]
 id = "backend-hiring"
@@ -115,7 +115,7 @@ class Config:
 
 
 def load_config(root: Path) -> Config:
-    """Read `shiplog.toml`. A missing file yields usable defaults, so every
+    """Read `zer0-distribute.toml`. A missing file yields usable defaults, so every
     command works in a repository that has not run `init` yet."""
     cfg = Config(root=root)
     path = root / CONFIG_NAME
@@ -207,6 +207,16 @@ class Draft:
     @property
     def title(self) -> str:
         return str(self.meta.get("title", self.id))
+
+    @property
+    def content_path(self) -> str:
+        """The page this distributes, when it came from the CMS index. Empty for
+        a repository-derived draft, which has no row in the content index."""
+        return str(self.meta.get("content_path", ""))
+
+    @property
+    def collection(self) -> str:
+        return str(self.meta.get("collection", ""))
 
 
 def read_draft(path: Path) -> Draft:

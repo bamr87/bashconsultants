@@ -1,7 +1,7 @@
 """Turn a source into a LinkedIn draft, written for a declared audience.
 
 **Audience is declared, never derived.** The profiles used here come from the
-developer's own `shiplog.toml`. shiplog does not read connections, followers,
+developer's own `zer0-distribute.toml`. zer0-distribute does not read connections, followers,
 or anyone's profile to infer who the reader is — there is no code path that
 requests member data, and adding one would be a change to this contract, not
 an implementation detail.
@@ -66,6 +66,8 @@ def _closing(audience: Audience | None, source: Source) -> str:
     The audience's `reads_for` is a note to the writer, not copy — splicing it
     into a sentence produces the kind of line nobody says out loud.
     """
+    if source.kind == "content":
+        return "Full piece is linked — happy to talk through any of it."
     if source.kind == "tag":
         return f"Code and changelog are public if you want the detail on {source.ref}."
     if source.kind == "changelog":
@@ -78,6 +80,14 @@ def _closing(audience: Audience | None, source: Source) -> str:
 def _template(source: Source, audience: Audience | None) -> str:
     """A hook that earns the click, the substance, then one ask."""
     who = f" for {audience.label.lower()}" if audience and audience.label else ""
+
+    # A page out of the CMS index: the commentary is the hook above the link
+    # card, so it must not restate the title the card already shows.
+    if source.kind == "content":
+        return (
+            f"{source.detail}\n\n"
+            f"{_closing(audience, source)}"
+        )
 
     if source.kind == "tag":
         return (
@@ -143,4 +153,9 @@ def draft_for(cfg: Config, source: Source, audience_id: str = "") -> Draft:
         "author": cfg.author_urn(),
         "status": STATUS_PENDING,
     }
+    # The join key for the whole feedback loop: engagement comes back keyed by
+    # post URN, and this is what lets it land on the page that earned it.
+    if source.content_path:
+        meta["content_path"] = source.content_path
+        meta["collection"] = source.collection
     return Draft(path=cfg.queue_dir / f"{slug}.md", meta=meta, body=composed.body)

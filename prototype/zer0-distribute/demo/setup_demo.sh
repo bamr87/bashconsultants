@@ -3,13 +3,13 @@
 #
 # It stands in for a normal developer's project: a real git history with
 # conventional commits, an annotated release tag, a CHANGELOG, and a doc the
-# author wrote. shiplog reads exactly these — nothing is staged or faked for
+# author wrote. zer0-distribute reads exactly these — nothing is staged or faked for
 # the camera beyond the repository itself.
 #
-# Usage:  ./setup_demo.sh [target-dir]      (default: /tmp/shiplog-demo)
+# Usage:  ./setup_demo.sh [target-dir]      (default: /tmp/zer0-distribute-demo)
 set -euo pipefail
 
-TARGET="${1:-/tmp/shiplog-demo}"
+TARGET="${1:-/tmp/zer0-distribute-demo}"
 rm -rf "$TARGET"
 mkdir -p "$TARGET/docs"
 cd "$TARGET"
@@ -83,8 +83,8 @@ commit "feat(worker): backpressure when a worker falls behind" "2026-07-24T09:55
 GIT_COMMITTER_DATE="2026-07-24T10:00:00" git tag -a v0.6.0 \
   -m "Backpressure, per-job visibility timeouts, and a drain command for deploys."
 
-cat > shiplog.toml <<'EOF'
-# shiplog — publish what you ship.
+cat > zer0-distribute.toml <<'EOF'
+# zer0-distribute — publish what you ship.
 
 [author]
 kind = "member"

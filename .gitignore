@@ -39,3 +39,7 @@ __pycache__/
 
 # Generated at build time by _plugins/content_statistics_generator.rb
 _data/content_statistics.yml
+
+# Python bytecode from the prototype
+__pycache__/
+*.pyc

@@ -3,23 +3,23 @@
 # a few posts already published (so the track record has something in it) and
 # drafts waiting for a human (so the approval gate can be demonstrated).
 #
-# Every draft here is composed by shiplog from the demo repo's own git history
+# Every draft here is composed by zer0-distribute from the demo repo's own git history
 # and files. Nothing is hand-written for the camera.
 #
-# Usage:  ./seed_state.sh [demo-dir]        (default: /tmp/shiplog-demo)
+# Usage:  ./seed_state.sh [demo-dir]        (default: /tmp/zer0-distribute-demo)
 set -euo pipefail
 
-TARGET="${1:-/tmp/shiplog-demo}"
+TARGET="${1:-/tmp/zer0-distribute-demo}"
 SHIPLOG="$(cd "$(dirname "$0")/.." && pwd)"
 run() { python3 "$SHIPLOG" --root "$TARGET" "$@"; }
 
-rm -rf "$TARGET/.shiplog"
+rm -rf "$TARGET/.zer0-distribute"
 
 # --- history: published posts, backdated, so `portfolio` has real numbers ----
 seed_published() {
   run draft "$1" --audience "$2" >/dev/null
   run record "$3" --at "$4" --urn "urn:li:share:demo-$3" >/dev/null
-  rm -f "$TARGET/.shiplog/queue/$3.md"
+  rm -f "$TARGET/.zer0-distribute/queue/$3.md"
 }
 
 seed_published "changelog:0-5-0"      peer-devs      "changelog-0-5-0"     "2026-05-21T15:00:00Z"

@@ -1,10 +1,20 @@
-"""shiplog — publish what you ship.
+"""zer0-distribute — the distribution lane of zer0-CMS.
 
-    python3 prototype/shiplog <command> [options]
+    python3 prototype/zer0-distribute <command> [options]
 
-A developer's publishing tool: it reads the work you already wrote down in a
-repository and turns it into LinkedIn posts, so a track record accumulates in
-public. Standard library only, so there is nothing to install.
+The CMS engine indexes and scores content. The authoring surface edits it. The
+theme renders it. This lane carries it off the site — to LinkedIn today — and
+brings the audience's response back into `.cms/` so the next thing written is
+chosen on evidence instead of instinct.
+
+The loop, end to end:
+
+    write ──▶ publish ──▶ engage ──▶ cater ──▶ write
+      │          │           │         │
+   authoring  this lane   this lane  catering worklist
+   (zer0-CMS)                        (.cms/distribution/worklists/)
+
+Standard library only, so there is nothing to install.
 
 The gate that matters: a draft is created `pending`, a person moves it to
 `approved`, and only then will `publish` send it. There is no scheduler and no
@@ -23,7 +33,11 @@ HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
+import analytics as analytics_mod                         # noqa: E402
+import catering as catering_mod                           # noqa: E402
 import compose                                            # noqa: E402
+import contract as contract_mod                           # noqa: E402
+import media as media_mod                                 # noqa: E402
 import payload as payload_mod                             # noqa: E402
 import portfolio as portfolio_mod                         # noqa: E402
 import sources as sources_mod                             # noqa: E402
@@ -38,6 +52,7 @@ from core import (                                        # noqa: E402
     already_published,
     find_draft,
     load_config,
+    load_ledger,
     load_queue,
     write_draft,
 )
@@ -71,24 +86,156 @@ def cmd_init(cfg: Config, args) -> int:
 
 
 def cmd_sources(cfg: Config, args) -> int:
-    found = sources_mod.discover(cfg)
+    contract = contract_mod.load(cfg.root)
+    found = sources_mod.discover(cfg, contract)
     if not found:
-        print("no publishable sources found — check [sources] in shiplog.toml")
+        print("no publishable sources found — check [sources] in zer0-distribute.toml")
         return 0
-    print(f"{len(found)} publishable source(s) in {cfg.root.name}:\n")
+    if contract.present:
+        print(f"CMS index: {len(contract.records)} file(s), "
+              f"{len(contract.distributable())} distributable "
+              f"(indexed {contract.generated_at or 'unknown'})")
+    else:
+        print("no .cms/ contract — falling back to git and the filesystem")
+    print(f"\n{len(found)} publishable source(s) in {cfg.root.name}:\n")
     for source in found:
         print(f"  {source.id}")
-        print(f"    {source.kind:<10} {source.title}")
+        badge = f"health {source.health} · {source.freshness}" if source.from_cms else source.kind
+        print(f"    {badge}")
+        print(f"    {source.title}")
         if source.short:
-            print(f"    {'':<10} {source.short}")
+            print(f"    {source.short}")
         print()
     print("Compose one:  draft <source-id> --audience <audience-id>")
     return 0
 
 
+def cmd_cms(cfg: Config, args) -> int:
+    """What the contract says, and what this lane adds to it."""
+    contract = contract_mod.load(cfg.root)
+    if not contract.present:
+        print(f"no .cms/ contract at {contract.cms_dir}")
+        print("\nThis lane works without one — `sources` falls back to git and the")
+        print("filesystem. With one, publishable content comes from the same index")
+        print("the authoring surface reads. Build it with: cms.py index")
+        return 0
+    summary = contract.summary
+    print(f".cms/ contract  (indexed {contract.generated_at or 'unknown'})")
+    print(f"  files           {len(contract.records)}")
+    print(f"  distributable   {len(contract.distributable())} "
+          f"(health >= {contract_mod.PUBLISHABLE_HEALTH}, not draft/generated/structural)")
+    if summary.get("avg_health") is not None:
+        print(f"  avg health      {summary['avg_health']}")
+    by_collection = {}
+    for record in contract.distributable():
+        by_collection[record.collection] = by_collection.get(record.collection, 0) + 1
+    if by_collection:
+        pairs = ", ".join(f"{k} {v}" for k, v in sorted(by_collection.items(), key=lambda kv: -kv[1]))
+        print(f"  by collection   {pairs}")
+    perf = contract_mod.load_performance(contract)
+    print(f"\n  distribution lane -> {contract.distribution_dir}")
+    print(f"  performance     {len(perf)} page(s) with audience data")
+    published = {d.content_path for d in load_queue(cfg) if d.content_path}
+    print(f"  distributed     {len(published)} page(s) drafted or published")
+    return 0
+
+
+def cmd_media(cfg: Config, args) -> int:
+    """Which image a page would share with — reused from the site, not made here."""
+    contract = contract_mod.load(cfg.root)
+    records = contract.distributable()
+    if args.content:
+        record = contract.by_path(args.content)
+        records = [record] if record else []
+        if not records:
+            print(f"no indexed content matches '{args.content}'")
+            return 1
+    if not records:
+        print("no distributable content to check")
+        return 0
+    missing = 0
+    for record in records[:20]:
+        found = media_mod.resolve(cfg.root, record)
+        mark = "ok  " if found.found else "MISS"
+        print(f"  [{mark}] {record.path}")
+        print(f"          {found.describe()}")
+        if not found.found:
+            missing += 1
+    if missing:
+        print(f"\n{missing} page(s) have no preview image. zer0-image-generator makes them;")
+        print("this lane only reuses what it produced.")
+    return 0
+
+
+def cmd_analytics(cfg: Config, args) -> int:
+    """Show the read surface, or ingest statistics from a file."""
+    contract = contract_mod.load(cfg.root)
+    if not args.ingest:
+        print(analytics_mod.describe_plan(cfg))
+        perf = contract_mod.load_performance(contract)
+        print(f"\nStored: {len(perf)} page(s) with audience data"
+              f" ({contract_mod.performance_path(contract)})")
+        if not perf:
+            print("Ingest some: analytics --ingest <file.json>   (keyed by post URN)")
+        return 0
+
+    path = Path(args.ingest)
+    if not path.exists():
+        print(f"no such file: {path}")
+        return 1
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as err:
+        print(f"could not parse {path}: {err}")
+        return 1
+    stats = raw.get("posts", raw) if isinstance(raw, dict) else {}
+    if not isinstance(stats, dict):
+        print("expected an object keyed by post URN")
+        return 1
+    merged, matched = analytics_mod.ingest(cfg, contract, stats)
+    print(f"ingested {matched} of {len(stats)} post(s) -> "
+          f"{contract_mod.performance_path(contract)}")
+    if matched < len(stats):
+        print("Unmatched URNs have no ledger entry, so there is no page to attribute them to.")
+    print(f"{len(merged)} page(s) now carry audience data. Next: cater")
+    return 0
+
+
+def cmd_cater(cfg: Config, args) -> int:
+    """What to write next, from how the audience responded."""
+    contract = contract_mod.load(cfg.root)
+    performance = contract_mod.load_performance(contract)
+    published = {
+        str(e.get("content_path") or "")
+        for e in load_ledger(cfg)
+        if e.get("content_path")
+    }
+    plan = catering_mod.build(contract, performance, published)
+    date = args.date or _now()[:10]
+    body = catering_mod.render(plan, date)
+
+    if args.print:
+        print(body)
+        return 0
+    if not contract.present:
+        print("no .cms/ contract — nothing to write a worklist into.")
+        print("Run with --print to see it anyway.")
+        return 1
+    path = contract_mod.write_worklist(contract, date, body)
+    print(f"wrote {path}")
+    print(f"  Lane A  {len(plan.undistributed)} strong page(s) never distributed")
+    if plan.has_evidence:
+        print(f"  Lane B  {len(plan.proven)} topic(s) at or above median engagement")
+        print(f"  Lane C  {len(plan.quiet)} topic(s) below it")
+        print(f"  Lane D  {len(plan.refresh)} page(s) that worked and went stale")
+    else:
+        print("  Lanes B-D  no audience data yet — rankings left empty, not guessed")
+    return 0
+
+
 def cmd_audience(cfg: Config, args) -> int:
     if not cfg.audiences:
-        print("no audience profiles declared — add [[audience]] blocks to shiplog.toml")
+        print("no audience profiles declared — add [[audience]] blocks to zer0-distribute.toml")
         return 0
     print(f"{len(cfg.audiences)} declared audience profile(s):\n")
     for aud in cfg.audiences:
@@ -101,7 +248,7 @@ def cmd_audience(cfg: Config, args) -> int:
         if aud.hashtags:
             print(f"    hashtags: {' '.join('#' + t for t in aud.hashtags)}")
         print()
-    print("Declared by you in config. shiplog never reads your connections to guess.")
+    print("Declared by you in config. zer0-distribute never reads your connections to guess.")
     return 0
 
 
@@ -233,6 +380,9 @@ def cmd_record(cfg: Config, args) -> int:
         "hashtags": _hashtags(draft.body),
         "published_at": args.at or _now(),
         "urn": args.urn or "",
+        # Carried so analytics can join engagement back onto the page.
+        "content_path": draft.content_path,
+        "collection": draft.collection,
     }
     append_ledger(cfg, entry)
     draft.meta["status"] = STATUS_PUBLISHED
@@ -262,12 +412,13 @@ def cmd_self_test(cfg: Config, args) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="shiplog", description="Publish what you ship."
+        prog="zer0-distribute",
+        description="The distribution lane of zer0-CMS: publish, engage, cater.",
     )
     parser.add_argument("--root", default=".", help="repository root (default: cwd)")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p = sub.add_parser("init", help="write a starter shiplog.toml")
+    p = sub.add_parser("init", help="write a starter zer0-distribute.toml")
     p.add_argument("--force", action="store_true")
     p.set_defaults(func=cmd_init)
 
@@ -301,6 +452,21 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_record)
 
     sub.add_parser("portfolio", help="your published track record").set_defaults(func=cmd_portfolio)
+
+    sub.add_parser("cms", help="what the .cms/ contract says").set_defaults(func=cmd_cms)
+
+    p = sub.add_parser("media", help="which preview image each page would share with")
+    p.add_argument("content", nargs="?", default="")
+    p.set_defaults(func=cmd_media)
+
+    p = sub.add_parser("analytics", help="the read surface, or ingest statistics")
+    p.add_argument("--ingest", default="", help="JSON keyed by post URN")
+    p.set_defaults(func=cmd_analytics)
+
+    p = sub.add_parser("cater", help="what to write next, from audience response")
+    p.add_argument("--print", action="store_true", help="print instead of writing")
+    p.add_argument("--date", default="", help="worklist date (default: today)")
+    p.set_defaults(func=cmd_cater)
 
     p = sub.add_parser("serve", help="local review dashboard")
     p.add_argument("--host", default="127.0.0.1")

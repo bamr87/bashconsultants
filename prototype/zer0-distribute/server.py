@@ -83,6 +83,13 @@ pre.json{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:1
 .tags{margin-top:7px}
 .tag{display:inline-block;background:#0d2d4e;color:#79c0ff;font-size:11px;padding:1px 8px;border-radius:20px;margin-right:5px}
 .empty{color:#7d8590;font-size:13px;background:#161b22;border:1px dashed #30363d;border-radius:9px;padding:18px;text-align:center}
+.lane{font-size:12.5px;font-weight:650;margin-bottom:3px;display:flex;align-items:center;gap:7px}
+.hint{color:#7d8590;font-size:11.5px;line-height:1.5;margin-bottom:9px}
+table.mini{width:100%;border-collapse:collapse;font-size:12px}
+table.mini th{text-align:left;color:#7d8590;font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 6px 4px 0;border-bottom:1px solid #21262d}
+table.mini td{padding:4px 6px 4px 0;border-bottom:1px solid #161b22;color:#c9d1d9}
+table.mini td.sm{font-size:11px;color:#8b949e}
+table.mini td.hot{color:#56d364;font-weight:600}
 """
 
 
@@ -172,6 +179,71 @@ def _portfolio_panel(cfg: Config) -> str:
       <div class="tags">{topics}</div></div>"""
 
 
+def _cater_panel(cfg: Config) -> str:
+    """The loop's return leg: what the audience's response says to write next."""
+    import analytics as analytics_mod
+    import catering as catering_mod
+    import contract as contract_mod
+    from core import load_ledger
+
+    contract = contract_mod.load(cfg.root)
+    if not contract.present:
+        return (
+            '<div class="empty">No <span class="mono">.cms/</span> index.<br>'
+            "Discovery is falling back to git and the filesystem.</div>"
+        )
+    performance = contract_mod.load_performance(contract)
+    published = {
+        str(e.get("content_path") or "") for e in load_ledger(cfg) if e.get("content_path")
+    }
+    plan = catering_mod.build(contract, performance, published)
+
+    head = f"""
+    <div class="stats">
+      <div class="stat"><div class="v">{len(contract.distributable())}</div><div class="k">Distributable</div></div>
+      <div class="stat"><div class="v">{len(published)}</div><div class="k">Distributed</div></div>
+      <div class="stat"><div class="v">{plan.observations}</div><div class="k">With data</div></div>
+    </div>"""
+
+    lane_a = "".join(
+        f'<tr><td class="mono">{_esc(r.health if r.health >= 0 else "—")}</td>'
+        f'<td>{_esc(r.collection)}</td><td class="mono sm">{_esc(r.path)}</td></tr>'
+        for r in plan.undistributed[:6]
+    )
+    a_html = (
+        f'<div class="card"><div class="lane">Lane A — publish what exists '
+        f'<span class="n">{len(plan.undistributed)}</span></div>'
+        f'<div class="hint">Scores well, never published. No writing required.</div>'
+        f'<table class="mini"><tr><th>Health</th><th>Collection</th><th>Page</th></tr>{lane_a}</table></div>'
+        if plan.undistributed
+        else '<div class="card"><div class="lane">Lane A</div>'
+        '<div class="hint">Everything publishable has been distributed.</div></div>'
+    )
+
+    if not plan.has_evidence:
+        b_html = (
+            '<div class="card"><div class="lane">Lane B — write more of what landed</div>'
+            '<div class="hint">No audience data yet. Topic rankings need published posts '
+            "with statistics read back, so this is empty rather than guessed.</div></div>"
+        )
+    else:
+        rows = "".join(
+            f'<tr><td>{_esc(s.topic)}</td><td class="mono">{s.posts}</td>'
+            f'<td class="mono">{s.impressions:,}</td>'
+            f'<td class="mono hot">{s.rate:.2%}</td></tr>'
+            for s in plan.proven
+        ) or '<tr><td colspan="4" class="hint">Not enough observations yet.</td></tr>'
+        b_html = (
+            '<div class="card"><div class="lane">Lane B — write more of what landed</div>'
+            f'<div class="hint">Aggregate numbers from your own posts, grouped by your own '
+            f'collections. Nothing about who engaged.</div>'
+            f'<table class="mini"><tr><th>Topic</th><th>Posts</th><th>Impr.</th>'
+            f'<th>Rate</th></tr>{rows}</table></div>'
+        )
+
+    return head + a_html + b_html
+
+
 def _audience_panel(cfg: Config) -> str:
     if not cfg.audiences:
         return '<div class="empty">No audience profiles declared.</div>'
@@ -184,7 +256,7 @@ def _audience_panel(cfg: Config) -> str:
         for a in cfg.audiences
     )
     return cards + (
-        '<div class="note">You declared these. shiplog does not read your '
+        '<div class="note">You declared these. zer0-distribute does not read your '
         "connections or anyone's profile to infer an audience.</div>"
     )
 
@@ -202,10 +274,10 @@ def render_page(cfg: Config) -> str:
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>shiplog — review</title><style>{STYLE}</style></head><body>
+<title>zer0-distribute — review</title><style>{STYLE}</style></head><body>
 <header>
-  <h1><span class="p">$</span> shiplog</h1>
-  <span class="sub">publish what you ship</span>
+  <h1><span class="p">$</span> zer0-distribute</h1>
+  <span class="sub">the distribution lane of zer0-CMS — publish, engage, cater</span>
   <div class="id"><b>{_esc(identity)}</b>{_esc(urn)}</div>
 </header>
 <main>
@@ -217,6 +289,7 @@ def render_page(cfg: Config) -> str:
   </div>
   <div>
     <section><h2>Outgoing request</h2>{_payload_panel(cfg, drafts)}</section>
+    <section><h2>What to write next <span class="n">from analytics</span></h2>{_cater_panel(cfg)}</section>
     <section><h2>Your track record</h2>{_portfolio_panel(cfg)}</section>
     <section><h2>Writing for</h2>{_audience_panel(cfg)}</section>
   </div>
@@ -225,7 +298,7 @@ def render_page(cfg: Config) -> str:
 
 class Handler(BaseHTTPRequestHandler):
     cfg: Config
-    server_version = "shiplog"
+    server_version = "zer0-distribute"
 
     def log_message(self, fmt, *args):  # quieter terminal during a demo
         return
@@ -265,7 +338,7 @@ class Handler(BaseHTTPRequestHandler):
 def serve(cfg: Config, host="127.0.0.1", port=8765, open_once=False) -> int:
     Handler.cfg = cfg
     httpd = ThreadingHTTPServer((host, port), Handler)
-    print(f"shiplog review dashboard: http://{host}:{port}")
+    print(f"zer0-distribute review dashboard: http://{host}:{port}")
     print("Approve a draft there, then run `publish`. Ctrl-C to stop.")
     try:
         if open_once:

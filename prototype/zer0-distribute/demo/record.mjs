@@ -1,7 +1,7 @@
-// Record the shiplog review dashboard as a screen capture.
+// Record the zer0-distribute review dashboard as a screen capture.
 //
 // This drives the real prototype in a real browser: the dashboard is served by
-// `shiplog serve` from actual files on disk, and the Approve click actually
+// `zer0-distribute serve` from actual files on disk, and the Approve click actually
 // writes to the queue. Nothing on screen is a mock-up, and nothing is a
 // re-enactment — the video is whatever the app did.
 //
