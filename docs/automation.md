@@ -153,7 +153,7 @@ with a cheap authenticated call and fails the run with an error annotation and s
 
 ### Activating LinkedIn publishing
 
-The app must already have Community Management API access (scopes `w_organization_social` + `r_organization_social`). Then:
+The app must already have Community Management API access (scopes `w_organization_social` + `r_organization_social`) — the submitted application answer is [`linkedin-api-application.md`](./linkedin-api-application.md). Then:
 
 1. Generate a 60-day token at
    <https://www.linkedin.com/developers/tools/oauth/token-generator>, authorized
