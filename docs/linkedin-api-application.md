@@ -8,8 +8,7 @@ The text we submit for the LinkedIn Developer application question:
 
 Access to that API is the prerequisite for everything in [`automation.md`](./automation.md#workflow-linkedin-publishing) — the publisher cannot post without the `w_organization_social` + `r_organization_social` scopes. Keep this answer factual and in step with what `scripts/features/linkedin/` actually does; reviewers reject vague submissions, and a claim we cannot back is worse than a short answer. `docs/` is excluded from the Jekyll build, so this never ships as a page.
 
-**Why the roadmap is in the answer.** Managing a page we do not own is a different
-kind of access than publishing to our own, and LinkedIn reviews it separately. Disclosing the intent up front — with the boundary stated plainly — is better than having a multi-organization product surface later against a grant that was approved as first-party. The present-tense claims and the forward-looking ones are kept in separate sections on purpose; do not blur them when editing.
+**Why the roadmap is in the answer.** Managing a page we do not own is a different kind of access than publishing to our own, and LinkedIn reviews it separately. Disclosing the intent up front — with the boundary stated plainly — is better than having a multi-organization product surface later against a grant that was approved as first-party. The present-tense claims and the forward-looking ones are kept in separate sections on purpose; do not blur them when editing.
 
 ## The answer (paste as plain text)
 
