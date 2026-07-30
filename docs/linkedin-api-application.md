@@ -9,104 +9,98 @@ The text we submit for the LinkedIn Developer application. The form asks two thi
 > *For each use case below, please provide a detailed description. What use case
 > does your organization plan to enable with the Community Management APIs?*
 > **Page management** — create and manage company posts, comments, and reactions,
-> and monitor engagement. **Page analytics** — track post analytics and
-> performance. **Profile management** — create and manage posts, comments, and
-> reactions, and monitor engagement, on behalf of individual profiles.
+> and monitor engagement. **Profile management** — the same, on behalf of
+> individual profiles. **Page analytics** — track post analytics and performance.
 
-Access to that API is the prerequisite for everything in [`automation.md`](./automation.md#workflow-linkedin-publishing) — the publisher cannot post without the `w_organization_social` + `r_organization_social` scopes. Keep this answer factual and in step with what `scripts/features/linkedin/` actually does; reviewers reject vague submissions, and a claim we cannot back is worse than a short answer. `docs/` is excluded from the Jekyll build, so this never ships as a page.
+> *Please provide a screen recording of the application for this submission.*
 
-**Why the roadmap is in the answer.** Managing a page we do not own is a different kind of access than publishing to our own, and LinkedIn reviews it separately. Disclosing the intent up front — with the boundary stated plainly — is better than having a multi-organization product surface later against a grant that was approved as first-party. The present-tense claims and the forward-looking ones are kept in separate sections on purpose; do not blur them when editing.
+The app under review is **shiplog** ([`prototype/shiplog/`](../prototype/shiplog/)), a publishing tool for developers. The recording and how to reproduce it: [`prototype/shiplog/demo/`](../prototype/shiplog/demo/).
+
+**Read this before editing.** The application is for a product with individual developers as its users, so **Profile management is the primary use case** — a developer publishing to their own profile. That is a larger ask than a company posting to its own page, and it will be read more carefully. Three things carry the application, and weakening any of them turns it into the kind of request LinkedIn refuses: every post is approved by the person whose name goes on it, each developer authorizes their own account through their own consent, and the audience a developer writes for is **declared by them, never derived from LinkedIn data**. Keep present-tense claims and roadmap separate; the prototype is honest about what does not exist yet.
 
 ## Business and product (paste as plain text)
 
-**Our business.** BASH Consulting LLC is a Denver, Colorado information technology (IT) consultancy serving small and medium-sized businesses. We design, implement, and support the systems a business runs on: cloud infrastructure, Enterprise Resource Planning (ERP) and accounting platforms, data architecture, and automation with an artificial intelligence (AI) overlay. Alongside client work we build and publish our own tooling — a governed content pipeline, a Visual Studio Code extension (Prompt Orchestrator) that runs a versioned library of AI prompts and review agents, and the publishing tool described below. The practice is owner-operated by Amr Abdel-Motaleb and develops in the open at https://bash-365.com.
+**Our business.** BASH Consulting LLC is a Denver, Colorado software and information technology (IT) consultancy serving small and medium-sized businesses. We build and run the systems a business depends on — cloud infrastructure, Enterprise Resource Planning (ERP) and accounting platforms, data architecture, and automation with an artificial intelligence (AI) overlay — and we build developer tooling alongside the client work, in the open, at https://bash-365.com. The practice is owner-operated by Amr Abdel-Motaleb.
 
-**What we are requesting access for today.** Our own website's publishing pipeline. The site is a static Jekyll site whose source lives in a GitHub repository; inside it we maintain a small, dependency-free Python publisher that shares our newly published articles and short practice updates to our own LinkedIn company page, BASH Consulting (urn:li:organization:64517157). The current implementation is first-party: one application, one organization page, administered by us. There are no third-party users, customer accounts, or sign-ups today.
+**The product: shiplog, a publishing tool for developers.** Developers produce a great deal of writing as a byproduct of doing their job: commit messages, release notes, changelog entries, architecture decisions, postmortems, internal docs. Almost none of it reaches anyone outside the repository. The obstacle is not time or modesty — it is that "write a LinkedIn post" is a different task from "write a release note," with a blank page and an unfamiliar register, so the work stays private. The cost lands later, when that developer is looking for a role, a client, a collaborator, or contributors to a project, and has no public record of what they can actually do.
 
-Scopes and endpoints in use today:
+shiplog starts from work that is already finished. It reads the developer's own repository — git tags, conventional commits, `CHANGELOG.md`, markdown docs — and composes a LinkedIn post from a chosen piece of it. The developer picks who they are writing for from audience profiles they defined themselves, reviews the draft in a local dashboard next to the exact API request it would become, edits it, and approves it. Approving is what publishes it. Over time the tool keeps a record of what was published, so a developer can see their own cadence, topics, and track record instead of guessing.
 
-- w_organization_social — create posts on our own page via POST /rest/posts. Two kinds only: an article link-share pointing at a post on our site, and a plain text update.
-- r_organization_social — read a post back via GET /rest/posts/{urn} to confirm it published, and validate access-token health with one inexpensive authenticated call.
-- Images API — upload the article's existing preview image as the share's thumbnail.
+**Concretely, the flow is four steps.** `sources` lists what is publishable in this repository. `draft <source>` composes a post for a declared audience and puts it in a queue at status `pending`. `serve` opens a local review dashboard where the developer reads the draft, the character count, where LinkedIn will truncate it, and the full outgoing payload. `publish` sends only what a human moved to `approved`.
 
-**Data handling today.** We do not access member profiles, connections, or private messages. We store no LinkedIn data beyond the post URN returned to us, which we keep in a version-controlled ledger so a given article can never be posted twice. No LinkedIn data is sold, shared with anyone, or used to train a model.
+**Who uses it.** Individual developers, publishing to their own LinkedIn profiles, each authorizing their own account through their own OAuth consent and able to revoke it at any time. A team or an open-source project can additionally connect a page they administer, so a release can go out under the project's name as well as the maintainer's. There is no version of shiplog that posts as a member who has not personally authorized it.
 
-**Approval before anything publishes.** An AI agent drafts the commentary into a file and opens a pull request; a person edits and merges it, and that merge is the approval that triggers publication. A dry-run mode renders the exact request payload with zero API calls, and an automated check rejects copy that fails our editorial standards. Current volume is low — on the order of one to four posts a month, tied to our own publishing cadence.
+**Status, stated plainly.** shiplog is a working prototype. Source discovery, composition, the audience profiles, the review dashboard, the approval gate, the payload builder, the portfolio view, and an offline test suite all exist and run end to end with no network access. The one thing that does not exist is the live call to LinkedIn: the app has no API access yet, which is what this application is for, so `publish` renders the request and stops. We chose not to stub a fake success — a tool that lies to its user about having posted is worse than one that plainly cannot yet.
 
-**Where the product is going.** We are building this pipeline out into a content management system (CMS) extension and distribution app that other organizations will be able to run against their own pages, with AI agents doing the drafting and analysis a small marketing team has no time for. The intent, plainly:
+**Volume.** Low by design and by nature. This is a tool for publishing considered posts about real work, not a scheduler: on the order of a few posts per developer per month. Nothing in the product rewards or enables volume, and there is no bulk, queue-ahead, or timed-release mode.
 
-- Distribution from the CMS. Publish from where the content is already authored — a git-based or headless CMS — rather than copying text into a browser tab. Write once, review it in the same pull request as the article, publish to the page on merge, and keep the audit trail of who approved what.
-- AI agents in the review loop. Extend the review agents we already run: draft the commentary, critique it against the organization's own editorial and brand rules before anyone sees it, and flag copy that should not go out. The agents draft and analyze; a named person still approves.
-- Analysis and sentiment on an organization's own content. Read back the comments and reactions on the organization's own posts to report which topics and formats earn engagement, and summarize the tone of the discussion for the page owner, so the next post is informed by the last one instead of guesswork.
-- Relevant industry news. Give an operator something worth posting by surfacing current, on-topic developments in their industry, drawn from public feeds and publications outside LinkedIn. This is a content-sourcing feature, not a LinkedIn data feature.
-
-The aim throughout is better engagement through better and more consistent posting — organizations publishing relevant, timely, human-approved content on a steady cadence, rather than volume for its own sake. We are not building an automation tool that posts without a person's approval, and the human gate stays in the product.
-
-**Boundaries we will hold to.** The access we are requesting now covers our own page, and we will use it only for that. When the app is ready to manage a page we do not own, each organization will authorize its own page through its own administrator's consent, and we will apply to LinkedIn separately for whatever review or partnership that use requires rather than treating this grant as covering it. Analysis will stay scoped to a page's own content and reported in aggregate to that page's owner — we will not build member profiles, resell LinkedIn data, or train models on it. News discovery reads public sources outside LinkedIn; we do not scrape LinkedIn or read member feeds.
-
-Our privacy policy is at https://bash-365.com/privacy/.
+**Our privacy policy is at https://bash-365.com/privacy/.**
 
 ## Use-case answers (paste as plain text, one per box)
 
-**Which to request.** Page management and Page analytics are both real and both belong to the product as described above — request them. Profile management is a decision: it is not implemented, it is the use case most likely to draw scrutiny, and requesting a capability we are not using is a common rejection reason. Request it only if founder-profile publishing is something we actually want in the near term; otherwise use the decline text below. Nothing in the other two use cases depends on it.
+### Profile management — our primary use case
 
-**If we do request Profile management, the business-and-product answer above needs one line**, or a reviewer reading both will find the main description silent on member posting. Add to the roadmap list: *"Publishing from a consultant's own profile. The same article, drafted and reviewed the same way, posted by the individual to their own profile under their own consent — never on behalf of a member who has not authorized it."* Leave the "Data handling today" paragraph alone; it is scoped to today and stays true either way.
+A developer publishing their own work to their own LinkedIn profile, with their explicit approval on every post. This is the centre of the product; the other two use cases support it.
+
+What we do with it. Create a text post on the authenticated member's own profile via POST /rest/posts with author urn:li:person:{id}, from a draft that member has read and approved in the review dashboard. Read that same member's own posts back to confirm publication and to show them how their own posts performed.
+
+Scope requested: w_member_social to publish, and member read access limited to the authenticated member's own content.
+
+Consent. Each developer connects their own account through their own three-legged OAuth consent, and can revoke it from LinkedIn at any time without asking us. We hold no credential that lets us act as a member who has not personally authorized us, and there is no administrative path, impersonation mode, or shared token that would produce one.
+
+The approval gate, which is the part we would ask a reviewer to look at first. A draft is created with status pending and is inert. It becomes eligible to publish only when the member moves it to approved — a click in the dashboard or an explicit command. `publish` reads nothing else. There is no scheduler, no queue-ahead, no timed release, and no unattended mode anywhere in the product. The screen recording shows this: a draft sitting pending, the payload it would become, and a person clicking Approve.
+
+Comments and reactions on the member's own posts. We want a developer to be able to answer the replies their own post attracts, from the same place they wrote it, rather than losing the thread. Same gate: a reply is drafted, the member reads it, the member sends it. No automated replying.
+
+What we will not do, and have not built. We will not post, comment, or react as any member who has not personally authorized it. We will not read other members' profiles, connections, followers, or feeds. There is no automated engagement of any kind — no auto-liking, auto-commenting, auto-following, auto-connecting, and no messaging or InMail. We do not scrape LinkedIn. Member data is not sold, shared, or used to train a model.
+
+On audience targeting, because the words invite a wrong reading. shiplog helps a developer write *for* an audience they have described in their own configuration file — "engineering managers hiring backend developers," in their words, with the tone and hashtags they chose. It does not identify, enumerate, segment, or target individual members, and it derives nothing from their connections or followers. There is no code path that requests member data for this, and adding one would be a change to a published design commitment rather than an implementation detail.
 
 ### Page management
 
-This is our primary use case and the one already built. We publish and manage the content on our own LinkedIn company page, BASH Consulting (urn:li:organization:64517157), from the same repository that holds our website.
+The same publishing flow, for a page the developer administers: a team's page, a product's page, or an open-source project's page. A maintainer usually wants a release to be visible under both their own name and the project's.
 
-Posts. When we publish an article at https://bash-365.com, our publisher creates the matching share on our page via POST /rest/posts — either an article link-share carrying that article's own preview image as the card thumbnail, or a plain text update for practice news. We read the post back with GET /rest/posts/{urn} to confirm it published, and we record the returned URN in a version-controlled ledger so the same article can never be posted twice.
+What we do with it. Create posts on a page the authenticated user administers via POST /rest/posts with author urn:li:organization:{id}, from the same reviewed-and-approved draft queue — the only structural difference from a profile post is the author URN. Read the post back to confirm it published. Read and reply to comments on the page's own posts so a maintainer can answer questions about their own release, and moderate spam and abuse in those threads.
 
-Comments and reactions. We want to hold the conversation our own posts start: read the comments on our page's posts, reply from the page to the ones that deserve an answer, and react where a reply is not needed. For a consultancy this is where the value is — an owner asking what a system like this costs for a twenty-person shop deserves an answer rather than silence. We also want to moderate our own page's threads, hiding or removing spam and abuse.
+Scope requested: w_organization_social and r_organization_social, only for pages the authenticated user administers, verified through LinkedIn rather than asserted by us.
 
-Engagement monitoring. We track which of our own posts drew comments and reactions, so the next one is informed by the last.
+Same gate, same refusals. Every page post is a draft a person approved. No automated posting or replying, no acting on a page whose administrator has not connected it.
 
-Governance. Everything that publishes — an original post or a reply to a comment — is drafted by an AI agent into a file, opened as a pull request, and published only when a person merges it. There is no auto-reply and no unattended posting. A dry-run mode renders the exact request payload with zero API calls, and an automated check rejects copy that fails our editorial standards.
-
-Scopes: w_organization_social and r_organization_social, on pages we administer. Volume is low — currently on the order of one to four posts a month plus replies, tied to our own publishing cadence.
+Our own use, for what it is worth as evidence. BASH Consulting's website repository already publishes its articles to our own company page (urn:li:organization:64517157) through the same draft-then-approve pipeline, gated on a human merging the draft. That code is in the open and is where shiplog started; we are the first user of the thing we are describing.
 
 ### Page analytics
 
-We want to know whether the content is working, and to report that back in plain terms to whoever owns the page.
+So a developer can tell whether any of this is working, and see a track record accumulate.
 
-What we would read. Aggregate statistics for our own organization's posts and page: impressions, clicks, reactions, comments, shares, and engagement rate per post, plus page-level follower and visitor counts over time. Read-only, through the Community Management API's organization share statistics and page statistics endpoints under r_organization_social.
+What we would read. Aggregate statistics for the author's own posts and, where a page is connected, their own page: impressions, clicks, reactions, comments, shares, engagement rate per post, and follower and visitor counts over time. Read-only, through the organization share and page statistics endpoints under r_organization_social, and the equivalent own-post statistics for a member.
 
-What we would do with it. Three things, all editorial rather than advertising. First, decide what to publish next — which topics, formats, and lengths earn attention from small-business owners and finance leads, and which do not. Second, decide when — what cadence actually correlates with engagement for our audience, instead of guessing. Third, close the loop on our own writing: our content pipeline already flags which articles on the site are thin or stale, and post performance is a second signal for which subjects deserve a deeper piece.
+What the developer gets. Three plain answers. Which of their own topics and formats people actually read, so the next post is chosen on evidence. What cadence they are really keeping, against what they think they are keeping. A portfolio view — volume, streak, subjects, the work each post came from — which is the honest version of a personal brand: a record of what someone shipped and explained, rather than a claim about themselves.
 
-Sentiment. Alongside the counts we want to summarize the tone and the recurring themes in the comments on our own posts — what readers ask, push back on, or raise repeatedly — so the page owner reads one honest summary instead of scrolling threads. This is analysis of the conversation on our own content, reported in aggregate to that content's owner.
+Boundaries. Statistics stay aggregate and belong to the author whose content produced them. We do not build profiles of individual members, do not attempt to identify anyone inside an aggregate count, do not join LinkedIn metrics to any other dataset about a person, and do not expose one developer's numbers to another. Nothing is sold or shared with a third party, and no LinkedIn data trains a model. Retention is limited to what a trend line needs.
 
-Boundaries. Metrics stay aggregate and stay scoped to pages we administer. We do not build profiles of individual members, do not attempt to re-identify anyone inside an aggregate count, and do not join LinkedIn metrics to any other dataset about a person. Nothing is sold or shared with a third party, and no LinkedIn data trains a model. We retain only what a trend line needs.
+## Screen recording (what we submit and what it shows)
 
-### Profile management — requesting it
+`prototype/shiplog/demo/recording/shiplog-review-gate.mp4` — 33 seconds, 1280×800, H.264. A live capture of the prototype's review dashboard, ending with a person approving a draft.
 
-We would use this narrowly: for the profile of the person who authorizes it, and never for anyone else's.
+In order: the queue as a developer opens it · a draft composed from the demo repository's own v0.6.0 release tag, with the marker showing where LinkedIn truncates the post · the exact POST /rest/posts payload that draft becomes, with the member author URN and the w_member_social scope named · the developer's accumulated track record · the audience profiles the copy was written for, with the note that they are declared and not derived · a person clicking Approve, and the pending counter dropping to zero.
 
-Today. Not implemented. Nothing in our current code touches a member profile.
+**It does not show a post reaching LinkedIn, and it says so.** The app has no API access, so `publish` renders the payload and stops. Recording a fabricated success would misrepresent the app to the reviewer assessing it. If LinkedIn would like to see the live call, we will record it the day the grant lands.
 
-Why we would want it. BASH Consulting is an owner-operated practice, so the founder's own profile is where most of the audience actually is and the company page is the smaller channel. The intent is that when we publish an article, the founder can also post it from his own profile — the same article, drafted and reviewed through the same pull-request gate, published under his own explicit consent — rather than retyping it into a browser. As the product opens to other organizations, an individual consultant would be able to do the same for their own profile, each authorizing their own account through their own OAuth consent and revoking it whenever they choose.
-
-What we would use. The member-level posting scope (w_member_social) to create a post on the authenticated member's own profile, and read-back of that member's own posts to confirm publication and report to that same member how the post performed.
-
-What we would not do. We would not post, comment, or react as any member who has not personally authorized it. We would not read other members' profiles, connections, or feeds. There is no automated engagement of any kind — no auto-liking, auto-commenting, auto-following, auto-connecting, and no scraping. Every post is drafted by an agent and published only when the member approves it. Member data is not sold, shared, or used to train a model.
-
-If this use case is not granted, nothing in our page management or page analytics use cases is affected.
-
-### Profile management — declining it
-
-Not requested. Our product manages organization pages, not individual profiles. We do not post, comment, or react on behalf of any member, and we do not read member profiles, connections, or feeds. If we later add profile-level publishing, we will apply for it separately, with each member authorizing their own account through their own consent.
+Everything in it is live: the dashboard is served from files on disk, the drafts were composed by shiplog from the demo repository's real git history, and the Approve click rewrites the draft — verifiable with `queue` before and after. [`demo/README.md`](../prototype/shiplog/demo/README.md) reproduces the whole thing from scratch, and carries the narration script if we add a voice-over.
 
 ## If we are asked for more
 
 Answers we can give without inventing anything:
 
-- **Who authorizes the token.** A page administrator (the founder) authorizes it
-  through LinkedIn's token generator; there is no third-party OAuth flow because there are no third-party users yet. A multi-organization version would use a standard three-legged OAuth consent per organization admin.
-- **Where credentials live.** Environment only — a gitignored local `.env` for
-development and GitHub Actions secrets in continuous integration. Never committed, never logged, never passed on a command line. See `.env.example`.
-- **Rate limiting.** Volume is bounded by our own publishing cadence and by the
-idempotency ledger (`.github/linkedin-log.json`); a source already in the ledger is skipped rather than retried.
-- **The code.** `scripts/features/linkedin/` — standard-library Python, readable
-  in full, documented in its own [README](../scripts/features/linkedin/README.md).
-- **What exists vs. what is planned.** Shipping today: the publisher, the
-`/linkedin-draft` command and `linkedin-share` skill, the merge-is-approval workflow, the token-health check, and the `extension/` Prompt Orchestrator that runs the prompt and review-agent library. Planned, and not to be described as built: the multi-organization CMS extension, comment replies and moderation, the analytics and sentiment reporting, industry-news sourcing, and any profile-level publishing. Keep that line in any answer we give — an overstated capability is the fastest way to lose the grant.
+- **What exists vs. what is planned.** Running now: source discovery from git
+tags, conventional commits, changelog sections and markdown docs; audience profiles; deterministic draft composition; the filler-and-length guard; the pending/approved/published queue; the review dashboard; the payload builder for both member and organization authors; the portfolio view; the local ledger; and an offline self-test covering all of it. Not built, and not to be described as built: the live LinkedIn call, comment reading and replying, analytics ingestion, and any multi-developer hosted service. Keep that line in every answer — an overstated capability is the fastest way to lose a grant after it is issued.
+- **Why a dashboard for a command-line tool.** Approving copy is reading, and a
+browser is where reading is comfortable. Every dashboard action exists as a command too, and the dashboard holds no state of its own — it reads and writes the same files. It exists so the decision that matters happens somewhere legible.
+- **No model is required.** Draft composition is a deterministic template per
+source kind. A language model can improve a draft the developer is already looking at; it is never the only way to get one, and it never publishes.
+- **Where credentials live.** Environment variables only — a gitignored local
+`.env` in development, secrets storage in continuous integration. Never committed, never logged, never passed on a command line. A hosted version would hold each developer's token encrypted and scoped to that developer alone.
+- **Idempotency and rate.** One source produces one post: the local ledger is
+keyed by source, and a source already in it is skipped rather than retried. Volume is bounded by how often a developer ships and chooses to write about it.
+- **The code.** [`prototype/shiplog/`](../prototype/shiplog/) — standard-library
+Python, no dependencies, readable in full. `python3 prototype/shiplog self-test` runs the assertions offline, including the ones that fail if `publish` ever picks up a draft a human did not approve.
