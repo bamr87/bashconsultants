@@ -164,6 +164,8 @@ by a page admin, and add repo **secrets** (Settings → Secrets and variables �
    runs never fail red just because the credential is absent.
 
 **Token lifecycle.** Access tokens last 60 days; programmatic refresh is gated to approved partners. If refresh is enabled, `python3 scripts/features/linkedin refresh-token` renews it; otherwise regenerate manually when the token-health workflow warns. The `LinkedIn-Version` string also expires ~yearly — bump `LINKEDIN_API_VERSION`.
+
+**Two sibling surfaces share this pipeline's files.** `scripts/features/linkedin/mcp_server.py` (wired into `.mcp.json`) exposes the publisher to Claude Code as six MCP tools — reads and previews always, publishing only behind `LINKEDIN_MCP_ALLOW_PUBLISH=1` plus a per-call confirm. And [BASH-CMS](https://github.com/bamr87/bash-cms) is the standalone VS Code extension packaging the same pipeline (TypeScript-native client, review-panel approval gate, catering lanes, bundled MCP server) — it speaks the same draft queue, the same ledger, and the same canonical URLs, so either lane can publish and the other skips.
 ## Workflow: Content review (weekly)
 
 File: `.github/workflows/content-review.yml` Schedule: `37 14 * * 4` UTC (Thursdays, morning in Denver), plus manual dispatch with optional `mode` (expand / new / auto) and `focus` inputs.

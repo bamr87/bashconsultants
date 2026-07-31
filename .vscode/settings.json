@@ -16,5 +16,11 @@
     },
     "files.associations": {
         "*.html": "liquid"
-    }
+    },
+    // BASH-CMS (the sibling VS Code extension, github.com/bamr87/bash-cms)
+    // publishing against this workspace — same queue, ledger, and canonical
+    // host as scripts/features/linkedin/. Publishing stays off by default.
+    "bashCms.linkedin.orgUrn": "urn:li:organization:64517157",
+    "bashCms.site.baseUrl": "https://bash-365.com",
+    "bashCms.publish.allow": false
 }

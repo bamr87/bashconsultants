@@ -16,6 +16,8 @@ A dual-purpose repository. Treat the two sub-projects independently — **never 
 2. **VS Code extension** (`extension/`) — *Prompt Orchestrator*, a self-contained TypeScript
    sub-project that runs the shared `.github/prompts/` library from inside the editor.
 
+A third surface lives in its own repository: [`bamr87/bash-cms`](https://github.com/bamr87/bash-cms) (**BASH-CMS**) packages this repo's LinkedIn publishing pipeline as a standalone VS Code extension, file-compatible with `scripts/features/linkedin/` — the two lanes share the draft queue and the ledger.
+
 The site builds **Docker-first** (host Ruby is usually too old). See [`AGENTS.md`](./AGENTS.md) for the cross-tool overview and [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) for the full project reference. This file does not repeat them — it adds the Claude-native layer.
 
 ## The context framework — where guidance lives
