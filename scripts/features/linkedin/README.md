@@ -35,6 +35,29 @@ Drop `--dry-run` to post for real. `--dry-run` renders the exact JSON payload, r
 | `verify --urn` | `GET /rest/posts/{urn}` (needs `r_organization_social`). |
 | `self-test` | Offline assertions on payload shape, canonical URL, hashtags, brand guard. |
 
+## MCP server (Claude-native front end)
+
+`mcp_server.py` exposes the publisher as a [Model Context Protocol](https://modelcontextprotocol.io) server, so Claude Code (or any MCP client) can inspect the page, preview a post, stage a governed draft, or publish. It is the local, stdio counterpart to LinkedIn's own "Develop with MCP" reference server — that one is a remote HTTP+SSE server running the MCP third-party OAuth flow per visitor; this one is single-operator and reuses the token already in `.env`, so there is no network surface and no OAuth dance.
+
+It is wired into the repo's [`.mcp.json`](../../../.mcp.json); Claude Code discovers it automatically (approve it on first use). Tools:
+
+| Tool | Safe? | Purpose |
+| --- | --- | --- |
+| `linkedin_whoami` | read | Token status, granted scopes, expiry (LinkedIn's `user-info`, adapted). Start here. |
+| `linkedin_list_posts` | read | Recent page posts with URNs + permalinks. |
+| `linkedin_get_post` | read | Fetch one post back by URN. |
+| `linkedin_preview` | read | Render the exact `/rest/posts` payload + brand-guard result, posting nothing. |
+| `linkedin_draft` | write (repo) | Stage a `drafts/linkedin/*.md` (`status: pending`) — the AI drafts, the human merge approves. |
+| `linkedin_publish` | **live** | Post to the company page. **OFF by default.** |
+
+`linkedin_publish` is disabled unless the server env sets `LINKEDIN_MCP_ALLOW_PUBLISH=1` **and** the call passes `confirm: true`; it still runs the brand guard and records the ledger. Leaving it off keeps the governed draft→merge→`from-drafts` path as the only route to the live page. To enable it for a session, add `"env": { "LINKEDIN_MCP_ALLOW_PUBLISH": "1" }` to the server block in `.mcp.json`.
+
+Run it standalone (newline-delimited JSON-RPC on stdio):
+
+```bash
+python3 scripts/features/linkedin/mcp_server.py   # then speak MCP on stdin
+```
+
 ## Secrets & config
 
 Secrets come from the environment **only** — local `.env` (gitignored) for dev, GitHub Actions secrets in CI. Never committed, never logged, never on a command line. See `.env.example`.
