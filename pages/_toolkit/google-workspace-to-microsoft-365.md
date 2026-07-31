@@ -20,7 +20,9 @@ keywords:
   - Exchange admin center migration endpoint
   - staged mailbox migration routing domain
   - Google Workspace MX cutover
-lastmod: 2026-07-30T02:30:00.000Z
+  - SyncProviderTokenUnexpectedInvalidationException
+  - People API not enabled migration
+lastmod: 2026-07-31T04:00:00.000Z
 mermaid: true
 sidebar:
   nav: toolkit
@@ -123,10 +125,12 @@ Then, following Microsoft's [manual Google Workspace configuration procedure](ht
    consent screen; the migration never uses it, but the dialog will not save without it.
 3. **Create a JavaScript Object Notation (JSON) key** and download it. This file is a credential that
    can read every mailbox in the tenant. Treat it accordingly: never commit it, hand it over through a secret manager rather than email, and delete the service account when the project closes.
-4. **Enable four application programming interfaces (APIs)** on the project — Gmail API, Google
-   Calendar API, Contacts API, and People API. All four, or the batch fails later rather than sooner.
+4. **Enable the application programming interfaces (APIs)** on the project — Gmail API, Google
+   Calendar API, and **People API**, which is what now serves contacts. Verify each one reads `Manage` rather than `Enable` on its page in the Cloud console. This is the single step most likely to be skipped and by far the most expensive to skip, for reasons the failure-modes section below sets out: a missing API here does not produce a missing-API error. It produces an authentication error, days later, that will send you to audit credentials that were never wrong.
 5. **Authorize the scopes** under Security → API Controls → Manage Domain Wide Delegation, adding the
    service account's client ID with the scope list below.
+
+Granting a scope and enabling the API that serves it are two independent switches, and only one of them is visible from the Google Workspace admin console. Domain-wide delegation can show a perfectly correct `auth/contacts` grant while the People API sits disabled in the Cloud project — the admin console has no idea, and reports nothing wrong.
 
 The scopes go in as one comma-separated string with **no spaces** anywhere in it:
 
@@ -139,6 +143,8 @@ A discrepancy worth understanding before it sends you down a blind alley: Micros
 `https://www.google.com/m8/feeds/` belongs to the old Contacts API, which Google [turned down on 19 January 2022](https://developers.google.com/people/contacts-api-migration). Google keeps that scope alive as a **legacy alias for `https://www.googleapis.com/auth/contacts`** — so when both appear in the string you paste, the console stores one grant, not two. Paste five, get four, no error and no warning.
 
 That matters because a four-scope list is the **correct** end state, not evidence of a defect. If a migration is failing and you go hunting for a missing fifth chip, you will burn an afternoon trying to add a scope Google will keep silently discarding, because the permission it conveys is already granted under its modern name. Verify the four by name — `mail.google.com/`, `auth/calendar`, `auth/contacts`, `auth/gmail.settings.sharing` — rather than by counting to five.
+
+Then stop looking at scopes. A correct scope list is the normal case, and scope problems are a rare cause of a failing batch relative to how much attention the error messages steer toward them. If the four are present by name, the delegation is done — go check API enablement instead.
 
 ![Google Workspace admin console, Domain-wide Delegation, showing a migration service account authorized for exactly four OAuth scopes: mail.google.com, auth/calendar, auth/contacts, and auth/gmail.settings.sharing. The service account identity and client ID are blurred.](/assets/images/toolkit/gws-delegation-scopes.png)
 
@@ -195,10 +201,44 @@ After the final batch completes, move the primary domain's MX record to Microsof
 
 These are the ones that cost real hours, and most of them are invisible until a batch is already in flight.
 
-- **Credential failures surface late and vaguely.** Authorization problems do not block endpoint
-creation. They fail after the batch starts — often after hours of apparently healthy copying — and surface as `TooManyTransientFailureRetriesPermanentException` wrapping dozens of `SyncProviderTokenUnexpectedInvalidationException` hits. That signature means Exchange's token for the Google side kept being invalidated; it does not tell you which credential is at fault. Check, in this order: that the service account is still **Enabled**, that the key the endpoint holds is still one of the keys **currently listed** on the service account (a rotated or deleted key looks exactly like this), and only then the delegated scope list. Do not read "transient" as "Google was flaky" and simply retry — and do not assume a scope count is the answer.
-- **A failed batch is not necessarily lost work.** Check the per-mailbox report before you rebuild
-anything. A batch can show `Failed` at the batch level while the mailbox underneath reports gigabytes migrated, zero items skipped, and a data consistency score of `Perfect` — the data path was fine and only the credential or the connection broke. **Resume migration** then picks up incrementally. Deleting the batch and starting over, or switching to a different tool, throws away a verified-consistent copy for no reason.
+- **`SyncProviderTokenUnexpectedInvalidationException` usually is not a token problem.** This is the
+most misleading error in the whole migration, and it is worth understanding precisely, because taken at face value it will cost you days. The batch fails with `TooManyTransientFailureRetriesPermanentException` wrapping dozens of `SyncProviderTokenUnexpectedInvalidationException` hits. The words point at credentials. **Check API enablement first, before you look at a single credential.**
+
+  When a Google API is not enabled in the Cloud project, requests are rejected at the *service-usage* layer with `SERVICE_DISABLED` (HTTP 403) — before they ever reach the API itself. Exchange surfaces that 403 as a token invalidation. So a disabled People API, with a perfectly valid key and perfectly correct scopes, presents as an authentication failure. Worse, the Cloud console's error graph for that API shows **zero errors**, because an API that is not enabled has no metrics to populate. A clean dashboard is not evidence of healthy calls.
+
+  Work the checks in this order, cheapest and likeliest first:
+
+  | Order | Check | Where |
+  | --- | --- | --- |
+  | 1 | **Gmail, Calendar, and People APIs all read `Manage`, not `Enable`** | Cloud console → APIs & Services → Library |
+  | 2 | Gmail API is serving traffic with a low error rate | Cloud console → APIs & Services → Dashboard |
+  | 3 | Service account is still **Enabled** | Cloud console → IAM & Admin → Service Accounts |
+  | 4 | The key the endpoint holds is still **currently listed** on the service account | Same page → Keys |
+  | 5 | Delegated scopes, verified **by name** | Workspace admin → Security → API controls |
+
+  Steps 3 through 5 are where instinct sends you and where the answer usually is not.
+
+  Step 1 takes seconds and is unambiguous. An API that is switched off offers you an **Enable** button; one that is already on offers **Manage**. There is no third state and nothing to interpret:
+
+![Google Cloud console product details page for the Google People API, showing an Enable button rather than a Manage button, which means the API is not enabled on this project. The project name chip is blurred.](/assets/images/toolkit/gws-people-api-disabled.png)
+
+- **Read the per-user report before forming any theory.** In the mailbox error panel, *Download the
+report for this user* produces the log that settles in one minute what guesswork will not settle in a day. Three lines in it carry nearly all the diagnostic value:
+
+  - **`Migrating Mail,Calendar,Contact,GmailFilter,MailboxDelegation.`** — the sub-providers this job
+    initializes. Any one of them failing kills the entire job, including the parts that work.
+  - **`Copy progress: X/Y messages, … N/M folders completed.`** — read the *denominator*. `0/0
+    messages` means nothing was ever queued, which rules out any theory about a specific bad message. `0/M folders completed` that never moves means the job is dying before transfer, not during it.
+  - **`The system will retry (48/60, 48/691).`** — **60 is a fixed retry ceiling, not a measurement.**
+    It reads identically across completely unrelated failures. It tells you the job gave up; it tells you nothing about why.
+
+- **Bisect by content type, not by folder.** When a job dies at init, uncheck content types in the
+batch wizard's configuration step and re-run. If a **Mail**-only batch completes while a full batch fails, the fault is in one of the other sub-providers and you have narrowed five suspects to four in a single run. Note that the folder filter constrains **Mail only** — it does not stop the job from initializing Calendar, Contacts, and rules, so folder-scoping a batch is useless as a test of anything other than mail volume.
+
+- **A failed batch is not necessarily lost work — but verify with bytes, not status.** A batch can
+show `Failed` at the batch level while the mailbox underneath reports gigabytes migrated and a data consistency score of `Perfect`. Consistency `Perfect` only means the items that *did* copy match; it is not a statement about completeness. **Resume migration** is free, touches no DNS, and moves no mail flow, so it is worth trying before you mint credentials or rebuild an endpoint.
+
+  What it is not is proof. A resumed batch returns to `Syncing` whether or not it is moving anything, and a batch can sit in `Syncing` transferring zero bytes indefinitely. Confirm a resume worked by watching **`Data migrated` climb and `folders completed` increase** — never by the status field. If successive resumes each report zero bytes, stop resuming: the underlying fault is unfixed and every retry costs another 30 minutes.
 
 ![Exchange admin center migration report for a single mailbox: 2.402 GB migrated, data consistency score Perfect, and an error reading TooManyTransientFailureRetriesPermanentException with 61 transient failures, 60 of them SyncProviderTokenUnexpectedInvalidationException. The mailbox address is blurred.](/assets/images/toolkit/gws-migration-token-error.png)
 
