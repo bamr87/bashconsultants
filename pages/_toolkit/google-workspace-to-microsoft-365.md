@@ -22,7 +22,9 @@ keywords:
   - Google Workspace MX cutover
   - SyncProviderTokenUnexpectedInvalidationException
   - People API not enabled migration
-lastmod: 2026-07-31T04:00:00.000Z
+  - MX record NXDOMAIN mail.protection.outlook.com
+  - inbound mail deferring after Microsoft 365 cutover
+lastmod: 2026-08-01T05:30:00.000Z
 mermaid: true
 sidebar:
   nav: toolkit
@@ -89,6 +91,13 @@ Before you configure anything, establish from outside the tenant where mail curr
 # Where does mail for this domain actually land right now?
 dig +short MX example.com
 
+# CRITICAL: resolve the MX *target*, not just the record. A record that names a
+# host which does not exist is indistinguishable from a correct one until you ask.
+for r in 8.8.8.8 1.1.1.1 9.9.9.9; do
+  host=$(dig +short @"$r" MX example.com | sort -n | head -1 | awk '{print $2}' | sed 's/\.$//')
+  printf '%-16s %s -> %s\n' "$r" "$host" "$(dig +short @"$r" A "$host" | head -1 || echo UNRESOLVED)"
+done
+
 # Which Microsoft 365 tenant, if any, already claims the domain?
 curl -s "https://login.microsoftonline.com/example.com/v2.0/.well-known/openid-configuration" \
   | python3 -c 'import json,sys; print(json.load(sys.stdin)["issuer"])'
@@ -106,6 +115,8 @@ Read the answers before you plan the work:
   Whatever is left to do, it is not the staged migration in this guide — and running the routing steps now, against a mailbox whose mail already lands in Exchange Online, is how you create a mail loop.
 - **The source and target domains return the same issuer.** They are one tenant, so there is no
   migration here at all. Moving a user between two domains inside a single tenant is a primary-address change or a mailbox-to-mailbox copy, not a tenant migration.
+- **The MX target does not resolve.** The record exists, names a plausible
+  `*.mail.protection.outlook.com` host, and the tenant reports the domain healthy — but the hostname returns `NXDOMAIN`. External senders cannot connect, so every inbound message defers and eventually bounces, while internal tenant-to-tenant mail keeps working perfectly and hides it. See the failure mode below; this is not hypothetical.
 - **Google DKIM or verification records are still published on a domain whose MX moved.** Inert
   leftovers, but they are the tell that a migration ran and its teardown never finished. Clean them up as part of the engagement.
 
@@ -201,6 +212,8 @@ After the final batch completes, move the primary domain's MX record to Microsof
 
 These are the ones that cost real hours, and most of them are invisible until a batch is already in flight.
 
+One pattern runs through the worst of them, and it is worth naming before the list. **Confirming that a setting exists is not the same as confirming it works.** A scope can be granted against an application programming interface (API) that is switched off. An MX record can name a mail server that does not exist. A vendor console can report `OK` for both. Every check below that matters asks a system to *do* something and observes the result — resolve this hostname, serve this request, move these bytes — rather than reading a value back and calling it verified. Configuration review finds typos; it does not find things that are configured correctly against something absent.
+
 - **`SyncProviderTokenUnexpectedInvalidationException` usually is not a token problem.** This is the
 most misleading error in the whole migration, and it is worth understanding precisely, because taken at face value it will cost you days. The batch fails with `TooManyTransientFailureRetriesPermanentException` wrapping dozens of `SyncProviderTokenUnexpectedInvalidationException` hits. The words point at credentials. **Check API enablement first, before you look at a single credential.**
 
@@ -247,6 +260,21 @@ show `Failed` at the batch level while the mailbox underneath reports gigabytes 
 ![Exchange admin center migration batches list after a resume, showing one batch with status Syncing, data consistency score Perfect, a total of one mailbox, and an empty Failed column.](/assets/images/toolkit/gws-batch-resumed-syncing.png)
 
   Note which command you are reaching for. `Resume migration` sits directly beside `Complete migration batch` and `Delete` in that toolbar, and only one of the three is safe to click on a batch you are trying to rescue.
+- **A tenant-generated MX record can name a host that does not exist.** The admin center publishes an
+MX target of the form `<domain-with-hyphens>.mail.protection.outlook.com` and marks it `OK`, the domain reports **Healthy**, and the hostname nonetheless returns `NXDOMAIN` from every public resolver. Inbound internet mail then defers on every attempt — senders report a *temporary* failure and retry for around 24 hours before bouncing — while **internal tenant-to-tenant mail continues to work perfectly**, because intra-tenant delivery never performs an MX lookup. That asymmetry is what makes this so easy to miss: the obvious test, mailing the address from another account in the same tenant, passes.
+
+  The tell is a message trace showing plenty of traffic to the tenant's other addresses and **none at all** to the affected domain. Resolve the target, from several resolvers, and compare against a working domain in the same tenant:
+
+  ```bash
+  dig +short MX broken.example.com          # 0 broken-example-com.mail.protection.outlook.com
+  dig +short A broken-example-com.mail.protection.outlook.com   # (nothing — NXDOMAIN)
+  dig +short A working-example-com01b.mail.protection.outlook.com  # 52.101.x.x
+  ```
+
+  Two things make this painful to fix. **Check health does not detect it** — the check appears to confirm the record matches the expected string without verifying the target resolves. And if the tenant also hosts your DNS, the admin center **refuses to add or edit an MX** while Exchange is enabled for the domain, offering only to disable the Exchange service first — which risks converting deferred mail into permanent bounces and is the wrong trade.
+
+  The safe repair is to move DNS hosting to a provider you control and set the MX to an endpoint that resolves. Exchange Online Protection routes on the recipient domain rather than the MX hostname, so any endpoint belonging to the same tenant — the one derived from the tenant's `*.onmicrosoft.com` initial domain, or another verified domain's — will accept mail for an Authoritative accepted domain. Moving nameservers never touches the accepted-domain configuration, so mail keeps deferring rather than bouncing during the cutover and nothing already queued is lost. Rebuild the zone **before** switching nameservers, then flip once: a dormant zone at the registrar is often years stale and may still carry the *source* provider's MX records, which would silently route mail back to the system you just migrated away from.
+
 - **Retention policies fake data loss.** Microsoft's migration tool has no awareness of messaging
 records management (MRM) or archival policies. Anything those policies delete or archive mid-migration gets flagged as "missing," which buries any genuine data loss in noise you cannot triage. Disable the default MRM policy and archive policies for migrating users, and re-enable them after cutover.
 - **Forwarding permissions block the flip.** If the Google organization prevents users from setting a
