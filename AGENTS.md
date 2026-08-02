@@ -6,7 +6,7 @@
 
 Dual-purpose repository:
 
-1. **Jekyll site** (root) — `bashconsultants.com` marketing/content site, GitHub Pages deploy on push to `main`, uses `jekyll-theme-zer0` remote theme.
+1. **Jekyll site** (root) — `bash-365.com` marketing/content site, GitHub Pages deploy on push to `main`, uses `jekyll-theme-zer0` remote theme.
 2. **VS Code extension** (`extension/`) — "Prompt Orchestrator", TypeScript + esbuild, self-contained sub-project.
 
 Default dev environment: Docker Compose for the Jekyll site (`docker-compose up`); `npm` inside `extension/` for the extension.

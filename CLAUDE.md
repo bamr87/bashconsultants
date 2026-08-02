@@ -11,7 +11,7 @@
 
 A dual-purpose repository. Treat the two sub-projects independently — **never mix them in one commit.**
 
-1. **Jekyll site** (repo root) — `bashconsultants.com`, built on the `bamr87/zer0-mistakes` remote
+1. **Jekyll site** (repo root) — `bash-365.com`, built on the `bamr87/zer0-mistakes` remote
    theme, deployed to GitHub Pages on every push to `main`. This is the primary project.
 2. **VS Code extension** (`extension/`) — *Prompt Orchestrator*, a self-contained TypeScript
    sub-project that runs the shared `.github/prompts/` library from inside the editor.
