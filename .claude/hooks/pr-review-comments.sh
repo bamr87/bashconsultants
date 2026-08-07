@@ -7,6 +7,9 @@
 
 set -euo pipefail
 
+# Fail open when jq is unavailable — the hook is advisory and must never block the tool call.
+command -v jq >/dev/null 2>&1 || exit 0
+
 payload="$(cat)"
 cmd="$(printf '%s' "$payload" | jq -r '.tool_input.command // ""')"
 

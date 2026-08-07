@@ -39,9 +39,9 @@ Four primitives, one job each. See [`.claude/README.md`](./.claude/README.md) fo
 
 | Primitive | Directory | Use it when |
 |---|---|---|
-| **Skills** | `.claude/skills/*/SKILL.md` | You need a *governed procedure* — the same steps done the same way every time (editorial gate, authoring a toolkit doc, wikilink discipline, brand application). |
+| **Skills** | `.claude/skills/*/SKILL.md` | You need a *governed procedure* — the same steps done the same way every time (editorial gate, authoring a toolkit doc, wikilink discipline, brand application, LinkedIn share drafting). |
 | **Subagents** | `.claude/agents/*.md` | You want to *delegate* a bounded job to a fresh context (editorial review, build validation, brand audit). Invoke via the Agent tool. |
-| **Commands** | `.claude/commands/*.md` | You want a discoverable `/`-entry point that runs a common workflow (`/lint-content`, `/new-toolkit-doc`, `/brand-check`). |
+| **Commands** | `.claude/commands/*.md` | You want a discoverable `/`-entry point that runs a common workflow (`/lint-content`, `/new-toolkit-doc`, `/brand-check`, `/linkedin-draft`). |
 | **Memory + hooks** | `.claude/agent-memory/`, `.claude/hooks/`, `.claude/settings.json` | Agents carry decisions across sessions; hooks enforce policy automatically. |
 
 **Skills vs. prompts:** `.github/prompts/*.prompt.md` are the *cross-tool* library (Copilot, the extension, Cursor). `.claude/skills/` are the *Claude-native* equivalents — richer, with optional scripts. When both exist, prefer the skill inside Claude Code; keep the two in sync when you change a shared workflow.
