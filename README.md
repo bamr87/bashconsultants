@@ -66,7 +66,7 @@ _layouts/, _includes/  Site-local overrides of the remote theme
 _plugins/              Local Jekyll plugins (Pages runs in safe mode — see below)
 pages/_posts/          Blog posts, by section: corp / erp / muses / tech
 pages/_services/       Service detail pages + hub
-pages/_case_studies/   Anonymized engagement snapshots
+pages/_case-studies/   Anonymized engagement snapshots
 api/                   Azure Functions app (AI chat proxy)
 scripts/               Preview-image generator, content linter, playbook data
 extension/             VS Code extension (independent sub-project)

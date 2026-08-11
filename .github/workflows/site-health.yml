@@ -35,7 +35,7 @@ jobs:
       PAGES_REPO_NWO: ${{ github.repository }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Production GitHub Pages ignores the repo Gemfile (which carries a
       # local-path theme gem for Docker dev) and builds with the github-pages

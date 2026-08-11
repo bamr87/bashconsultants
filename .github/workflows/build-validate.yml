@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Lint self-test (fixtures)
         run: python3 scripts/content_lint.py --self-test
@@ -64,7 +64,7 @@ jobs:
       PAGES_REPO_NWO: ${{ github.repository }}
       JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Write CI Gemfile
         run: |
@@ -78,7 +78,7 @@ jobs:
           EOF
 
       - name: Cache gems
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: vendor/bundle
           # The CI Gemfile is defined in this workflow file, so key on it.
@@ -126,10 +126,10 @@ jobs:
       PAGES_REPO_NWO: ${{ github.repository }}
       JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Cache gems
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: vendor/bundle
           key: gems-azure-${{ runner.os }}-${{ hashFiles('Gemfile.azure') }}

@@ -261,8 +261,8 @@
       "fields": []
     }
   },
-  "frontMatter.preview.host": "http://localhost:4002",
-  "frontMatter.website.host": "https://it-journey.dev",
+  "frontMatter.preview.host": "http://localhost:4042",
+  "frontMatter.website.host": "https://bash-365.com",
   "frontMatter.git.enabled": false,
   "frontMatter.data.types": [
     {
