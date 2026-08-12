@@ -169,16 +169,13 @@ Budget for propagation regardless: Microsoft states these delegation settings ta
 
 All of this runs before the batch, in the order given, and it is documented in Microsoft's [Google Workspace migration prerequisites](https://learn.microsoft.com/en-us/exchange/mailbox-migration/google-workspace-migration-prerequisites). The migrating administrator needs at minimum the **Recipient Management** role group in Exchange Online.
 
-**1. Add the Microsoft 365 routing subdomain in Google.** In the Google admin console, add
-`o365.example.com` as a **user alias domain**. Use a subdomain of the primary domain, because Google verifies it automatically; anything else triggers per-address verification emails and the migration cannot complete against an unverified routing domain. Point a mail exchange (MX) record for it at Microsoft 365 and add it as an accepted domain in the tenant. This subdomain becomes the **Target Delivery Domain** in the batch wizard.
+**1. Add the Microsoft 365 routing subdomain in Google.** In the Google admin console, add `o365.example.com` as a **user alias domain**. Use a subdomain of the primary domain, because Google verifies it automatically; anything else triggers per-address verification emails and the migration cannot complete against an unverified routing domain. Point a mail exchange (MX) record for it at Microsoft 365 and add it as an accepted domain in the tenant. This subdomain becomes the **Target Delivery Domain** in the batch wizard.
 
 Resist the temptation to use the built-in `tenantname.onmicrosoft.com` domain here. Microsoft's own guidance is blunt about it: that choice "occasionally causes issues that Microsoft is not able to assist with." Also note that the Add a domain option does not exist on the legacy free edition of G Suite — if that is what you are looking at, this entire model is unavailable and you need a different plan.
 
-**2. Add the Google routing subdomain in Google.** Same procedure for `gsuite.example.com`, with MX
-records per [Google's Gmail MX record instructions](https://support.google.com/a/answer/140034). Google can take up to 24 hours to propagate this to all users. If your Exchange Online organization uses non-default transport settings, confirm that automatic forwarding is enabled either on the default remote domain (`*`) or on a new remote domain for the Google routing subdomain — otherwise mail from Microsoft 365 back to Google is dropped.
+**2. Add the Google routing subdomain in Google.** Same procedure for `gsuite.example.com`, with MX records per [Google's Gmail MX record instructions](https://support.google.com/a/answer/140034). Google can take up to 24 hours to propagate this to all users. If your Exchange Online organization uses non-default transport settings, confirm that automatic forwarding is enabled either on the default remote domain (`*`) or on a new remote domain for the Google routing subdomain — otherwise mail from Microsoft 365 back to Google is dropped.
 
-**3. Provision a mail user for everyone who will migrate,** now or eventually, per Microsoft's
-[manage mail users](https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-mail-users) guidance. Each one carries three addresses, and getting this shape wrong is the second-most-common source of a failed batch:
+**3. Provision a mail user for everyone who will migrate,** now or eventually, per Microsoft's [manage mail users](https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-mail-users) guidance. Each one carries three addresses, and getting this shape wrong is the second-most-common source of a failed batch:
 
 | Attribute | Value | Why |
 | --- | --- | --- |
