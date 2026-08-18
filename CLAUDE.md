@@ -51,7 +51,7 @@ Four primitives, one job each. See [`.claude/README.md`](./.claude/README.md) fo
 These are the hard rules for working in this repo. The brand and content-style files add detail; these are the ones you cannot skip.
 
 1. **Minimal, surgical changes.** Match the surrounding style. Do not refactor adjacent code, and do
-   not restructure the remote theme — override via `_includes/`, `_layouts/`, `_sass/`, `_data/`.
+   not restructure the remote theme — override via `_includes/`, `_layouts/`, `_sass/`, `_data/`. Every override is declared in `.theme-overrides.yml` — see "Theme overrides" below.
 2. **Validate before declaring done.**
    - Jekyll changes → run the Docker build:
      `docker-compose exec -T jekyll bundle exec jekyll build --config '_config.yml,_config_dev.yml'`
@@ -81,12 +81,27 @@ Internal cross-links use Obsidian `[[Page Title]]` syntax, resolved client-side.
 - **Collection docs + non-root pages only.** The wiki index covers collection docs and pages with an
 `output_ext` of `.html`; it does **not** index root-level pages (`tools.md`, `ai-operations.md`). Link to those with a normal markdown link. Full detail: the `wikilinks` skill.
 
+## Theme overrides (what we fork, and why)
+
+The site is a thin consumer of `bamr87/zer0-mistakes`. Anything under `_includes/` or `_layouts/` that shares a path with the theme **shadows** it. [`.theme-overrides.yml`](./.theme-overrides.yml) at the repo root is the source of truth for those forks: fork a file, add its row with an honest reason. An undeclared fork reads as accidental drift to the theme's `audit-consumer`, and the point of the file is that its list stays short and true.
+
+| Override | Why |
+|---|---|
+| `_layouts/landing.html` | Bespoke marketing homepage — particles hero, services grid from `_data/entity/services.yml`, industries/process/FAQ. Replaces the theme's generic `_data/landing.yml` template. |
+| `_includes/analytics/posthog.html` | Consent gate, Global Privacy Control, no IP geolocation. **Retire on the next theme pin bump** — upstreamed in v1.28.0 as `posthog.privacy.*`, already set in `_config.yml`; the pin is still v1.26.0, which ignores those keys. |
+| `_includes/analytics/google-tag-manager-head.html` | Deliberate no-op stub. Google Tag Manager is off site-wide; PostHog is the only analytics. |
+| `assets/images/wizard-on-journey.png` | Our own homepage/Open Graph image that happens to share a path with an unrelated theme asset. |
+
+`_data/**` and `_plugins/**` are **not** overrides — Jekyll never loads either from a theme, so ours are the only copies that run. `_data/authors.yml` exists for exactly that reason: the theme's author card and "About the Author" box read `site.data.authors`, which `remote_theme` does not ship. Its `name:` values must stay byte-identical to the `author:` strings in post front matter, or bylines fall back to a bare name and a generic icon.
+
 ## Build stacks (know which config you're in)
 
-| Stack | Config | Notes |
-|---|---|---|
-| **Local dev** | `_config.yml,_config_dev.yml` | Docker, port 4042, livereload. `_plugins/` run here. |
-| **GitHub Pages** | `_config.yml` alone | **Safe mode** — local `_plugins/` do **not** run in production. |
-| **Azure Static Web Apps** | `_config.yml,_config.azure.yml` | `Gemfile.azure` pins the theme as a gem. |
+| Stack | Config | Theme source | Built by CI? |
+|---|---|---|---|
+| **Local dev** | `_config.yml,_config_dev.yml` | path gem (`/zer0-mistakes` mount) | **No** |
+| **GitHub Pages** | `_config.yml` alone | `remote_theme`, pinned tag | Yes (`build-pages`) |
+| **Azure Static Web Apps** | `_config.yml,_config.azure.yml` | `Gemfile.azure` gem pin | Yes (`build-azure`) |
 
-Anything that depends on a local plugin (e.g. server-side wikilink resolution) must also work in Pages safe mode, or it is broken in production. Validate the change against the stack it ships on.
+Local dev runs on port 4042 with livereload and is the only stack where `_plugins/` execute; GitHub Pages is **safe mode**, so anything depending on a local plugin (e.g. server-side wikilink resolution) must also work without it, or it is broken in production.
+
+**CI never builds the local-dev stack.** `.github/workflows/build-validate.yml` builds only the Pages and Azure stacks (plus the content lint). The Docker command in operating rule 2 is a *developer* check that nothing verifies afterwards — a change that builds only under `_config_dev.yml` can still be broken in production, and a change that breaks only local dev will pass CI silently. Validate against the stack the change ships on, and treat a green PR as evidence about Pages and Azure only.

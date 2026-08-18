@@ -6,8 +6,16 @@
 # - Let Bundler resolve the latest compatible versions at build time
 # - Build fails immediately if incompatible → caught in CI, not production
 # - Production always gets exactly what passed TEST (via Gemfile.lock)
-# 
-# See: docs/systems/ZERO_PIN_STRATEGY.md for full documentation
+#
+# Inherited from the theme repo, where it is documented in full:
+# https://github.com/bamr87/zer0-mistakes/blob/main/docs/systems/ZERO_PIN_STRATEGY.md
+# (there is no copy of that doc in this repo).
+#
+# Two honest caveats for this repo: the theme below IS hard-pinned to a local
+# path, and no Gemfile.lock is committed (it is in .gitignore and _config.yml
+# `exclude`), so "production gets exactly what passed TEST" does not hold here.
+# Production is GitHub Pages, which resolves its own gem set anyway, and CI
+# builds with its own generated Gemfile — see .github/workflows/build-validate.yml.
 # ==============================================================================
 
 source "https://rubygems.org"
@@ -31,8 +39,19 @@ source "https://rubygems.org"
 gem "github-pages", ">= 228", group: :jekyll_plugins
 
 # Zer0-Mistakes theme gem (needed for local/Docker dev with theme: in _config_dev.yml)
-# Use local path during development to pick up unreleased features (e.g. admin dashboard).
-# Switch back to `gem "jekyll-theme-zer0"` once a gem version with admin includes is published.
+#
+# This path gem is a deliberate LOCAL-DEV MOUNT, not a workaround: it lets the
+# Docker/devcontainer stack render against a live theme checkout so theme work
+# can be tried here before it ships. It is local-dev only — production
+# (GitHub Pages) uses `remote_theme` from _config.yml, Azure uses the published
+# gem from Gemfile.azure, and CI writes its own Gemfile without this line.
+#
+# The old reason for the path — "waiting for a gem version with admin
+# includes" — is obsolete: the published gem has shipped _layouts/admin.html
+# and _includes/navigation/admin-nav.html since v1.26.0. Switching this line
+# back to `gem "jekyll-theme-zer0"` is therefore possible, but docker-compose.yml,
+# Dockerfile, and .claude/agents/jekyll-build-validator.md all expect the
+# /zer0-mistakes mount, so that is a migration of its own.
 #
 # Path resolution:
 #   - Docker/devcontainer: compose mounts the theme checkout at /zer0-mistakes (default)
