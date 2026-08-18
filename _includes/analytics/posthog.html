@@ -8,7 +8,16 @@
        cookie or localStorage is written before the visitor opts in.
     4. IP geolocation is disabled ($geoip_disable), so no city/region/postal is
        derived; with the project's anonymize_ips, no IP or location is stored.
-  Keep in sync with the theme file on theme upgrades.
+
+  RETIREMENT (do this, don't maintain this file): all four deltas were
+  upstreamed in theme v1.28.0 as config keys —
+  posthog.privacy.{respect_gpc, require_consent, geoip_disable} — and
+  _config.yml already sets them. This site's remote_theme is still pinned to
+  v1.26.0, which does NOT read those keys, so deleting this override today
+  would silently re-enable capture-before-consent and IP geolocation, breaking
+  what /privacy/ promises. Bump the pin to >= v1.28.0 (in _config.yml AND
+  Gemfile.azure), verify the config keys take effect, then delete this file and
+  its entry in .theme-overrides.yml.
 {% endcomment %}
 {% comment %} Feature: ZER0-006 {% endcomment %}
 <!--

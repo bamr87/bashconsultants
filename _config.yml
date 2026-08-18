@@ -178,6 +178,17 @@ posthog:
     mask_all_text        : false  # Mask all text in session recordings
     mask_all_inputs      : true   # Mask form inputs in session recordings
     ip_anonymization     : true   # Anonymize IP: client sends ip:false; project anonymize_ips=true
+    # Consent + browser-signal gates. The theme upstreamed these in v1.28.0
+    # (site.posthog.privacy.*), but remote_theme above is pinned to v1.26.0,
+    # which ignores them — so the local override
+    # _includes/analytics/posthog.html still hardcodes exactly this behaviour.
+    # Declared here so the two agree today and the override can be deleted
+    # (not rewritten) the moment the pin reaches >= v1.28.0. Retirement is
+    # tracked in .theme-overrides.yml. The published behaviour these describe
+    # is what /privacy/ promises readers — keep all three in sync.
+    respect_gpc          : true   # Global Privacy Control: don't load PostHog at all
+    require_consent      : true   # Start opted out, memory-only, until the banner records analytics consent
+    geoip_disable        : true   # No IP-derived city/region/postal on any event
 
 ## Site verification #############################################################
 
