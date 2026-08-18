@@ -88,7 +88,7 @@ The site is a thin consumer of `bamr87/zer0-mistakes`. Anything under `_includes
 | Override | Why |
 |---|---|
 | `_layouts/landing.html` | Bespoke marketing homepage — particles hero, services grid from `_data/entity/services.yml`, industries/process/FAQ. Replaces the theme's generic `_data/landing.yml` template. |
-| `_includes/analytics/posthog.html` | Consent gate, Global Privacy Control, no IP geolocation. **Retire on the next theme pin bump** — upstreamed in v1.28.0 as `posthog.privacy.*`, already set in `_config.yml`; the pin is still v1.26.0, which ignores those keys. |
+| `_includes/analytics/posthog.html` | Consent gate, Global Privacy Control, no IP geolocation. **Retirable now** — upstreamed in v1.28.0 as `posthog.privacy.*`, set in `_config.yml`, and `remote_theme` is untagged so the theme honours them. Delete in its own PR after diffing the rendered PostHog init on both stacks. |
 | `_includes/analytics/google-tag-manager-head.html` | Deliberate no-op stub. Google Tag Manager is off site-wide; PostHog is the only analytics. |
 | `assets/images/wizard-on-journey.png` | Our own homepage/Open Graph image that happens to share a path with an unrelated theme asset. |
 
@@ -99,7 +99,7 @@ The site is a thin consumer of `bamr87/zer0-mistakes`. Anything under `_includes
 | Stack | Config | Theme source | Built by CI? |
 |---|---|---|---|
 | **Local dev** | `_config.yml,_config_dev.yml` | path gem (`/zer0-mistakes` mount) | **No** |
-| **GitHub Pages** | `_config.yml` alone | `remote_theme`, pinned tag | Yes (`build-pages`) |
+| **GitHub Pages** | `_config.yml` alone | `remote_theme`, untagged (latest) | Yes (`build-pages`) |
 | **Azure Static Web Apps** | `_config.yml,_config.azure.yml` | `Gemfile.azure` gem pin | Yes (`build-azure`) |
 
 Local dev runs on port 4042 with livereload and is the only stack where `_plugins/` execute; GitHub Pages is **safe mode**, so anything depending on a local plugin (e.g. server-side wikilink resolution) must also work without it, or it is broken in production.

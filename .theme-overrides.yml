@@ -2,7 +2,8 @@
 # .theme-overrides.yml — the theme files this site intentionally forks
 # =============================================================================
 #
-# This site consumes bamr87/zer0-mistakes (pinned in _config.yml). Any file
+# This site consumes bamr87/zer0-mistakes (untagged in _config.yml — tracks
+# the theme's latest main, per fleet policy). Any file
 # kept here that also exists in the theme SHADOWS the theme's copy. The theme's
 # auditor classifies each one:
 #
@@ -45,16 +46,20 @@ overrides:
 
   - path: "_includes/analytics/posthog.html"
     reason: >-
-      Privacy hardening the pinned theme cannot express: initializes opted out
-      with memory-only persistence until the cookie banner records analytics
-      consent, honors Global Privacy Control alongside Do Not Track, and
-      disables PostHog IP geolocation. This is what /privacy/ promises readers.
+      Privacy hardening: initializes opted out with memory-only persistence
+      until the cookie banner records analytics consent, honors Global Privacy
+      Control alongside Do Not Track, and disables PostHog IP geolocation. This
+      is what /privacy/ promises readers.
     upstream: >-
-      Upstreamed in theme v1.28.0 as posthog.privacy.{respect_gpc,
-      require_consent, geoip_disable}; _config.yml already sets all three.
-      Delete this fork once remote_theme is bumped from v1.26.0 to >= v1.28.0
-      (and Gemfile.azure with it) — not before, or capture-before-consent and
-      IP geolocation come back silently.
+      RETIRABLE — precondition met. The theme upstreamed this in v1.28.0 as
+      posthog.privacy.{respect_gpc, require_consent, geoip_disable}; _config.yml
+      sets all three to the values this fork hardcodes, and remote_theme is now
+      untagged (tracking latest), so the THEME honours them directly and this
+      fork is redundant. Deleting it is a separate PR: build the Pages and Azure
+      stacks and diff the rendered PostHog init against this fork's output
+      first, because a mismatch silently restores capture-before-consent and IP
+      geolocation. Until then it shadows the theme's newer copy — same privacy
+      behaviour, but frozen at v1.26-era code.
 
   - path: "assets/images/wizard-on-journey.png"
     reason: >-

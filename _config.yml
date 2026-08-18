@@ -26,9 +26,11 @@
 # Site Settings ###################################################################
 
 founder                  : "Amr"
-# Pinned to a release tag so a theme push can never change production without review.
-# Bump deliberately: test with both config stacks (dev + azure) before raising.
-remote_theme             : "bamr87/zer0-mistakes@v1.26.0"
+# Untagged by policy: the fleet tracks the theme's latest main, so a theme fix
+# reaches production without a bump PR in nine repos. Theme bugs go upstream
+# rather than getting pinned around. Keep Gemfile.azure unconstrained to match —
+# the Pages and Azure stacks must resolve the same theme.
+remote_theme             : "bamr87/zer0-mistakes"
 # theme                    : "jekyll-theme-zer0"  # Commented out - GitHub Pages uses remote_theme instead
 
 ## Github Information
@@ -88,7 +90,7 @@ logo_link                : 'https://bash-365.com' # URL to link the logo to, e.g
 teaser                   : '/assets/images/favicon_gpt_computer_retro.png' # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 
 # Favicon / browser identity — rendered by the theme's core/favicon.html
-# (no-op on the pinned v1.26.0 theme; lights up on the next pin bump — the
+# (honoured now that remote_theme is untagged and tracks latest — the
 # root favicon.ico keeps working via the browser's implicit probe meanwhile).
 favicon:
   ico                    : /favicon.ico
@@ -179,13 +181,13 @@ posthog:
     mask_all_inputs      : true   # Mask form inputs in session recordings
     ip_anonymization     : true   # Anonymize IP: client sends ip:false; project anonymize_ips=true
     # Consent + browser-signal gates. The theme upstreamed these in v1.28.0
-    # (site.posthog.privacy.*), but remote_theme above is pinned to v1.26.0,
-    # which ignores them — so the local override
-    # _includes/analytics/posthog.html still hardcodes exactly this behaviour.
-    # Declared here so the two agree today and the override can be deleted
-    # (not rewritten) the moment the pin reaches >= v1.28.0. Retirement is
-    # tracked in .theme-overrides.yml. The published behaviour these describe
-    # is what /privacy/ promises readers — keep all three in sync.
+    # (site.posthog.privacy.*) and remote_theme is now untagged, so the THEME
+    # honours these keys directly. The local override
+    # _includes/analytics/posthog.html hardcodes the identical behaviour and is
+    # therefore redundant — it is now retirable, tracked in .theme-overrides.yml,
+    # and should be deleted in its own PR after verifying the theme's rendered
+    # PostHog init matches. The published behaviour these describe is what
+    # /privacy/ promises readers — keep all three in sync.
     respect_gpc          : true   # Global Privacy Control: don't load PostHog at all
     require_consent      : true   # Start opted out, memory-only, until the banner records analytics consent
     geoip_disable        : true   # No IP-derived city/region/postal on any event

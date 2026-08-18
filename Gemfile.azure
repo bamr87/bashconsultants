@@ -4,9 +4,10 @@ source "https://rubygems.org"
 
 gem 'github-pages'
 
-# Pinned to match remote_theme bamr87/zer0-mistakes@v1.26.0 in _config.yml —
-# keep the two pins in lockstep and test the Azure stack before bumping either.
-gem 'jekyll-theme-zer0', '~> 1.26.0'
+# Unconstrained to match the untagged remote_theme in _config.yml: the Pages and
+# Azure stacks must resolve the SAME theme, and fleet policy is to track latest.
+# `bundle update jekyll-theme-zer0` is what actually advances this stack.
+gem 'jekyll-theme-zer0'
 
 group :jekyll_plugins do
   # Keep other plugins, but omit jekyll-remote-theme for Azure
