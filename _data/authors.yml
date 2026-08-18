@@ -1,0 +1,68 @@
+# Author profiles for the zer0-mistakes theme.
+#
+# Consumed by the theme's components/author-card.html (bylines, "About the
+# Author") and components/author-bio.html, which the `article` layout renders
+# for every post. `remote_theme` does NOT ship _data/ — without this file the
+# theme falls back to a bare name string and a generic person icon, with no
+# avatar, role, or bio.
+#
+# Resolution: the theme matches page front matter `author:` against a key
+# first, then against each entry's `name` / `display_name`. Posts here are
+# bylined with the display name (`author: Amr Abdel-Motaleb`), so the `name`
+# values below MUST stay byte-identical to the strings used in front matter —
+# rename one and the byline silently falls back to the generic icon again.
+#
+# Fields the theme reads: name, display_name, bio, avatar, email, twitter,
+# github, linkedin, website, role, tagline, location, expertise.
+#
+# Everything here is sourced from the repo's own identity files — the profile
+# page pages/_about/organization/amr.md, _data/entity/info.yml, and
+# .github/instructions/brand.instructions.md. Never add a credential, metric,
+# or certification that is not already attested there (operating rule 4).
+#
+# NOTE: the theme's /authors/<key>/ profile pages come from a theme _plugin,
+# which GitHub Pages safe mode never runs — so the card's "More from" link is
+# correctly suppressed in production. The `website` link below carries readers
+# to the site's own /about/amr/ page instead.
+#
+# `avatar` values are ABSOLUTE URLs on purpose. The pinned theme (v1.26.0)
+# builds a relative avatar path as `{{ site.baseurl }}/{{ site.public_folder }}`
+# + the value, and this site's public_folder already carries a leading slash
+# ("/assets" — pages/index.html depends on that), so a relative path renders as
+# a broken protocol-relative "//assets/...". A value containing "://" is passed
+# through untouched by every theme version. Theme v1.28.0 collapses the double
+# slash and applies relative_url; after the pin bump these can become
+# "/images/<file>" (theme convention: no /assets prefix — public_folder adds it).
+
+amr:
+  name: "Amr Abdel-Motaleb"
+  role: "Founder and solutions architect, BASH Consulting"
+  tagline: "Enterprise-grade IT for small business — cloud, ERP, data, and AI-augmented automation, from Denver, Colorado"
+  bio: >-
+    Solutions architect with a finance and IT background — ERP, financial
+    systems, and data work for manufacturers and growing businesses. Through
+    BASH Consulting he brings that enterprise-grade work to businesses that
+    cannot justify a big-firm engagement, and teaches the people inside them
+    to run their own systems.
+  location: "Denver, CO"
+  avatar: "https://bash-365.com/assets/images/Amr-Headshot_v2.jpg"
+  github: "bamr87"
+  linkedin: "amrabdel"
+  website: "https://bash-365.com/about/amr/"
+  expertise:
+    - "ERP implementations"
+    - "Financial system design"
+    - "Business intelligence reporting"
+    - "System integrations"
+    - "Cloud architecture"
+
+bash-team:
+  name: "BASH Consulting Team"
+  role: "BASH Consulting"
+  tagline: "Bourne Again Solutions Hero"
+  bio: >-
+    Denver-based IT consulting that brings cloud, ERP, financial systems, and
+    governed AI automation within reach of small and medium businesses.
+  location: "Denver, CO"
+  avatar: "https://bash-365.com/assets/brand/favicon.svg"
+  website: "https://bash-365.com/about/"
