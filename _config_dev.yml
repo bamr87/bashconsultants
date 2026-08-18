@@ -42,6 +42,16 @@ profile                  : false
 # last; a short list here *replaces* the base exclude and would skip
 # node_modules/, causing Liquid to parse README.md samples under npm packages.
 exclude:
+  # Repo docs + dev tooling — keep in lockstep with _config.yml's exclude list
+  # (these four .md files were being served from production; see that file).
+  - README.md
+  - CLAUDE.md
+  - AGENTS.md
+  - CHANGELOG.md
+  - Dockerfile
+  - docker-compose.yml
+  - package.json
+  - frontmatter.json
   - .sass-cache/
   - .jekyll-cache/
   - .obsidian
