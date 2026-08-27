@@ -24,7 +24,7 @@ tags:
 categories:
   - Cloud Services
   - IT Infrastructure
-lastmod: 2026-07-06T12:00:00.000Z
+lastmod: 2026-08-27T12:00:00.000Z
 slug: cloud-architecture
 permalink: /services/cloud/
 draft: false
@@ -58,6 +58,18 @@ We work across all three major providers and pick the one that fits your workloa
 | **Amazon Web Services (AWS)** | The broadest, most mature set of managed services | You want maximum breadth and proven scale |
 | **Google Cloud Platform (GCP)** | Data, analytics, and Kubernetes | Data warehousing and analytics matter most |
 | **Microsoft Azure** | Deep Microsoft and Office 365 integration | You already run Windows, Office 365, or Dynamics |
+
+## Security and the shared responsibility model
+
+Moving to the cloud does not make security someone else's job — it splits the job differently. AWS, Azure, and GCP each secure the physical data centers, the host infrastructure, and the virtualization layer — what AWS calls [the shared responsibility model](https://aws.amazon.com/compliance/shared-responsibility-model/) describes as "security **of** the cloud." Everything above that line — identity and access management (IAM), data encryption, network configuration, and what you back up and how often — is "security **in** the cloud," and it stays the customer's responsibility regardless of provider.
+
+That distinction matters most at migration time, because it's exactly when the gaps show up:
+
+- **Identity and access.** Default configurations are rarely least-privilege. We scope IAM roles to what each system and person actually needs, not broad admin access carried over from an on-prem habit.
+- **Encryption and network boundaries.** Data at rest and in transit gets encrypted by default in our designs, and workloads sit behind the same kind of network segmentation you'd expect on-prem — not a flat, open subnet.
+- **Backup and recovery objectives.** "The provider handles backups" is a common assumption and often wrong — most managed services back up for their own durability, not for your recovery point objective (RPO) and recovery time objective (RTO). We set those targets explicitly and test the restore, not just the backup job.
+
+None of this is optional once a compliance framework is in scope. The Health Insurance Portability and Accountability Act (HIPAA), PCI DSS, and SOC 2 all evaluate the customer's side of that line — a cloud migration doesn't inherit compliance, it inherits the opportunity to configure it correctly the first time. The fundamentals in [[The security baseline every small business needs]] — multi-factor authentication (MFA), least privilege, and tested backups — still apply in the cloud; this is where they get implemented.
 
 ## Who it's for
 
