@@ -123,5 +123,5 @@ jobs:
               preview image at the frontmatter's `preview:` path exists (or
               regenerate it), and update `lastmod` if edited.
           claude_args: |
-            --max-turns 40
+            --max-turns 80
             --allowedTools "Read,Write,Edit,Glob,Grep,Bash(date:*),Bash(ls:*),Bash(git:*),Bash(gh pr create:*),Bash(gh pr list:*)"
