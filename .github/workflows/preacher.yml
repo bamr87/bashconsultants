@@ -134,5 +134,5 @@ jobs:
             Step 4 — print a short summary: gate results, the mode you chose, and the
             PR URL.
           claude_args: |
-            --max-turns 40
+            --max-turns 80
             --allowedTools "Read,Write,Edit,Glob,Grep,Bash(python3 scripts/doctrine_check.py:*),Bash(python3 scripts/content_lint.py:*),Bash(date:*),Bash(ls:*),Bash(git:*),Bash(gh pr create:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr comment:*)"
