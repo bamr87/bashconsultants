@@ -48,11 +48,20 @@ python3 scripts/generate_playbook_data.py --check  # exit 1 if the file is stale
 
 ### `generate_mark_shape.py`
 
-Generates `_includes/brand/mark-shape.svg` — the outline the interactive homepage mark (`_includes/bash-mark.html`, `assets/js/bash-mark.js`) samples its particles from — straight out of the canonical `assets/brand/favicon.svg`, by Inkscape label (`outer-B`, `inner-c`, and the `B-Logo` layer's translate). The geometry is never hand-copied, so it cannot drift from the mark. Standard library only, deterministic output.
+Generates `_includes/brand/mark-shape.svg` — the outline the interactive homepage mark (`_includes/bash-mark.html` over `assets/js/constellation.js`) samples its stars from — straight out of the canonical `assets/brand/favicon.svg`, by Inkscape label (`outer-B`, `inner-c`, and the `B-Logo` layer's translate). The geometry is never hand-copied, so it cannot drift from the mark. Standard library only, deterministic output.
 
 ```bash
 python3 scripts/generate_mark_shape.py          # write _includes/brand/mark-shape.svg
 python3 scripts/generate_mark_shape.py --check  # exit 1 if the include is stale
+```
+
+### `sample_mesh_points.py`
+
+Samples a Wavefront OBJ mesh surface uniformly by area into a point-cloud JSON that the constellation engine's `points` source loads with `url:` — the way a 3D model from Blender or a CAD tool becomes a scene in `_data/constellations/`. Reads `v` and `f` records (polygons fan-triangulated), ignores normals, textures, and materials, normalizes to a unit half-size, and uses a fixed seed so the same mesh gives the same file. Standard library only. Reference: `/tools/partners/constellation-engine/`.
+
+```bash
+python3 scripts/sample_mesh_points.py model.obj -o assets/data/constellations/model.json
+python3 scripts/sample_mesh_points.py model.obj --count 2400 --seed 7 > model.json
 ```
 
 ## Preview images

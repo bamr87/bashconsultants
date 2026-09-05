@@ -1,0 +1,82 @@
+{%- comment -%}
+  constellation.html — render any shape as an interactive cloud of light.
+
+  The markup half of assets/js/constellation.js. A scene (or a timeline of
+  scenes) is YAML under _data/constellations/<name>.yml; this include emits it
+  as JSON for the engine, so animations are designed as data and reviewed in a
+  diff. Without JavaScript, or in a browser with no canvas, only the fallback
+  you pass renders.
+
+  Usage:
+    {% include constellation.html scene="bash-mark" shape="brand/mark-shape.svg" fallback=site.logo alt="BASH Consulting logo" %}
+    {% include constellation.html scene="terminal-demo" aspect="16 / 10" size="min(100%, 720px)" %}
+
+  Parameters:
+    scene      name of a file in _data/constellations/ (required unless config is given)
+    config     a config object instead of a scene file (e.g. from page front matter)
+    shape      an include path for an inline SVG the svg source samples by default
+    fallback   image URL shown when the engine cannot run; alt is its alt text
+    size       CSS width of the stage (default clamp(220px, 55vw, 400px))
+    aspect     CSS aspect-ratio of the stage (default 1 / 1)
+    background "dark" (default) paints a deep-navy stage with rounded corners —
+               additive light needs a dark ground; "none" for a host that is
+               already dark, like the homepage hero band
+    label      aria-label for the pointer/keyboard control
+    hint       short hint text under the stage ("" hides it)
+    particles  override the pool size for this instance
+
+  The accent colors default to the logo palette from `theme_color` in
+  _config.yml (data-accents), so the brand's file of record stays the single
+  source of truth unless a scene declares its own palette. Styles are inline on
+  purpose: the stage is often above the fold, and a stylesheet request from
+  inside <body> would flash the fallback before it loaded.
+{%- endcomment -%}
+{%- assign tc = site.theme_color -%}
+{%- assign cfg = include.config -%}
+{%- if include.scene -%}{%- assign cfg = site.data.constellations[include.scene] -%}{%- endif -%}
+{%- assign stage_size = include.size | default: "clamp(220px, 55vw, 400px)" -%}
+{%- assign stage_aspect = include.aspect | default: "1 / 1" -%}
+{%- assign stage_label = include.label | default: cfg.label | default: "Drag or use arrow keys to rotate; click to send a wave" -%}
+{%- assign stage_hint = include.hint | default: cfg.hint | default: "Drag to rotate · click to ripple" -%}
+{%- assign stage_bg = include.background | default: "dark" -%}
+<style>
+  .constellation { position: relative; width: var(--constellation-size, 320px); aspect-ratio: var(--constellation-aspect, 1 / 1); margin-inline: auto; user-select: none; -webkit-user-select: none; }
+  @supports not (aspect-ratio: 1 / 1) { .constellation { height: var(--constellation-size, 320px); } }
+  .constellation--dark { background: radial-gradient(120% 90% at 50% 0%, #10294a 0%, #071628 45%, #030811 100%); border-radius: 1rem; color: #dee2e6; overflow: hidden; }
+  .constellation--dark + .constellation__hint, .constellation--dark .constellation__hint { color: #dee2e6; }
+  .constellation__canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.2s ease; }
+  .constellation.is-live .constellation__canvas { opacity: 1; }
+  /* Doubled-up selector on purpose: the theme styles every button that is not a
+     copy button (border, padding, radius), and that rule outranks a lone class. */
+  .constellation button.constellation__drag { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: 12%; box-shadow: none; background: transparent; color: inherit; font: inherit; cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+  .constellation button.constellation__drag[data-dragging="true"] { cursor: grabbing; }
+  .constellation button.constellation__drag:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+  .constellation:not(.is-live) button.constellation__drag { display: none; }
+  .constellation__shape { display: none; }
+  .constellation__fallback { position: absolute; inset: 15%; width: 70%; height: 70%; object-fit: contain; }
+  .constellation.is-live .constellation__fallback { display: none; }
+  .constellation__hint { position: absolute; left: 0; right: 0; top: 100%; margin: .35rem 0 0; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; text-align: center; opacity: .5; pointer-events: none; transition: opacity .6s ease; }
+  .constellation:not(.is-live) .constellation__hint, .constellation.is-touched .constellation__hint { opacity: 0; }
+  .constellation--dark .constellation__hint { top: auto; bottom: .5rem; margin: 0; }
+  @media (prefers-reduced-motion: reduce) { .constellation__canvas, .constellation__hint { transition: none; } }
+</style>
+<div class="constellation{% if stage_bg == 'dark' %} constellation--dark{% endif %}" data-constellation
+     data-accents="{{ tc.yellow | default: '#ffe900' }},{{ tc.teal | default: '#376986' }},{{ tc.red | default: '#a11111' }}"
+     {%- if include.particles %} data-particles="{{ include.particles }}"{% endif %}
+     style="--constellation-size: {{ stage_size }}; --constellation-aspect: {{ stage_aspect }};">
+  {%- if cfg %}
+  <script type="application/json" data-constellation-config>{{ cfg | jsonify }}</script>
+  {%- endif %}
+  <canvas class="constellation__canvas" aria-hidden="true"></canvas>
+  <button class="constellation__drag" type="button" aria-label="{{ stage_label }}" data-dragging="false"></button>
+  {%- if include.shape %}
+  <div class="constellation__shape" data-constellation-shape aria-hidden="true">{% include {{ include.shape }} %}</div>
+  {%- endif %}
+  {%- if include.fallback %}
+  <img class="constellation__fallback" src="{{ include.fallback | relative_url }}" alt="{{ include.alt | default: '' }}" width="160" height="160" decoding="async">
+  {%- endif %}
+  {%- if stage_hint != "" %}
+  <p class="constellation__hint" aria-hidden="true">{{ stage_hint }}</p>
+  {%- endif %}
+</div>
+<script defer src="{{ '/assets/js/constellation.js' | relative_url }}"></script>

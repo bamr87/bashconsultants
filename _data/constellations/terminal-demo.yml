@@ -1,0 +1,31 @@
+# A typed shell session, glyph by glyph, drawn in stars. Each line is typed
+# (prompt + type) or printed at once (print); role picks the color
+# (prompt = accent 1, input = base, output = accent 2, error = accent 3).
+label: "A terminal session drawn in stars. Drag to rotate; click to send a wave"
+hint: "Typed live · drag · click"
+particles: 3000
+look:
+  glow: point        # crisp dots read as text better than soft halos
+  halo: { accent: 1, alpha: 0.10, scale: 3.2 }
+  stars: 70
+camera: { radius: 0.42, restTilt: 0.04, startYaw: 0 }
+motion: { spin: 0, nod: 0.02 }     # text faces the reader unless dragged
+scene:
+  source: terminal
+  width: 3.4         # stage width in half-sizes; the 16:10 stage has room to spare
+  cps: 18
+  lines:
+    - prompt: "$ "
+      type: "bash --version | head -1"
+      pause: 0.3
+    - print: "GNU bash, version 5.2"
+      pause: 0.6
+    - prompt: "$ "
+      type: "./close-books --period 2026-08"
+      pause: 0.3
+    - print: "✓ 3 ledgers reconciled"
+      pause: 0.2
+    - print: "✓ 0 exceptions"
+      pause: 0.2
+    - print: "audit trail: 12 steps logged"
+      pause: 1.2

@@ -1,0 +1,27 @@
+# One field of stars, three scenes: the mark, a short terminal exchange, a
+# torus. The same stars travel between them; whatever a scene does not need
+# waits as background dust. `hold` is how long a finished scene stays.
+label: "The BASH mark, a terminal line, and a torus, drawn by the same stars. Drag to rotate; click to send a wave"
+hint: "Morphing · drag · click"
+particles: 3000
+loop: true
+settle: 2.5
+camera: { radius: 0.40 }
+timeline:
+  - source: svg           # the inline shape the include renders
+    hold: 5
+  - source: terminal
+    width: 2.6
+    cps: 20
+    hold: 2.5
+    lines:
+      - prompt: "$ "
+        type: "deploy --env prod"
+        pause: 0.3
+      - print: "✓ 12 services healthy"
+        pause: 1.0
+  - source: points
+    generator: torus
+    count: 1600
+    depth: 1
+    hold: 5
