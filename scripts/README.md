@@ -44,6 +44,53 @@ python3 scripts/generate_playbook_data.py          # write _data/playbook.yml
 python3 scripts/generate_playbook_data.py --check  # exit 1 if the file is stale
 ```
 
+## The content loop (`loop/`)
+
+The deterministic half of the [content loop](../docs/content-loop.md) — the daily routine that turns the practice's own recent work into a new article every other day and an improvement to an existing page on the days between. Standard library only; every script has a `--self-test`. The model does only the writing.
+
+### `loop/signals.py`
+
+Mines the activity into scored *stories*: this repository's git history (commits grouped by the `Claude-Session:` trailer, by `(#N)` pull-request reference, or by day; AI-assisted work marked by its `Co-Authored-By: Claude` trailer; areas, files, insertions and deletions), the CHANGELOG lines that mention each pull request, the committed AI-session trace, and — best-effort, read-only via `gh api` — the sister repositories in `_data/loop/sources.yml`. Stories already recorded in the ledger are marked spent and score zero.
+
+```bash
+python3 scripts/loop/signals.py --no-remote              # the digest, home repo only
+python3 scripts/loop/signals.py --window 60 --json       # machine-readable, wider window
+python3 scripts/loop/signals.py --out .loop              # signals.json + digest.md
+```
+
+### `loop/plan.py`
+
+The pure decision: given the ledger, `_data/loop/config.yml`, the count of open loop PRs, and the stories, choose **new**, **improve**, or **idle** with a reason; order the section ring most-overdue first; offer the best unspent stories and the improve candidates (from `content_inventory.py`, boosted when recent work touched a page's subject). Writes `plan.json` + `plan.md` and, in CI, the job outputs.
+
+```bash
+python3 scripts/loop/plan.py --out .loop --no-remote     # decide today; read .loop/plan.md
+python3 scripts/loop/plan.py --mode improve --section erp --json   # operator overrides
+```
+
+### `loop/ledger.py`
+
+The loop's memory — one YAML record per run under `_data/loop/runs/`, committed in the same pull request as the content it describes (one file per run, so parallel loop PRs never conflict).
+
+```bash
+python3 scripts/loop/ledger.py --list
+python3 scripts/loop/ledger.py --record --mode new --section tech --path <file> --title "…" --signals session:abc,pr:38 --summary "…"
+python3 scripts/loop/ledger.py --set-pr <run-id> <pull-request-url>
+```
+
+### `loop/trace.py`
+
+The session trace: the `SessionEnd` hook (`.claude/hooks/session-trace.sh`) calls `trace.py append` to record one line of scrubbed metadata per Claude Code session — id, intent (the first prompt, one line), files touched, commits carrying the session's trailer — into the local, gitignored queue `.claude/loop/sessions.jsonl`. Never a transcript. `--sync` folds the queue into the committed `_data/loop/sessions.jsonl`, which a human reviews and commits.
+
+```bash
+python3 scripts/loop/trace.py --list
+python3 scripts/loop/trace.py --sync
+python3 scripts/loop/trace.py --add --session-id <id> --intent "…"   # a manual entry
+```
+
+### `loop/_lib.py`
+
+Shared helpers: a strict YAML-subset reader/writer for `_data/loop/*.yml` (no block scalars, anchors, or flow maps — by design), the git wrapper, the credential scrubber every committed string passes through, the house slug rule, and date helpers.
+
 ## Preview images
 
 ### `features/generate-preview-images` (canonical)

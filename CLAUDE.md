@@ -32,6 +32,7 @@ Guidance is layered. Read from the top; the deeper layers auto-load or are pulle
 | **File-scoped rules** | `.github/instructions/*.instructions.md` | Auto-matched by `applyTo` glob |
 | **Frontmatter schema** | [`.github/FRONTMATTER.md`](./.github/FRONTMATTER.md) | Editing any `.prompt.md` / `.instructions.md` |
 | **Content taxonomy** | [`_data/taxonomy.yml`](./_data/taxonomy.yml) | Categorizing or voicing a post |
+| **The content loop** | [`docs/content-loop.md`](./docs/content-loop.md) + `_data/loop/` | Before touching the loop's scripts, data, workflow, or the session-trace hook |
 
 ### The Claude-native primitives (`.claude/`)
 
@@ -39,10 +40,12 @@ Four primitives, one job each. See [`.claude/README.md`](./.claude/README.md) fo
 
 | Primitive | Directory | Use it when |
 |---|---|---|
-| **Skills** | `.claude/skills/*/SKILL.md` | You need a *governed procedure* — the same steps done the same way every time (editorial gate, authoring a toolkit doc, wikilink discipline, brand application, LinkedIn share drafting). |
-| **Subagents** | `.claude/agents/*.md` | You want to *delegate* a bounded job to a fresh context (editorial review, build validation, brand audit). Invoke via the Agent tool. |
-| **Commands** | `.claude/commands/*.md` | You want a discoverable `/`-entry point that runs a common workflow (`/lint-content`, `/new-toolkit-doc`, `/brand-check`, `/linkedin-draft`). |
-| **Memory + hooks** | `.claude/agent-memory/`, `.claude/hooks/`, `.claude/settings.json` | Agents carry decisions across sessions; hooks enforce policy automatically. |
+| **Skills** | `.claude/skills/*/SKILL.md` | You need a *governed procedure* — the same steps done the same way every time (editorial gate, authoring a toolkit doc, wikilink discipline, brand application, LinkedIn share drafting, one cycle of the content loop). |
+| **Subagents** | `.claude/agents/*.md` | You want to *delegate* a bounded job to a fresh context (editorial review, build validation, brand audit, the loop writer). Invoke via the Agent tool. |
+| **Commands** | `.claude/commands/*.md` | You want a discoverable `/`-entry point that runs a common workflow (`/lint-content`, `/new-toolkit-doc`, `/brand-check`, `/linkedin-draft`, `/loop-run`). |
+| **Memory + hooks** | `.claude/agent-memory/`, `.claude/hooks/`, `.claude/settings.json` | Agents carry decisions across sessions; hooks enforce policy automatically (the `SessionEnd` trace feeds the content loop). |
+
+**The content loop** is the showcase's autopilot: a daily, variable-gated routine that turns the practice's own commits, pull requests, and AI sessions into one new article every other day and one improvement on the days between, through the scripts in `scripts/loop/`, the `content-loop` skill, the `loop-writer` agent, and one human-merged pull request per run. Read [`docs/content-loop.md`](./docs/content-loop.md) before changing any of it.
 
 **Skills vs. prompts:** `.github/prompts/*.prompt.md` are the *cross-tool* library (Copilot, the extension, Cursor). `.claude/skills/` are the *Claude-native* equivalents — richer, with optional scripts. When both exist, prefer the skill inside Claude Code; keep the two in sync when you change a shared workflow.
 
