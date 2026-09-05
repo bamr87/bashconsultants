@@ -92,6 +92,8 @@ Each particle is a pre-rendered sprite: a small canvas holding a radial gradient
 
 Every particle twinkles on its own phase and speed, a few twinkle hard and fast as sparklers, and each one drifts a hair around its home position. On load the particles fly in from scattered positions over about a second and a half, staggered per particle. When nobody is touching it, the mark turns slowly and nods a little, which keeps the slab's depth in view.
 
+The mouse gets a reaction of its own. Particles within a small radius of the pointer are pushed away from it, hardest right under the cursor, and the displacement is stored per particle and decayed a little every frame, so the letter reassembles over a few seconds once the pointer moves on. One detail makes it feel physical rather than painted on: the push happens in screen space, but it is stored in the mark's own space by running it back through the inverse of the rotation, so a dent you leave on the front face turns away with the mark instead of sticking to the glass. Disturbed particles also flare a little brighter, which is what sells the scatter.
+
 ### 6. Make it usable
 
 The control is the same one OpenAI used: a `button` over the canvas with an `aria-label`, focusable and keyboard-operable. Pointer events with pointer capture handle the drag; the release velocity is smoothed over the last few moves so a flick keeps the mark spinning and it eases back into the idle turn. Arrow left and right nudge the turn, up and down the tilt, Home resets, and the handler calls `preventDefault()` so the page does not scroll under the keyboard user's feet.

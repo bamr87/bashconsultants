@@ -26,6 +26,9 @@
  *   Drag horizontally to turn, vertically to tilt; a flick keeps spinning and eases
  *   back into the idle rotation. Arrow left/right nudge the turn, arrow up/down the
  *   tilt, Home resets. Touch drags that are mostly vertical still scroll the page.
+ *   Moving the pointer over the mark pushes the particles near it aside; the push
+ *   is stored in the mark's own space (so the dent turns with the mark) and decays
+ *   slowly, so the letter reassembles over a few seconds once the pointer moves on.
  */
 (function () {
   'use strict';
@@ -40,7 +43,11 @@
     focal: 4,          // perspective strength: camera distance in half-sizes
     restTilt: 0.16,    // idle tilt about X so the slab's thickness shows
     startYaw: -0.55,   // initial turn so the mark loads three-quarter on
-    maxTilt: 1.2
+    maxTilt: 1.2,
+    hoverRadius: 0.22, // pointer field radius, as a fraction of the canvas size
+    hoverForce: 3.2,   // push under the pointer, in half-sizes per second
+    hoverReturn: 0.6,  // settle-home rate per second: ~0.55 left after 1s, ~5% after 5s
+    hoverMax: 0.45     // cap on displacement, in half-sizes
   };
   var MIN_PARTICLES = 900, MAX_PARTICLES = 4200, REFERENCE_SIZE = 400;
   var SPRITE = 64, WHITE = [255, 255, 255];
@@ -227,7 +234,8 @@
         twPhase: rand() * Math.PI * 2,
         twDepth: sparkler ? 0.7 : 0.28,
         jx: rand() * Math.PI * 2, jy: rand() * Math.PI * 2, jz: rand() * Math.PI * 2,
-        jAmp: 0.006 + rand() * 0.01
+        jAmp: 0.006 + rand() * 0.01,
+        ox: 0, oy: 0, oz: 0                         // pointer displacement, mark space
       });
     }
     return list;
@@ -263,7 +271,10 @@
       spin: d.spin != null && d.spin !== '' && !isNaN(parseFloat(d.spin)) ? parseFloat(d.spin) : DEFAULTS.spin,
       seed: parseInt(d.seed, 10) || DEFAULTS.seed,
       edgeBand: DEFAULTS.edgeBand, edgeShare: DEFAULTS.edgeShare,
-      focal: DEFAULTS.focal, restTilt: DEFAULTS.restTilt, startYaw: DEFAULTS.startYaw, maxTilt: DEFAULTS.maxTilt
+      focal: DEFAULTS.focal, restTilt: DEFAULTS.restTilt, startYaw: DEFAULTS.startYaw, maxTilt: DEFAULTS.maxTilt,
+      hover: d.hover !== '0' && d.hover !== 'false',
+      hoverRadius: DEFAULTS.hoverRadius, hoverForce: DEFAULTS.hoverForce,
+      hoverReturn: DEFAULTS.hoverReturn, hoverMax: DEFAULTS.hoverMax
     };
 
     var shape = readShape(root);
@@ -292,6 +303,8 @@
     this.vx = 0; this.vy = 0;
     this.rxTarget = null;
     this.dragging = false;
+    this.pointer = null;                     // hover position in CSS px, or null
+    this.disturbed = false;                  // any particle still displaced
     this.lastInteraction = -Infinity;
     this.reduced = !!(reduceMotion && reduceMotion.matches);
     this.visible = true;
@@ -339,6 +352,7 @@
       el.addEventListener('pointerdown', function (e) {
         if (e.button != null && e.button !== 0) return;
         self.dragging = true;
+        self.pointer = null;                 // a drag turns the mark, it does not dent it
         self.vx = self.vy = 0; self.rxTarget = null;
         last = { x: e.clientX, y: e.clientY, t: performance.now() };
         el.setAttribute('data-dragging', 'true');
@@ -347,7 +361,7 @@
       });
 
       el.addEventListener('pointermove', function (e) {
-        if (!self.dragging || !last) return;
+        if (!self.dragging || !last) { self.hover(e); return; }
         var now = performance.now();
         var dt = Math.max((now - last.t) / 1000, 1 / 240);
         var dyaw = (e.clientX - last.x) / self.size * 2.8;
@@ -373,6 +387,7 @@
       el.addEventListener('pointerup', release);
       el.addEventListener('pointercancel', release);
       el.addEventListener('lostpointercapture', release);
+      el.addEventListener('pointerleave', function () { self.pointer = null; });
 
       el.addEventListener('keydown', function (e) {
         var tilt = self.rxTarget == null ? self.rx : self.rxTarget;
@@ -406,6 +421,15 @@
     if (reduceMotion && reduceMotion.addEventListener) {
       reduceMotion.addEventListener('change', function (e) { self.reduced = e.matches; self.dirty = true; self.start(); });
     }
+  };
+
+  // Track a hovering pointer (mouse or pen) in canvas coordinates. Touch has no
+  // hover, and under reduced motion the mark only moves when dragged or keyed.
+  BashMark.prototype.hover = function (e) {
+    if (!this.opts.hover || this.reduced || e.pointerType === 'touch') return;
+    var r = this.root.getBoundingClientRect();
+    this.pointer = { x: e.clientX - r.left, y: e.clientY - r.top };
+    this.start();
   };
 
   BashMark.prototype.start = function () {
@@ -461,12 +485,13 @@
       }
     }
 
+    if (this.disturbed) moving = true;      // still reassembling after a hover
     if (!this.reduced) moving = true;       // twinkle keeps the normal mode alive
-    if (moving || this.dirty) { this.draw(t, intro); this.dirty = false; }
+    if (moving || this.dirty) { this.draw(t, intro, dt); this.dirty = false; }
     return moving;
   };
 
-  BashMark.prototype.draw = function (t, intro) {
+  BashMark.prototype.draw = function (t, intro, dt) {
     var ctx = this.ctx, S = this.size, dpr = this.dpr;
     var W = this.canvas.width, H = this.canvas.height;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -499,10 +524,20 @@
     var haloD = Rpx * 2.6;
     ctx.globalAlpha = 0.16;
     ctx.drawImage(this.halo, cX - haloD / 2, cY - haloD / 2, haloD, haloD);
+    // Pointer field: particles inside it are pushed away from the pointer along
+    // the screen plane; the push is mapped back into the mark's own space so the
+    // dent turns with the mark, then decays slowly so the letter reassembles.
+    var ptr = this.dragging ? null : this.pointer;
+    var hr = this.opts.hoverRadius * S, hr2 = hr * hr;
+    var force = this.opts.hoverForce * (dt || 0);
+    var settle = Math.exp(-this.opts.hoverReturn * (dt || 0));
+    var maxOff2 = this.opts.hoverMax * this.opts.hoverMax;
+    var disturbed = false;
+
     var sprites = this.sprites, list = this.particles;
     for (var j = 0; j < list.length; j++) {
       var p = list[j];
-      var x = p.x, y = p.y, z = p.z;
+      var x = p.x + p.ox, y = p.y + p.oy, z = p.z + p.oz;
       if (!still) {
         var w = p.jAmp;
         x += Math.sin(t * 0.9 + p.jx) * w;
@@ -519,11 +554,36 @@
       var per = f / (f + z2);
       var X = cX + x1 * Rpx * per, Y = cY + y2 * Rpx * per;
       var bright = still ? 1 : (1 - p.twDepth) + p.twDepth * (0.5 + 0.5 * Math.sin(t * p.twSpeed + p.twPhase));
+
+      var off2 = p.ox * p.ox + p.oy * p.oy + p.oz * p.oz;
+      if (ptr) {
+        var ddx = X - ptr.x, ddy = Y - ptr.y, d2 = ddx * ddx + ddy * ddy;
+        if (d2 < hr2 && d2 > 0) {
+          var dist = Math.sqrt(d2), fall = 1 - dist / hr;
+          var push = force * fall * fall / dist;       // strongest right under the pointer
+          var pxs = ddx * push, pys = ddy * push;      // screen-plane push, half-size units
+          p.ox += pxs * cy + pys * sx * sy;            // inverse of the turn-then-tilt rotation
+          p.oy += pys * cx;
+          p.oz += pxs * sy - pys * sx * cy;
+          off2 = p.ox * p.ox + p.oy * p.oy + p.oz * p.oz;
+        }
+      }
+      if (off2 > 0) {
+        if (off2 > maxOff2) {
+          var sc = this.opts.hoverMax / Math.sqrt(off2);
+          p.ox *= sc; p.oy *= sc; p.oz *= sc; off2 = maxOff2;
+        }
+        p.ox *= settle; p.oy *= settle; p.oz *= settle;
+        if (off2 < 1e-6) { p.ox = p.oy = p.oz = 0; }
+        else { disturbed = true; bright += Math.min(Math.sqrt(off2) * 1.5, 0.6); }  // disturbed light flares
+      }
+
       var shade = 0.55 + 0.45 * clamp(0.5 - z2 * 0.5, 0, 1);  // nearer is brighter
       var dia = p.size * S * per * (0.85 + 0.15 * bright);
       ctx.globalAlpha = p.alpha * bright * shade * (0.35 + 0.65 * k);
       ctx.drawImage(sprites[p.color], X - dia / 2, Y - dia / 2, dia, dia);
     }
+    this.disturbed = disturbed;
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
   };

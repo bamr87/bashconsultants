@@ -2,8 +2,9 @@
   bash-mark.html — the BASH B mark as an interactive, rotating cloud of light.
 
   A canvas rendering of the mark as a few thousand glowing particles: it turns
-  on its own, follows a pointer drag with inertia, and answers the arrow keys
-  for keyboard users. The geometry is the inline SVG include below (generated
+  on its own, follows a pointer drag with inertia, answers the arrow keys for
+  keyboard users, and scatters under a hovering pointer before slowly
+  reassembling once the pointer moves on. The geometry is the inline SVG include below (generated
   from assets/brand/favicon.svg by scripts/generate_mark_shape.py); the
   behavior is assets/js/bash-mark.js. Without JavaScript, or in a browser
   with no canvas, the static mark stays in place and nothing else renders.
@@ -17,6 +18,7 @@
     particles  particle count at full size (scaled by area on small screens)
     spin       idle rotation in radians per second ("0" disables it)
     depth      slab thickness as a fraction of the mark's half-size
+    hover      "0" turns off the pointer reaction (the drag still works)
 
   The accent colors are the logo palette from `theme_color` in _config.yml,
   so the brand's file of record stays the single source of truth. The styles
@@ -48,6 +50,7 @@
      {%- if include.particles %} data-particles="{{ include.particles }}"{% endif %}
      {%- if include.spin %} data-spin="{{ include.spin }}"{% endif %}
      {%- if include.depth %} data-depth="{{ include.depth }}"{% endif %}
+     {%- if include.hover %} data-hover="{{ include.hover }}"{% endif %}
      style="--bash-mark-size: {{ mark_size }};">
   <canvas class="bash-mark__canvas" aria-hidden="true"></canvas>
   <button class="bash-mark__drag" type="button" aria-label="Drag or use arrow keys to rotate the BASH mark" data-dragging="false"></button>
