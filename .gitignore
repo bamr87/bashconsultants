@@ -39,3 +39,9 @@ __pycache__/
 
 # Generated at build time by _plugins/content_statistics_generator.rb
 _data/content_statistics.yml
+
+# Content loop: the local SessionEnd trace queue (folded into
+# _data/loop/sessions.jsonl by `scripts/loop/trace.py --sync`) and the
+# planner's per-run working directory (plan.json / digest.md).
+.claude/loop/
+.loop/

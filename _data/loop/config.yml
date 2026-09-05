@@ -1,0 +1,89 @@
+# =============================================================================
+# _data/loop/config.yml — the content loop's one configuration file
+# -----------------------------------------------------------------------------
+# Read by scripts/loop/plan.py (the deterministic planner) and signals.py (the
+# activity miner). Change a number here and the whole loop changes; nothing in
+# the scripts or the workflow hard-codes cadence, rotation, or caps.
+#
+# The loop's job: one NEW article every other day, drawn from the practice's
+# own recent work (commits, pull requests, AI sessions, tools), and on the days
+# in between, one IMPROVEMENT to an existing page that the same activity has
+# made thin or stale. Sections rotate so no one voice dominates. Every run
+# opens ONE pull request; a human merges. See docs/content-loop.md.
+#
+# Format note: keep this file to plain `key: value`, nested maps, and lists —
+# scripts/loop/_lib.py reads it with a small stdlib YAML reader (no block
+# scalars, no anchors). It refuses anything fancier so the config stays simple.
+# =============================================================================
+
+cadence:
+  # A new article is due once this many days have passed since the last one
+  # the loop produced (a run file with mode: new). Daily cron + 2 = every
+  # other day, self-correcting: a missed day is caught up, never doubled.
+  new_every_days: 2
+  # An improvement is due once this many days have passed since the last one.
+  # With both set to 2 the days alternate: new, improve, new, improve.
+  improve_every_days: 2
+
+caps:
+  # Backpressure: never leave more than this many loop PRs awaiting the human.
+  # The loop idles (recorded, not silent) until the queue drains. Throughput
+  # is clamped to review speed by design.
+  max_open_prs: 2
+
+sections:
+  # The rotation ring for NEW articles, in tie-break order. The planner offers
+  # the section that has gone longest without a new piece (from the ledger
+  # and the posts on disk) first, then the rest, most-overdue first. Each
+  # section carries its own voice profile in _data/taxonomy.yml.
+  ring: [tech, corp, erp, muses]
+
+signals:
+  # How far back the miner looks for unspent activity, and how far it may
+  # widen when everything in the default window has already been written up.
+  window_days: 30
+  max_window_days: 180
+  # How many stories the planner hands the writer (best first).
+  top: 6
+  # Score multipliers, so the weighting is data, not code.
+  ai_session_bonus: 1.15
+  content_only_factor: 0.5
+
+improve:
+  # Don't re-improve the same page within this many days of a loop improvement.
+  cooldown_days: 60
+  # Inventory sections that are concise by design and never expansion targets.
+  exclude_sections: [case-studies]
+  # How many candidates the planner hands the writer (best first).
+  top: 3
+  # Which pages an area of recent activity makes stale. Keys are the miner's
+  # area labels (see scripts/loop/signals.py AREA_RULES); values are pages
+  # whose subject that activity touches. A candidate on this list gets a boost
+  # when an UNSPENT story hits the area — so the rewrite follows the work.
+  related_pages:
+    claude:
+      - ai-operations.md
+      - pages/_toolkit/claude-context-framework.md
+      - pages/_toolkit/ai-native-practice.md
+    ci:
+      - pages/_toolkit/ai-native-practice.md
+      - pages/_toolkit/production-ai.md
+    scripts:
+      - pages/_toolkit/deterministic-first.md
+      - pages/_toolkit/ai-native-practice.md
+    prompts:
+      - pages/_toolkit/ai-native-practice.md
+      - pages/_posts/tech/2025-11-19-prompts-are-the-new-command-line.md
+    extension:
+      - pages/_posts/tech/2025-11-19-agentic-prompt-workflows-in-vscode.md
+      - pages/_toolkit/ai-native-practice.md
+    api:
+      - pages/_services/ai.md
+    config:
+      - pages/_toolkit/security-baseline.md
+    theme:
+      - pages/_toolkit/claude-context-framework.md
+    toolkit:
+      - tools.md
+    services:
+      - pages/_services/index.md
