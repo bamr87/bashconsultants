@@ -3,8 +3,8 @@
 
   A canvas rendering of the mark as a few thousand glowing particles: it turns
   on its own, follows a pointer drag with inertia, answers the arrow keys for
-  keyboard users, and scatters under a hovering pointer before slowly
-  reassembling once the pointer moves on. The geometry is the inline SVG include below (generated
+  keyboard users, and scatters under a hovering pointer, harder and wider the
+  faster the pointer moves, before springing slowly back into shape. The geometry is the inline SVG include below (generated
   from assets/brand/favicon.svg by scripts/generate_mark_shape.py); the
   behavior is assets/js/bash-mark.js. Without JavaScript, or in a browser
   with no canvas, the static mark stays in place and nothing else renders.
