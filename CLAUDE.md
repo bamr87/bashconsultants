@@ -87,7 +87,7 @@ The site is a thin consumer of `bamr87/zer0-mistakes`. Anything under `_includes
 
 | Override | Why |
 |---|---|
-| `_layouts/landing.html` | Bespoke marketing homepage — particles hero, services grid from `_data/entity/services.yml`, industries/process/FAQ. Replaces the theme's generic `_data/landing.yml` template. |
+| `_layouts/landing.html` | Bespoke marketing homepage — the interactive B-mark hero (`_includes/bash-mark.html`), services grid from `_data/entity/services.yml`, industries/process/FAQ. Replaces the theme's generic `_data/landing.yml` template. |
 | `_includes/analytics/posthog.html` | Consent gate, Global Privacy Control, no IP geolocation. **Retirable now** — upstreamed in v1.28.0 as `posthog.privacy.*`, set in `_config.yml`, and `remote_theme` is untagged so the theme honours them. Delete in its own PR after diffing the rendered PostHog init on both stacks. |
 | `_includes/analytics/google-tag-manager-head.html` | Deliberate no-op stub. Google Tag Manager is off site-wide; PostHog is the only analytics. |
 | `assets/images/wizard-on-journey.png` | Our own homepage/Open Graph image that happens to share a path with an unrelated theme asset. |

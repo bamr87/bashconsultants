@@ -44,6 +44,17 @@ python3 scripts/generate_playbook_data.py          # write _data/playbook.yml
 python3 scripts/generate_playbook_data.py --check  # exit 1 if the file is stale
 ```
 
+## Brand assets
+
+### `generate_mark_shape.py`
+
+Generates `_includes/brand/mark-shape.svg` — the outline the interactive homepage mark (`_includes/bash-mark.html`, `assets/js/bash-mark.js`) samples its particles from — straight out of the canonical `assets/brand/favicon.svg`, by Inkscape label (`outer-B`, `inner-c`, and the `B-Logo` layer's translate). The geometry is never hand-copied, so it cannot drift from the mark. Standard library only, deterministic output.
+
+```bash
+python3 scripts/generate_mark_shape.py          # write _includes/brand/mark-shape.svg
+python3 scripts/generate_mark_shape.py --check  # exit 1 if the include is stale
+```
+
 ## Preview images
 
 ### `features/generate-preview-images` (canonical)

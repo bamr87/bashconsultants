@@ -1,0 +1,58 @@
+{%- comment -%}
+  bash-mark.html — the BASH B mark as an interactive, rotating cloud of light.
+
+  A canvas rendering of the mark as a few thousand glowing particles: it turns
+  on its own, follows a pointer drag with inertia, and answers the arrow keys
+  for keyboard users. The geometry is the inline SVG include below (generated
+  from assets/brand/favicon.svg by scripts/generate_mark_shape.py); the
+  behavior is assets/js/bash-mark.js. Without JavaScript, or in a browser
+  with no canvas, the static mark stays in place and nothing else renders.
+
+  Usage:
+    {% include bash-mark.html %}
+    {% include bash-mark.html size="clamp(200px, 55vw, 360px)" particles="1800" %}
+
+  Parameters (all optional):
+    size       CSS length for the square the mark occupies
+    particles  particle count at full size (scaled by area on small screens)
+    spin       idle rotation in radians per second ("0" disables it)
+    depth      slab thickness as a fraction of the mark's half-size
+
+  The accent colors are the logo palette from `theme_color` in _config.yml,
+  so the brand's file of record stays the single source of truth. The styles
+  are inline on purpose: the mark sits above the fold, and a stylesheet
+  request from inside <body> would flash the fallback before it loaded.
+{%- endcomment -%}
+{%- assign tc = site.theme_color -%}
+{%- assign mark_size = include.size | default: "clamp(220px, 55vw, 400px)" -%}
+<style>
+  .bash-mark { position: relative; width: var(--bash-mark-size, 320px); aspect-ratio: 1 / 1; margin-inline: auto; user-select: none; -webkit-user-select: none; }
+  @supports not (aspect-ratio: 1 / 1) { .bash-mark { height: var(--bash-mark-size, 320px); } }
+  .bash-mark__canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.2s ease; }
+  .bash-mark.is-live .bash-mark__canvas { opacity: 1; }
+  /* Doubled-up selector on purpose: the theme styles every button that is not a
+     copy button (border, padding, radius), and that rule outranks a lone class. */
+  .bash-mark button.bash-mark__drag { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: 12%; box-shadow: none; background: transparent; color: inherit; font: inherit; cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+  .bash-mark button.bash-mark__drag[data-dragging="true"] { cursor: grabbing; }
+  .bash-mark button.bash-mark__drag:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+  .bash-mark:not(.is-live) button.bash-mark__drag { display: none; }
+  .bash-mark__shape { display: none; }
+  .bash-mark__fallback { position: absolute; inset: 15%; width: 70%; height: 70%; object-fit: contain; }
+  .bash-mark.is-live .bash-mark__fallback { display: none; }
+  .bash-mark__hint { position: absolute; left: 0; right: 0; top: 100%; margin: .35rem 0 0; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; text-align: center; opacity: .5; pointer-events: none; transition: opacity .6s ease; }
+  .bash-mark:not(.is-live) .bash-mark__hint, .bash-mark.is-touched .bash-mark__hint { opacity: 0; }
+  @media (prefers-reduced-motion: reduce) { .bash-mark__canvas, .bash-mark__hint { transition: none; } }
+</style>
+<div class="bash-mark" data-bash-mark
+     data-colors="{{ tc.yellow | default: '#ffe900' }},{{ tc.teal | default: '#376986' }},{{ tc.red | default: '#a11111' }}"
+     {%- if include.particles %} data-particles="{{ include.particles }}"{% endif %}
+     {%- if include.spin %} data-spin="{{ include.spin }}"{% endif %}
+     {%- if include.depth %} data-depth="{{ include.depth }}"{% endif %}
+     style="--bash-mark-size: {{ mark_size }};">
+  <canvas class="bash-mark__canvas" aria-hidden="true"></canvas>
+  <button class="bash-mark__drag" type="button" aria-label="Drag or use arrow keys to rotate the BASH mark" data-dragging="false"></button>
+  {% include brand/mark-shape.svg %}
+  <img class="bash-mark__fallback" src="{{ site.logo | relative_url }}" alt="BASH Consulting logo" width="160" height="160" decoding="async">
+  <p class="bash-mark__hint" aria-hidden="true">Drag to rotate</p>
+</div>
+<script defer src="{{ '/assets/js/bash-mark.js' | relative_url }}"></script>
