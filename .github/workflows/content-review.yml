@@ -56,8 +56,17 @@ jobs:
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Kill switch (fleet convention, bamr87/bamr87 fleet.yml harnesses:): a
+          # SCHEDULED firing is a no-op once the repo variable is "false" — the
+          # three content agents share one switch. Default-ON because they were
+          # already in service; a manual dispatch always runs.
+          CONTENT_AGENTS_ENABLED: ${{ vars.CONTENT_AGENTS_ENABLED }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ] || [ -n "$ANTHROPIC_API_KEY" ]; then
+          if [ "$EVENT_NAME" = "schedule" ] && [ "${CONTENT_AGENTS_ENABLED:-true}" = "false" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::CONTENT_AGENTS_ENABLED is false — scheduled run skipped (workflow_dispatch still runs)."
+          elif [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ] || [ -n "$ANTHROPIC_API_KEY" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
@@ -136,5 +145,5 @@ jobs:
 
             Step 6 — print a one-paragraph summary and the PR URL.
           claude_args: |
-            --max-turns 40
+            --max-turns 80
             --allowedTools "Read,Write,Edit,Glob,Grep,Bash(python3 scripts/content_inventory.py:*),Bash(python3 scripts/content_lint.py:*),Bash(date:*),Bash(ls:*),Bash(git:*),Bash(gh pr create:*),Bash(gh pr list:*)"
