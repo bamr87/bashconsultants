@@ -2,7 +2,7 @@
 
 This page documents the repo's automation: the GitHub Actions workflows and the Azure Functions app in `api/` that powers the site's AI chat widget. It is an internal operations doc — `docs/` is excluded from the Jekyll build.
 
-The workflows: **build & validate** (the PR gate), **site health** (nightly), **content gardener** (weekly new-post draft), **content review** (weekly expand-or-add), **PR to upstream** (fork sync), and **the preacher** (weekly doctrine enforcement — see [`the-preacher.md`](./the-preacher.md)).
+The workflows: **build & validate** (the PR gate), **site health** (nightly), **content loop** (daily, activity-driven: a new article every other day and an improvement on the days between — see [`content-loop.md`](./content-loop.md)), **content gardener** (weekly new-post draft), **content review** (weekly expand-or-add), **PR to upstream** (fork sync), and **the preacher** (weekly doctrine enforcement — see [`the-preacher.md`](./the-preacher.md)).
 
 ## What runs where
 
@@ -133,6 +133,8 @@ includes the reviewer's promotion checklist (move to `pages/_posts/<subfolder>/`
 
 Add a `CLAUDE_CODE_OAUTH_TOKEN` repository secret (preferred — `claude setup-token`) **or** an `ANTHROPIC_API_KEY` repository secret (repo → Settings → Secrets and variables → Actions). When both are set, `claude-code-action` uses the OAuth token. Without either, the workflow logs a notice and skips — scheduled runs never fail red just because the credential is absent. These are separate from the Azure application settings above; they can be different credentials with different spend caps.
 
+When the content loop is enabled (`CONTENT_LOOP_ENABLED=true`), the gardener's schedule stands down and only manual runs proceed — see [`content-loop.md`](./content-loop.md).
+
 Optional: add a `GARDENER_GITHUB_TOKEN` secret — a fine-grained personal access token with Contents and Pull requests read/write on this repo. Pull requests opened with the default `GITHUB_TOKEN` can't trigger other workflows, so the SWA staging build only runs on gardener PRs when this token is set (or after any human push to the PR branch). Review still works fine without it; you just review the markdown instead of a staged preview.
 
 ## Workflow: LinkedIn publishing
@@ -170,7 +172,17 @@ File: `.github/workflows/content-review.yml` Schedule: `37 14 * * 4` UTC (Thursd
 
 The content counterpart to the preacher. It adopts the content-curator charter (`.claude/agents/content-curator.md`) and moves the site's content forward by ONE unit each week: it reviews the corpus — starting from the deterministic `scripts/content_inventory.py --focus` shortlist of thin/stale pages — and opens a PR that either **expands** an existing article with more relevant, current information or **writes** a new article filling a real gap. It follows the same editorial authorities as the gardener, gates on `content_lint.py`, and never pushes to `main`.
 
-This complements the **content gardener** (which only drafts brand-new posts): the gardener grows breadth, the curator reviews everything and chooses between depth and breadth. Activate it the same way (a `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` secret; optional `CONTENT_REVIEW_GITHUB_TOKEN`).
+This complements the **content gardener** (which only drafts brand-new posts): the gardener grows breadth, the curator reviews everything and chooses between depth and breadth. Activate it the same way (a `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` secret; optional `CONTENT_REVIEW_GITHUB_TOKEN`). While the content loop is enabled its schedule stands down (manual runs still work) — the loop's improve mode covers the same ground on a faster cadence.
+
+## Workflow: Content loop (daily)
+
+File: `.github/workflows/content-loop.yml` Schedule: `11 14 * * *` UTC (daily, morning in Denver), plus manual dispatch with `mode` (auto / new / improve), `section`, and `dry_run` inputs.
+
+The activity-driven counterpart to the gardener and the curator, modeled on the lifehacker.dev autopilot. A deterministic planner (`scripts/loop/plan.py`) reads the loop's ledger (`_data/loop/runs/`) and decides one of three things each day: a **new** article is due (every other day), an **improvement** is due (the days between), or the loop should **idle** (nothing due, too many loop PRs awaiting review, or no unspent work to write about — always with the reason in the run summary). Ideas come from the practice's own work: `scripts/loop/signals.py` mines this repository's git history (grouping commits by the `Claude-Session:` trailer, by pull request, or by day; marking AI-assisted work by its `Co-Authored-By: Claude` trailer), the CHANGELOG, the committed AI-session trace (`_data/loop/sessions.jsonl`, fed by the `SessionEnd` hook), and, best-effort, the sister repositories in `_data/loop/sources.yml`. The writer (`.claude/agents/loop-writer.md`, following `.claude/skills/content-loop/SKILL.md`) turns one story into one on-voice piece in the most-overdue section, or expands the page that work made stale, gates it with the repo's scripts, records the run, and opens ONE pull request on a `loop/<run-id>` branch. It never pushes to `main`. Full design: [`content-loop.md`](./content-loop.md).
+
+### Activating the loop
+
+The schedule idles until the repository **variable** `CONTENT_LOOP_ENABLED` is `true` — the bot cannot set variables, so the loop cannot enable itself. It writes with the same credential as the other routines (`CLAUDE_CODE_OAUTH_TOKEN` preferred, `ANTHROPIC_API_KEY` fallback); without one it still plans, which makes a manual `dry_run` a free way to see what it would do. Optional: `CONTENT_LOOP_GITHUB_TOKEN` (a fine-grained PAT, probed for validity before use so an expired token degrades with a warning rather than failing the run), `OPENAI_API_KEY` (generates a new post's preview image on the PR branch), and the `CONTENT_LOOP_MODEL` variable (pins the writer's model). While the loop is enabled, the weekly **content gardener** and **content review** schedules stand down — their gates check the same variable — so the same topic is not drafted twice; both still run on manual dispatch.
 
 ## Workflow: PR to upstream (weekly)
 

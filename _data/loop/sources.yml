@@ -1,0 +1,35 @@
+# =============================================================================
+# _data/loop/sources.yml — where the content loop looks for the practice's work
+# -----------------------------------------------------------------------------
+# The loop writes about work that actually happened. This file is the list of
+# places it may look. The home repository is mined from its own git history
+# (deterministic, offline, no token). Sister repositories — the founder's other
+# open projects — are read through the GitHub API when `gh` and a token are
+# available, and skipped with a notice when they are not. Every story keeps
+# its `repo`, so the writer can say honestly where the work was done.
+#
+# weight: multiplies a story's score (home work first; sister work as colour).
+# via:    git (this checkout) | github (public API, read-only, best-effort).
+# =============================================================================
+
+repos:
+  - slug: bamr87/bashconsultants
+    via: git
+    weight: 1.0
+    label: "this site and practice"
+  - slug: bamr87/lifehacker.dev
+    via: github
+    weight: 0.6
+    label: "the autopilot sister site"
+  - slug: bamr87/gitorio
+    via: github
+    weight: 0.6
+    label: "GitFactory — GitHub automation as a factory builder"
+  - slug: bamr87/zer0-mistakes
+    via: github
+    weight: 0.4
+    label: "the Jekyll theme under all the sites"
+  - slug: bamr87/it-journey
+    via: github
+    weight: 0.4
+    label: "the learning-journey site"

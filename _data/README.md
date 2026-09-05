@@ -8,6 +8,7 @@ This directory contains YAML data files used by Jekyll to generate the site.
 _data/
 ├── README.md           # This file
 ├── entity/             # Entity data (organization, contact info)
+├── loop/               # The content loop's data: config, sources, ledger (runs/), session trace
 └── navigation/         # Navigation configuration files
     ├── README.md       # Navigation schema documentation
     ├── main.yml        # Primary site navigation (navbar)
@@ -30,6 +31,10 @@ Navigation files follow the **zer0-mistakes theme v0.22+** schema. See [`navigat
   icon: string         # Optional - Bootstrap Icons class (bi-*)
   children: array      # Optional - Nested items
 ```
+
+## Content loop data
+
+`loop/` holds everything the [content loop](../docs/content-loop.md) needs to decide and remember: `config.yml` (cadence, caps, rotation, signal weights), `sources.yml` (which repositories it may mine), `runs/*.yml` (the ledger — one record per run, written by `scripts/loop/ledger.py` in the loop's own pull request), and `sessions.jsonl` (the committed AI-session trace, synced from the local hook queue by `scripts/loop/trace.py --sync`). See [`loop/README.md`](loop/README.md).
 
 ## Entity Data
 
