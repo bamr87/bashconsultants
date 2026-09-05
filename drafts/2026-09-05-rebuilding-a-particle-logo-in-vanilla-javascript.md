@@ -132,6 +132,14 @@ A third snag was pure environment: the local Jekyll build failed with an invalid
 4. **Let it tune from pictures, but keep the taste.** The first render was chunky confetti. Narrowing the edge band, shrinking the particles, and pulling the red back to a few sparks were judgment calls made from screenshots, not from code.
 5. **Keep the boring parts as scripts.** Extracting paths from an SVG is a deterministic job. Spend the model on the parts that need judgment, like the interaction feel, and let a forty-line script own the rest.
 
+## It turned into a framework
+
+Once the logo worked, the obvious question was what else the same stars could draw. The answer was to split the script in two: sources, which turn something into targets (points in a unit space with a look and a color), and the engine, which gives every target a star with physics and renders the lot. A source for SVG, one for text, one for a typed terminal session, one for 3D point clouds, one for images, and a registry for your own. Scenes became YAML files rendered by one include, so an animation is designed as data and reviewed in a diff, and a timeline morphs the same light from one scene to the next while the stars a scene does not need wait as background dust.
+
+The terminal source is the one that surprised us. Each character is rasterized once with a monospace font and sampled into a dozen points, and because new targets recruit stars from the dust around the stage, typed text looks like it condenses out of the field rather than being drawn on it. A click got physics too: a pop under the pointer and a ring that travels outward, pushing stars as it passes.
+
+The engine, five scenes, a mesh sampler, and the full reference live in the [BASH toolkit](https://bash-365.com/tools/partners/constellation-engine/).
+
 ## Try it
 
 The mark is live on the [BASH Consulting homepage](https://bash-365.com/). Drag it, flick it, or tab to it and use the arrow keys. The include, the script, and the generator are in the site's public repository, and the whole thing is small enough to read in one sitting.
