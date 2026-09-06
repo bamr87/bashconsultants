@@ -142,6 +142,13 @@ jobs:
               for a new post includes the reviewer's preview-image checklist.
 
             Step 6 — print a one-paragraph summary and the PR URL.
+          # The charter is a six-step run (inventory, read the standards, choose a
+          # mode, write, lint, open the PR), so the turn count scales with the
+          # corpus. At 40 it began tripping *after* the work was done: the
+          # 2026-08-27 run used 42 turns and the 2026-09-03 run 43, each landing
+          # its PR (#40, #44 — both merged) seconds before the action failed the
+          # job on the ceiling alone. `timeout-minutes: 30` is the real cost guard
+          # here; these runs finish in ~4.5m.
           claude_args: |
-            --max-turns 40
+            --max-turns 60
             --allowedTools "Read,Write,Edit,Glob,Grep,Bash(python3 scripts/content_inventory.py:*),Bash(python3 scripts/content_lint.py:*),Bash(date:*),Bash(ls:*),Bash(git:*),Bash(gh pr create:*),Bash(gh pr list:*)"
