@@ -5,14 +5,14 @@ description: "Build automation that corrects itself — three-node loops, goals 
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-06-20T11:00:00.000Z
-lastmod: 2026-06-21T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
-categories: [muses]
+categories: [muses, ai]
 tags: [automation, workflow-design, bash, shell, ai-engineering, systems-thinking, productivity]
 keywords: [automation design rule of three, triangular routing efficiency, chunking tasks and goals, feedback loop three stages, llm router cascade pattern, small model triage automation]
 preview: /images/previews/three-is-the-magic-number-for-automation-that-hold.png
 featured: false
-excerpt: "Three is the magic number: the triangle is the only rigid shape, the most efficient loops have three nodes, and a small fast AI now fronts the trade and routes the work."
+excerpt: "The triangle is the only rigid shape, the most efficient loops have three nodes, and a small fast AI now sits at the front of the trade, routing the work."
 ---
 
 > *One long brittle pipe—*
@@ -120,7 +120,7 @@ A haiku is three lines: five syllables, seven, five. It is the smallest poem tha
 
 There is a haiku of *trade*, too — the smallest complete transaction, the three-beat loop at the bottom of all commerce. A request comes in. A decision is made. A response goes out. Read the order, decide the fulfillment, ship the thing. Five-seven-five. Sense, decide, act. It is the same triangle wearing an apron, and for the whole history of business it had a human at the front of it: someone who read what came in, judged what it was, and routed it onward — the clerk, the dispatcher, the desk that triaged the morning's mail into piles.
 
-That front seat is now an artificial intelligence (AI) core. And here is the actual news, the thing under your brief: it is not the *biggest* model that takes the front. It's the *smallest fast one*.
+That front seat is now an artificial intelligence (AI) core. And here is the actual news: it is not the *biggest* model that takes the front. It's the *smallest fast one*.
 
 The pattern has a name in the trade now — the **router**, or the **cascade** — and the economics are the triangle inequality applied to compute. You do not send every request to the most powerful, most expensive model you own, any more than you'd drive a separate round trip from the depot for every single package. You put a small, fast, cheap model at the front — call it a [Haiku](https://docs.anthropic.com/en/docs/about-claude/models/overview), because that is precisely the role and, as it happens, the name of the model class built for it — and its whole job is the first beat of the loop: read the work, decide what it *is*, and route it. Most requests are simple, and the fast front-line core handles them whole and ships the answer in one slice. The genuinely hard ones — the cases where the triangle inequality says the detour through heavier compute actually pays — it escalates: hands them up to the heavyweight, the deep reasoner, or out to the human who's the right one of the three to lift this particular stone. The fast core reads the work, routes it, and steps aside.
 
@@ -155,7 +155,7 @@ Three is the magic number, and the magic is structural. So, three things to take
 
 **Put the fast core at the front.** The haiku of trade now has an AI core reading the first line — small, fast, constant — routing most of the work whole and escalating only the chunk that earns the heavyweight or the human. That's the efficient shape. But the front is now the whole game: all else follows what it sends, so audit the read, watch what it waves through, and make sure what comes behind is worth the follow.
 
-The trade has a new clerk at the front desk, and it works in fives and sevens and fives, sorting the morning's mail faster than any human ever could. For a Denver small or medium business (SMB), that is the difference between two analysts hand-triaging support tickets all morning and a small model routing most of them — often 70–85% — in seconds, freeing your people for the harder fraction that actually needs a human. That's not the end of your job. That's the start of a better one — minding the vertex where the fast core decides, because everything downstream is now following a haiku, and a haiku is only as good as its first line.
+The trade has a new clerk at the front desk, and it works in fives and sevens and fives, sorting the morning's mail faster than any human ever could. For a Denver small or medium business (SMB), that is the difference between two analysts hand-triaging support tickets all morning and a small model routing most of them in seconds, freeing your people for the harder fraction that actually needs a human. That's not the end of your job. That's the start of a better one — minding the vertex where the fast core decides, because everything downstream is now following a haiku, and a haiku is only as good as its first line.
 
 ```bash
 $ exit 0   # this time, on purpose.

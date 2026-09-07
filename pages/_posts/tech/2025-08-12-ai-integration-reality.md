@@ -1,13 +1,14 @@
 ---
 title: "AI for small business: what the pilots don't tell you"
-description: "Most AI projects at small and mid-sized businesses fail on data, change management, and ongoing cost — not the model. A realistic look at what works"
+description: "Most small-business AI projects fail on data, change management, and recurring cost rather than the model, so fix those three before you buy"
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2025-08-12T11:00:00.000Z
-lastmod: 2026-07-06T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [tech, ai]
-tags: [artificial-intelligence, implementation, strategy, data-readiness]
+tags: [ai, implementation, strategy, data-readiness]
+keywords: [small business ai implementation, ai project failure rate, ai data readiness, ai pilot to production, denver ai consultant, smb ai cost, ai change management]
 featured: true
 excerpt: "The AI model is the easy part — most small-business AI projects break on dirty data, unowned workflow change, and recurring cost nobody budgeted for."
 preview: /images/previews/ai-for-small-business-what-the-pilots-don-t-tell-y.png
@@ -19,13 +20,13 @@ AI here means the practical kind a small or mid-sized business (SMB) actually bu
 
 ## Why this matters before you sign anything
 
-The reason AI projects stall is rarely the technology. The industry's own benchmark, the [State of AI in Business report from MIT's Project NANDA](https://nanda.media.mit.edu/), found that the large majority of enterprise generative-AI pilots never reach production or produce measurable return. At SMB scale the math is harsher: you do not have a data team to absorb the cleanup, and a six-month dead-end costs a bigger share of your year. Knowing the three failure modes up front is the cheapest insurance you can buy.
+The reason AI projects stall is rarely the technology. MIT's [Project NANDA](https://nanda.media.mit.edu/) put a number on it in its 2025 *State of AI in Business* report: the large majority of enterprise generative-AI pilots never reach production or show a measurable return, and the exact share moves with who is counting, but the direction does not. At SMB scale the math is harsher: you do not have a data team to absorb the cleanup, and a six-month dead-end costs a bigger share of your year. Knowing the three failure modes up front is the cheapest insurance you can buy.
 
 ## Where SMB AI projects actually fail
 
 Three failure modes account for most of what we see, and none of them are about the algorithm.
 
-**Data the team doesn't trust.** Most SMBs have data in three or four systems that disagree with each other — QuickBooks says one revenue number, the customer relationship management (CRM) system says another, the spreadsheet on the controller's desktop says a third. Vendor and analyst estimates routinely put data preparation at well over half of an AI project's effort; in smaller shops it runs higher, because the cleanup has never been done before. A model trained on dirty data produces confident wrong answers, which is worse than no model at all.
+**Data the team doesn't trust.** Most SMBs have data in three or four systems that disagree with each other — QuickBooks says one revenue number, the customer relationship management (CRM) system says another, the spreadsheet on the controller's desktop says a third. Data preparation routinely eats more than half the effort on these projects, and in smaller shops it runs higher, because the cleanup has never been done before. A model trained on dirty data produces confident wrong answers, which is worse than no model at all.
 
 **No one owns the change.** A pilot that produces a useful weekly report is not a project until someone's job changes to use it. We routinely see pilots prove value, get a round of applause, and then quietly die because the controller's month-end close still runs the old way. The technical deployment is the cheap half; the workflow change is the expensive half.
 
@@ -63,11 +64,11 @@ The pattern in both: the AI sits between two systems that previously required a 
 
 ## Watch-outs before you sign
 
-- **Audit and explainability.** If the output drives a financial entry, a compliance filing, or a customer-facing price, you need a logged reason for every answer. Many cheaper AI products do not provide this.
+- **Audit and explainability.** If the output drives a financial entry, a compliance filing, or a customer-facing price, you need a logged reason for every answer. Many cheaper AI products do not provide this. The [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) is a useful checklist for what to ask a vendor.
 - **Vendor lock-in.** Tuning a prompt or workflow tightly to one model is fine for a pilot, risky for a system you will run for three years. Keep the integration thin enough to switch.
-- **Data residency and confidentiality.** Decide what the model is allowed to see *before* the contract, not after. For regulated work (the Health Insurance Portability and Accountability Act (HIPAA), Payment Card Industry (PCI) standards, or customers who require SOC 2) this is non-negotiable.
+- **Data residency and confidentiality.** Decide what the model is allowed to see *before* the contract, not after. For regulated work — the Health Insurance Portability and Accountability Act (HIPAA), Payment Card Industry (PCI) standards, or customers who require SOC 2 — this is non-negotiable.
 - **The honest twelve-month picture.** A useful first project typically runs 4–8 weeks of implementation, then six to nine months of iteration before it does what the original pitch promised. Plan for the iteration, not just the launch.
 
 ## Next step
 
-Most AI conversations should start with the data underneath, not the model on top. If you are weighing an AI project and want to know whether the case study you saw last week applies to your actual business, our [[AI solutions and intelligent automation]] is where to begin — including the data-readiness work that decides whether the project is worth starting. We scope realistically for Denver-area SMBs and tell you when the honest answer is "not yet."
+Most AI conversations should start with the data underneath, not the model on top. If you are weighing an AI project and want to know whether the case study you saw last week applies to your actual business, our [[AI solutions and intelligent automation]] page is where to begin — including the data-readiness work that decides whether the project is worth starting. We scope realistically for Denver-area SMBs and tell you when the honest answer is "not yet."

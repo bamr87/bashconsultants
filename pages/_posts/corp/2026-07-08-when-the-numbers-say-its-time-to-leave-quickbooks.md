@@ -5,7 +5,7 @@ excerpt: "The QuickBooks-to-ERP decision isn't a software preference — it's a 
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-07-08T12:00:00.000Z
-lastmod: 2026-07-08T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [corp]
 tags: [erp-implementation, quickbooks, total-cost-of-ownership, multi-entity, month-end-close, vendor-lock-in]
@@ -49,11 +49,11 @@ A migration is a real project with a real budget, and anyone who quotes you a fi
 - **Data cleanup and migration.** Mapping and moving history into a new structure. This is the bucket nobody budgets for, and more on it below.
 - **Subscription.** The ongoing platform cost, which is genuinely the smallest of the three over a project's life.
 
-The timeline that governs the budget: a mid-market Enterprise Resource Planning (ERP) implementation typically runs about **five to seven months** from decision to go-live, and that assumes someone internal can own it without dropping their day job. The largest hidden cost of the whole project is that person's time — the months your best operator spends on migration instead of running the business. It sinks more projects than the sticker price does. We work these numbers as scoped ranges, never a fixed quote, and you should be suspicious of anyone who does otherwise.
+The timeline that governs the budget: a mid-market Enterprise Resource Planning (ERP) implementation typically runs about **five to seven months** from decision to go-live, and that assumes someone internal can own it without dropping their day job. The largest hidden cost of the whole project is that person's time — the months your best operator spends on migration instead of running the business. It sinks more projects than the sticker price does. We work these numbers as scoped ranges, never a fixed quote, and you should be wary of anyone who offers one.
 
 ## Inventory before you decide
 
-Before you evaluate a single platform, document your own numbers. This is the deterministic part of the decision, and it comes first — you cannot compare systems against requirements you haven't written down. Write down, on one page — the same inventory the [[Outgrowing QuickBooks: is it time for ERP?]] guide walks through step by step:
+Before you evaluate a single platform, document your own numbers. This is the deterministic part of the decision, and it comes first — you cannot compare systems against requirements you haven't written down. On one page, write down the same inventory the [[Outgrowing QuickBooks: is it time for ERP?]] guide walks through step by step:
 
 - **Entities and files.** How many legal entities, how many QuickBooks files, and exactly how they get consolidated today.
 - **Volume.** Transactions per month, users, and the reports that have gotten slow.

@@ -4,15 +4,14 @@ description: "How a chart of accounts debate teaches Denver controllers to desig
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-09-03T12:00:00.000Z
-lastmod: 2026-09-03T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [erp]
 tags: [erp-implementation, change-management, chart-of-accounts, segregation-of-duties, denver-smb]
+keywords: [chart of accounts design, erp chart of accounts, general ledger dimensions, segregation of duties small business, chart of accounts cleanup, erp implementation controls, denver erp consultant, month-end close controls]
 preview: /images/previews/erp-survivor-episode-2-the-great-chart-of-accounts.png
 excerpt: "The Alliance of the Spreadsheet People wanted the new system to keep every project code they'd ever created. Episode 2, where the chart of accounts becomes the season's real battlefield."
 ---
-
-<!-- TODO: add preview image at /images/previews/erp-survivor-episode-2-the-great-chart-of-accounts.png (1200x630) -->
 
 ## Previously on ERP Survivor
 
@@ -20,7 +19,7 @@ excerpt: "The Alliance of the Spreadsheet People wanted the new system to keep e
 
 **Narrator**: "Last season, the Alliance of the Spreadsheet People formed to resist the new system. The consultants recruited them instead of fighting them. Requirements gathering is done. Now the tribes face the challenge that ends more Enterprise Resource Planning (ERP) projects than any go-live disaster: designing the chart of accounts (COA), the numbered list of every account the general ledger (GL) will ever use."
 
-If you are the controller who has to sign off on that list, this is the episode for you. The lessons are in the commercial breaks, same as always.
+The alliance formed in [[ERP Survivor, episode 1: alliance of the spreadsheet people]]. If you are the controller signing off on that list — or the information technology (IT) lead who will be asked to build reports on top of it — this is the episode for you. The lessons are in the commercial breaks, same as always.
 
 ## Why this challenge matters now
 
@@ -40,7 +39,7 @@ For a Denver light-manufacturing or distribution shop, this shows up as a very s
 
 **Dave**: "And we keep the old chart too. Just in case."
 
-> **Commercial break — the lesson:** This is the classic mistake, and it comes from a real need: Linda's team needs to report profit by project. The wrong fix is a GL account per project. The right fix is a **dimension** — a tag you attach to a transaction (project, department, location) that lets you slice reports without multiplying the chart itself. Microsoft's own guidance on [designing a chart of accounts for Dynamics 365 Business Central](https://learn.microsoft.com/en-us/dynamics365/business-central/finance-chart-of-accounts) puts it plainly: "start simple with fewer G/L accounts" and "use dimensions to simplify your chart of accounts — don't have specific G/L accounts for each product or department." One clean expense account with a project dimension answers Linda's question and every other cut she will ever ask for, including the ones she has not thought of yet.
+> **Commercial break — the lesson:** This is the classic mistake, and it comes from a real need: Linda's team needs to report profit by project. The wrong fix is a GL account per project. The right fix is a **dimension** — a tag you attach to a transaction (project, department, location) that lets you slice reports without multiplying the chart itself. Microsoft's own guidance on [designing a chart of accounts for Dynamics 365 Business Central](https://learn.microsoft.com/en-us/dynamics365/business-central/finance-chart-of-accounts) puts it plainly: "Consider starting simple with fewer G/L accounts" and "Use dimensions to simplify your chart of accounts. Don't have specific G/L accounts for each product or department." One clean expense account with a project dimension answers Linda's question and every other cut she will ever ask for, including the ones she has not thought of yet.
 
 ### Operations tribe counters
 
@@ -83,7 +82,7 @@ For a Denver light-manufacturing or distribution shop, this shows up as a very s
 1. **Inventory the current chart and every report built on it (1-2 weeks).** Include the accounts nobody remembers the purpose of — those are usually the first to retire.
 2. **Adopt a standard structure, then customize only where a real business rule demands it (1-2 weeks).** Most mid-market ERP platforms ship a sensible default chart for your industry; start there instead of rebuilding from scratch.
 3. **Map every "I need to slice by X" request to a dimension, not an account (1-2 weeks).** Project, department, location, and sales channel almost always belong here.
-4. **Design the control matrix alongside the chart, not after go-live (1-2 weeks).** Decide who can post, who approves exceptions, and at what dollar threshold — including Bob's overrides.
+4. **Design the control matrix alongside the chart, not after go-live (1-2 weeks).** Decide who can post, who approves exceptions, and at what dollar threshold — including Bob's overrides. Our [[Record-to-report automation and controls]] guide lists the control points worth writing down.
 5. **Pilot the close with the new chart for one full cycle before retiring the old one.** A chart that looks right on paper still has to survive an actual month-end.
 
 ## Watch-outs that eliminate contestants
@@ -95,8 +94,6 @@ For a Denver light-manufacturing or distribution shop, this shows up as a very s
 ## Next step
 
 Redesigning your chart of accounts as part of a bigger system change? See our [[ERP consulting]], including the financial and control design work that keeps Linda's reporting and Bob's speed both intact.
-
-<a href="/contact/" class="btn btn-primary btn-lg px-4">Book a free consultation</a>
 
 ---
 
