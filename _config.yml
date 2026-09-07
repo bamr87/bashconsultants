@@ -103,7 +103,7 @@ info_banner              : '/assets/images/network.jpg' # path of fallback tease
 
 preview_images:
   enabled                : true
-  provider               : 'openai'           # openai, stability, local
+  provider               : 'openai'           # openai, xai, stability, local
   model                  : 'gpt-image-2'      # gpt-image-2 (latest), gpt-image-1, gpt-image-1-mini; dall-e-3 is retired on this account
   size                   : '1536x1024'        # gpt-image landscape: 1536x1024, square: 1024x1024, portrait: 1024x1536, auto
   quality                : 'high'             # gpt-image quality: low, medium, high, auto (DALL-E's 'standard'/'hd' are not valid here)
@@ -115,6 +115,13 @@ preview_images:
   auto_prefix            : true               # Auto-add assets_prefix if path doesn't start with it
   # Additional style modifiers applied to all prompts
   style_modifiers        : 'pixelated, retro gaming style, CRT screen glow effect, limited color palette'
+  # xAI Imagine (--provider xai). Credentials are resolved OAuth-first at run
+  # time: XAI_OAUTH_TOKEN, then the Grok CLI store (~/.grok/auth.json), then
+  # Kilo's xAI login, then XAI_API_KEY last. See docs/preview-images.md.
+  xai_model              : 'grok-imagine-image-2.0'
+  xai_aspect_ratio       : '3:2'              # matches the 1536x1024 house banners
+  xai_resolution         : '1k'               # 1k or 2k
+  xai_quality            : 'medium'           # low or medium
 
 breadcrumbs              : true # true, false (default)
 words_per_minute         : 200

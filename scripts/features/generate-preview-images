@@ -13,7 +13,7 @@
 #   -v, --verbose           Enable verbose output
 #   -f, --file FILE         Process a specific file only
 #   -c, --collection NAME   Process specific collection (posts, quickstart, docs)
-#   -p, --provider PROVIDER AI provider (openai, stability, local)
+#   -p, --provider PROVIDER AI provider (openai, xai, stability, local)
 #   --output-dir DIR        Output directory for images (default: assets/images/previews)
 #   --force                 Regenerate images even if preview exists
 #   --list-missing          Only list files with missing previews
@@ -26,6 +26,8 @@
 #
 # Environment Variables:
 #   OPENAI_API_KEY          OpenAI API key for DALL-E image generation
+#   XAI_OAUTH_TOKEN         xAI OAuth access token (preferred for --provider xai)
+#   XAI_API_KEY             xAI API key (fallback for --provider xai)
 #   STABILITY_API_KEY       Stability AI API key for Stable Diffusion
 #   IMAGE_STYLE             Default image style (default: "digital art, professional")
 #   IMAGE_SIZE              Image dimensions (default: "1024x1024")
@@ -152,6 +154,10 @@ CONFIG_QUALITY=$(read_config "quality" "auto")
 CONFIG_STYLE=$(read_config "style" "retro pixel art, 8-bit video game aesthetic, vibrant colors, nostalgic, clean pixel graphics")
 CONFIG_STYLE_MODIFIERS=$(read_config "style_modifiers" "pixelated, retro gaming style, CRT screen glow effect, limited color palette")
 CONFIG_OUTPUT_DIR=$(read_config "output_dir" "assets/images/previews")
+CONFIG_XAI_MODEL=$(read_config "xai_model" "grok-imagine-image-2.0")
+CONFIG_XAI_ASPECT=$(read_config "xai_aspect_ratio" "3:2")
+CONFIG_XAI_RESOLUTION=$(read_config "xai_resolution" "1k")
+CONFIG_XAI_QUALITY=$(read_config "xai_quality" "medium")
 
 # Default configuration (env vars override config file)
 DRY_RUN="${DRY_RUN:-false}"
@@ -167,6 +173,17 @@ IMAGE_STYLE_MODIFIERS="${IMAGE_STYLE_MODIFIERS:-$CONFIG_STYLE_MODIFIERS}"
 IMAGE_SIZE="${IMAGE_SIZE:-$CONFIG_SIZE}"
 IMAGE_QUALITY="${IMAGE_QUALITY:-$CONFIG_QUALITY}"
 IMAGE_MODEL="${IMAGE_MODEL:-$CONFIG_MODEL}"
+
+# xAI Imagine (--provider xai). Credentials are resolved OAuth-first by
+# resolve_xai_auth() at run time; these hold the outcome for the workers.
+XAI_IMAGE_MODEL="${XAI_IMAGE_MODEL:-$CONFIG_XAI_MODEL}"
+XAI_IMAGE_ASPECT="${XAI_IMAGE_ASPECT:-$CONFIG_XAI_ASPECT}"
+XAI_IMAGE_RESOLUTION="${XAI_IMAGE_RESOLUTION:-$CONFIG_XAI_RESOLUTION}"
+XAI_IMAGE_QUALITY="${XAI_IMAGE_QUALITY:-$CONFIG_XAI_QUALITY}"
+XAI_BASE_URL="${XAI_BASE_URL:-https://api.x.ai/v1}"
+XAI_AUTH_TOKEN=""
+XAI_AUTH_SOURCE=""
+XAI_AUTH_MODE=""
 
 # Enhancement configuration
 ENHANCE="${ENHANCE:-false}"
@@ -258,7 +275,7 @@ OPTIONS:
     -v, --verbose           Enable verbose output
     -f, --file FILE         Process a specific file only
     -c, --collection NAME   Process specific collection (posts, quickstart, docs)
-    -p, --provider PROVIDER AI provider: openai, stability, local (default: openai)
+    -p, --provider PROVIDER AI provider: openai, xai, stability, local (default: openai)
     -e, --enhance           Enhance/improve existing preview images using AI
     --enhance-prompt TEXT   Custom enhancement prompt (implies --enhance)
     --enhance-model MODEL  Model for enhancement (default: gpt-image-2)
@@ -270,6 +287,13 @@ OPTIONS:
 
 ENVIRONMENT VARIABLES:
     OPENAI_API_KEY          Required for OpenAI DALL-E provider
+    XAI_OAUTH_TOKEN         xAI OAuth token for --provider xai (else the Grok CLI
+                            store ~/.grok/auth.json or Kilo's xAI login is read)
+    XAI_API_KEY             xAI API key, used only when no OAuth token resolves
+    XAI_IMAGE_MODEL         xAI model (default: grok-imagine-image-2.0)
+    XAI_IMAGE_ASPECT        xAI aspect ratio (default: 3:2)
+    XAI_IMAGE_RESOLUTION    xAI resolution: 1k or 2k (default: 1k)
+    XAI_IMAGE_QUALITY       xAI quality: low or medium (default: medium)
     STABILITY_API_KEY       Required for Stability AI provider
     IMAGE_STYLE             Override style from _config.yml
     IMAGE_SIZE              Override size (default: 1536x1024 landscape)
@@ -292,6 +316,9 @@ EXAMPLES:
 
     # Generate images for posts collection
     ./scripts/generate-preview-images.sh --collection posts
+
+    # Same, painted by xAI Imagine (OAuth from `grok login` or Kilo, API key last)
+    ./scripts/generate-preview-images.sh --provider xai --collection posts
 
     # Generate image for a specific file
     ./scripts/generate-preview-images.sh -f pages/_posts/my-article.md
@@ -414,6 +441,12 @@ validate_environment() {
                 if [[ -z "${OPENAI_API_KEY:-}" ]]; then
                     error "OPENAI_API_KEY environment variable is required for OpenAI provider"
                 fi
+                ;;
+            xai)
+                if ! resolve_xai_auth; then
+                    error "No xAI credential: run \`grok login\`, set XAI_OAUTH_TOKEN, or set XAI_API_KEY (see .env.example)"
+                fi
+                info "xAI auth: $XAI_AUTH_MODE via $XAI_AUTH_SOURCE"
                 ;;
             stability)
                 if [[ -z "${STABILITY_API_KEY:-}" ]]; then
@@ -645,6 +678,307 @@ generate_image_openai() {
     fi
 }
 
+# =============================================================================
+# xAI Imagine provider (OAuth first)
+# =============================================================================
+# Ported from the lifehacker.dev preview wiring (scripts/preview/lib/xai_auth.mjs
+# and xai.mjs): a subscription/OAuth token wins over a metered API key, and the
+# key is never sent when OAuth is present. Sources, in order:
+#   1. XAI_OAUTH_TOKEN
+#   2. Official Grok CLI store (~/.grok/auth.json from `grok login`)
+#   3. Kilo's local xAI OAuth store (~/.local/share/kilo/auth.json), refreshed
+#      against auth.x.ai when the access token is expired
+#   4. XAI_API_KEY (pay-per-use; last resort)
+# GROK_AUTH_PATH / KILO_AUTH_PATH override the store locations. Never logs a token.
+
+# Resolve the xAI credential into XAI_AUTH_TOKEN / XAI_AUTH_SOURCE / XAI_AUTH_MODE.
+resolve_xai_auth() {
+    local resolved
+    if ! resolved=$(python3 - <<'PY'
+import base64, json, os, sys, time, urllib.error, urllib.parse, urllib.request
+
+SKEW = 60  # seconds of clock skew tolerated before a token counts as expired
+
+
+def claims(token):
+    try:
+        part = str(token or "").split(".")[1]
+        part += "=" * (-len(part) % 4)
+        return json.loads(base64.urlsafe_b64decode(part))
+    except Exception:
+        return None
+
+
+def expiry(value, jwt):
+    if isinstance(value, (int, float)) and value:
+        return value / 1000 if value > 1e12 else value
+    exp = (jwt or {}).get("exp")
+    return exp if isinstance(exp, (int, float)) else 0
+
+
+def read_store(path):
+    try:
+        with open(path) as fh:
+            data = json.load(fh)
+        return data if isinstance(data, dict) else None
+    except Exception:
+        return None
+
+
+def out(token, source, mode):
+    print(json.dumps({"token": token, "source": source, "mode": mode}))
+    sys.exit(0)
+
+
+def fail(message):
+    print(message, file=sys.stderr)
+    sys.exit(3)
+
+
+env = os.environ
+home = os.path.expanduser("~")
+
+token = env.get("XAI_OAUTH_TOKEN", "").strip()
+if token:
+    out(token, "XAI_OAUTH_TOKEN", "oauth")
+
+grok_path = env.get("GROK_AUTH_PATH") or os.path.join(home, ".grok", "auth.json")
+store = read_store(grok_path)
+if store:
+    rows = list(store.items())
+    hit = next((r for r in rows if "auth.x.ai" in r[0]), None) or \
+        next((r for r in rows if "accounts.x.ai" in r[0]), None)
+    if hit:
+        _scope, value = hit
+        rec = value if isinstance(value, dict) else {"key": value}
+        access = rec.get("key") or rec.get("access") or rec.get("access_token")
+        if access:
+            exp = expiry(rec.get("expires"), claims(access))
+            if not exp or exp - SKEW > time.time():
+                out(access, "grok-auth", "oauth")
+
+xdg = env.get("XDG_DATA_HOME") or os.path.join(home, ".local", "share")
+kilo_path = env.get("KILO_AUTH_PATH") or os.path.join(xdg, "kilo", "auth.json")
+store = read_store(kilo_path)
+slot = store.get("xai") if store else None
+if isinstance(slot, dict) and (slot.get("access") or slot.get("refresh")):
+    jwt = claims(slot.get("access"))
+    exp = expiry(slot.get("expires"), jwt)
+    if slot.get("access") and exp - SKEW > time.time():
+        out(slot["access"], "kilo-auth", "oauth")
+    if slot.get("refresh"):
+        client_id = slot.get("client_id") or (jwt or {}).get("client_id") or (jwt or {}).get("aud")
+        if isinstance(client_id, list):
+            client_id = client_id[0] if client_id else None
+        if not client_id:
+            fail("xAI OAuth access token expired and the store has no client_id to refresh with — re-login via Kilo")
+        body = urllib.parse.urlencode({
+            "grant_type": "refresh_token",
+            "refresh_token": slot["refresh"],
+            "client_id": str(client_id),
+        }).encode()
+        fresh, last = None, "no token endpoint responded"
+        for path in ("/oauth/token", "/oauth2/token"):
+            req = urllib.request.Request(
+                "https://auth.x.ai" + path, data=body, method="POST",
+                headers={"content-type": "application/x-www-form-urlencoded"})
+            try:
+                with urllib.request.urlopen(req, timeout=30) as res:
+                    fresh = json.loads(res.read().decode("utf-8"))
+                break
+            except urllib.error.HTTPError as err:
+                last = f"{err.code} from {path}"
+                if err.code == 404:
+                    continue
+                fail(f"xAI OAuth refresh failed ({last})")
+            except Exception as err:
+                fail(f"xAI OAuth refresh failed ({err})")
+        if not fresh:
+            fail(f"xAI OAuth refresh failed ({last})")
+        if not fresh.get("access_token"):
+            fail("xAI OAuth refresh returned no access_token")
+        try:
+            ttl = float(fresh.get("expires_in") or 3600)
+        except (TypeError, ValueError):
+            ttl = 3600.0
+        renewed = dict(slot)
+        renewed.update({
+            "type": "oauth",
+            "access": fresh["access_token"],
+            "refresh": fresh.get("refresh_token") or slot["refresh"],
+            "expires": int((time.time() + ttl) * 1000),
+            "client_id": client_id,
+        })
+        store["xai"] = renewed
+        os.makedirs(os.path.dirname(kilo_path), exist_ok=True)
+        tmp = kilo_path + ".tmp"
+        with open(tmp, "w") as fh:
+            json.dump(store, fh, indent=2)
+            fh.write("\n")
+        os.chmod(tmp, 0o600)
+        os.replace(tmp, kilo_path)
+        out(renewed["access"], "kilo-auth-refresh", "oauth")
+    fail("xAI OAuth access token in the Kilo store is expired and has no refresh token — re-login via Kilo")
+
+key = env.get("XAI_API_KEY", "").strip()
+if key:
+    out(key, "XAI_API_KEY", "api_key")
+fail("no xAI credential. Run `grok login`, set XAI_OAUTH_TOKEN, or set XAI_API_KEY")
+PY
+    ); then
+        return 1
+    fi
+    XAI_AUTH_MODE=$(printf '%s' "$resolved" | jq -r '.mode')
+    XAI_AUTH_SOURCE=$(printf '%s' "$resolved" | jq -r '.source')
+    XAI_AUTH_TOKEN=$(printf '%s' "$resolved" | jq -r '.token')
+    [[ -n "$XAI_AUTH_TOKEN" ]]
+}
+
+# Write the raw image bytes in $1 to $2 as a real PNG. Imagine returns JPEG; a
+# real conversion keeps the house convention (<slug>.png) honest instead of
+# storing JPEG bytes under a .png name. Uses sips (macOS), ImageMagick, or Pillow.
+save_as_png() {
+    local src="$1"
+    local dest="$2"
+    local magic
+    magic=$(head -c 4 "$src" | od -An -tx1 | tr -d ' \n')
+    if [[ "$magic" == "89504e47" ]]; then
+        cp "$src" "$dest"
+        return 0
+    fi
+    if command -v sips &> /dev/null; then
+        sips -s format png "$src" --out "$dest" &> /dev/null && [[ -s "$dest" ]] && return 0
+    fi
+    if command -v magick &> /dev/null; then
+        magick "$src" "png:$dest" &> /dev/null && [[ -s "$dest" ]] && return 0
+    fi
+    if command -v convert &> /dev/null; then
+        convert "$src" "png:$dest" &> /dev/null && [[ -s "$dest" ]] && return 0
+    fi
+    if python3 -c 'import PIL' &> /dev/null; then
+        python3 -c 'import sys; from PIL import Image; Image.open(sys.argv[1]).convert("RGB").save(sys.argv[2], "PNG")' "$src" "$dest" &> /dev/null && [[ -s "$dest" ]] && return 0
+    fi
+    warn "Cannot convert the xAI JPEG to PNG: install ImageMagick or Pillow (macOS has sips)"
+    rm -f "$dest"
+    return 1
+}
+
+# Generate image using xAI Imagine (grok-imagine-image-2.0 by default)
+generate_image_xai() {
+    local prompt="$1"
+    local output_file="$2"
+
+    if [[ -z "$XAI_AUTH_TOKEN" ]] && ! resolve_xai_auth; then
+        warn "No xAI credential available"
+        return 1
+    fi
+
+    debug "Generating image with xAI model: $XAI_IMAGE_MODEL ($XAI_IMAGE_ASPECT, $XAI_IMAGE_RESOLUTION, $XAI_IMAGE_QUALITY) — auth $XAI_AUTH_MODE via $XAI_AUTH_SOURCE"
+    debug "Prompt: ${prompt:0:200}..."
+
+    # Imagine models take aspect/resolution/quality; grok-2-image takes only the prompt.
+    local payload
+    if [[ "$XAI_IMAGE_MODEL" == *imagine* ]]; then
+        payload=$(jq -n \
+            --arg model "$XAI_IMAGE_MODEL" \
+            --arg prompt "$prompt" \
+            --arg aspect "$XAI_IMAGE_ASPECT" \
+            --arg resolution "$XAI_IMAGE_RESOLUTION" \
+            --arg quality "$XAI_IMAGE_QUALITY" \
+            '{model: $model, prompt: $prompt, n: 1, aspect_ratio: $aspect, resolution: $resolution, quality: $quality, response_format: "b64_json"}')
+    else
+        payload=$(jq -n \
+            --arg model "$XAI_IMAGE_MODEL" \
+            --arg prompt "$prompt" \
+            '{model: $model, prompt: $prompt, n: 1, response_format: "b64_json"}')
+    fi
+
+    # The token travels in a mode-600 curl config, never on the command line.
+    local auth_config payload_file response_file
+    auth_config=$(mktemp)
+    payload_file=$(mktemp)
+    response_file=$(mktemp)
+    TEMP_FILES+=("$auth_config" "$payload_file" "$response_file")
+    chmod 600 "$auth_config" "$payload_file" "$response_file"
+    printf 'header = "Authorization: Bearer %s"\n' "$XAI_AUTH_TOKEN" > "$auth_config"
+    printf '%s' "$payload" > "$payload_file"
+
+    local url="${XAI_BASE_URL%/}/images/generations"
+    local http_code="000"
+    local attempt=0
+    local max_attempts=4
+    while [[ $attempt -lt $max_attempts ]]; do
+        attempt=$((attempt + 1))
+        http_code=$(curl -s --max-time 600 -o "$response_file" -w '%{http_code}' -X POST "$url" \
+            --config "$auth_config" \
+            -H "Content-Type: application/json" \
+            --data-binary "@$payload_file") || http_code="000"
+        [[ "$http_code" == "200" ]] && break
+        if [[ $attempt -lt $max_attempts && ( "$http_code" == "429" || "$http_code" == "000" || "$http_code" == 5* ) ]]; then
+            local backoff=5
+            [[ "$http_code" == "429" ]] && backoff=$((15 * attempt))
+            warn "xAI API returned $http_code — retrying in ${backoff}s (attempt $attempt/$max_attempts)"
+            sleep "$backoff"
+            continue
+        fi
+        break
+    done
+    rm -f "$auth_config" "$payload_file"
+
+    if [[ "$http_code" != "200" ]]; then
+        local error_msg
+        error_msg=$(jq -r 'if (.error|type) == "object" then (.error.message // empty) else (.error // .message // empty) end | tostring' "$response_file" 2>/dev/null | head -c 400)
+        [[ -z "$error_msg" ]] && error_msg=$(head -c 400 "$response_file" 2>/dev/null | tr -d '\n')
+        warn "xAI API error (HTTP $http_code): ${error_msg:-no response body}"
+        rm -f "$response_file"
+        return 1
+    fi
+
+    local raw_file
+    raw_file=$(mktemp)
+    TEMP_FILES+=("$raw_file")
+    local b64_data
+    b64_data=$(jq -r '.data[0].b64_json // empty' "$response_file")
+    if [[ -n "$b64_data" ]]; then
+        debug "Decoding base64 image data..."
+        printf '%s' "$b64_data" | base64 -d > "$raw_file"
+    else
+        local image_url
+        image_url=$(jq -r '.data[0].url // .data[0].image_url // empty' "$response_file")
+        if [[ -z "$image_url" ]]; then
+            warn "No image URL or base64 data in xAI response"
+            debug "Response: $(head -c 300 "$response_file")"
+            rm -f "$response_file" "$raw_file"
+            return 1
+        fi
+        debug "Downloading image from: $image_url"
+        curl -s --max-time 300 -o "$raw_file" "$image_url"
+    fi
+    rm -f "$response_file"
+
+    if [[ ! -s "$raw_file" ]]; then
+        warn "Failed to save image"
+        rm -f "$raw_file"
+        return 1
+    fi
+
+    # Imagine returns JPEG; convert to a real PNG so <slug>.png is not a mislabel.
+    if ! save_as_png "$raw_file" "$output_file"; then
+        rm -f "$raw_file"
+        return 1
+    fi
+    rm -f "$raw_file"
+
+    if [[ -f "$output_file" && -s "$output_file" ]]; then
+        local file_size
+        file_size=$(du -h "$output_file" | cut -f1)
+        success "Image saved to: $output_file ($file_size)"
+        return 0
+    fi
+    warn "Failed to save image"
+    return 1
+}
+
 # Generate image using Stability AI
 generate_image_stability() {
     local prompt="$1"
@@ -732,6 +1066,9 @@ generate_image() {
     case "$AI_PROVIDER" in
         openai)
             generate_image_openai "$prompt" "$output_file"
+            ;;
+        xai)
+            generate_image_xai "$prompt" "$output_file"
             ;;
         stability)
             generate_image_stability "$prompt" "$output_file"
@@ -1187,6 +1524,10 @@ main() {
     info "Configuration:"
     echo "  AI Provider: $AI_PROVIDER"
     echo "  Image Model: $IMAGE_MODEL"
+    if [[ "$AI_PROVIDER" == "xai" ]]; then
+        echo "  xAI Model: $XAI_IMAGE_MODEL ($XAI_IMAGE_ASPECT, $XAI_IMAGE_RESOLUTION, $XAI_IMAGE_QUALITY)"
+        echo "  xAI Auth: ${XAI_AUTH_MODE:-not resolved} via ${XAI_AUTH_SOURCE:-none}"
+    fi
     echo "  Output Dir: $OUTPUT_DIR"
     echo "  Image Size: $IMAGE_SIZE"
     echo "  Parallel Workers: $MAX_PARALLEL"

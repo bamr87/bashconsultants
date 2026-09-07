@@ -115,9 +115,9 @@ Shared helpers: a strict YAML-subset reader/writer for `_data/loop/*.yml` (no bl
 
 ### `features/generate-preview-images` (canonical)
 
-AI preview image generator for posts and configured collections. Reads defaults from the `preview_images` section of `_config.yml` (provider `openai`, model `gpt-image-2`, size `1536x1024`, quality `high`), detects content missing a `preview:` image, generates images via the OpenAI Images API (Stability AI and a `local` placeholder provider are also supported), and writes them to `assets/images/previews/`.
+AI preview image generator for posts and configured collections. Reads defaults from the `preview_images` section of `_config.yml` (provider `openai`, model `gpt-image-2`, size `1536x1024`, quality `high`), detects content missing a `preview:` image, generates images via the OpenAI Images API (xAI Imagine via `--provider xai`, Stability AI, and a `local` placeholder provider are also supported), and writes them to `assets/images/previews/`.
 
-Requires `OPENAI_API_KEY` (or `STABILITY_API_KEY`) — see `.env.example`. API keys are passed to `curl` via mode-600 config files, never on the command line.
+Requires `OPENAI_API_KEY` — or, for `--provider xai`, an xAI OAuth token (read directly from the `grok login` or Kilo stores, or set as `XAI_OAUTH_TOKEN`) with `XAI_API_KEY` as the last resort; or `STABILITY_API_KEY` — see `.env.example` and `docs/preview-images.md`. Credentials are passed to `curl` via mode-600 config files, never on the command line.
 
 ```bash
 ./scripts/features/generate-preview-images --list-missing        # no API calls
