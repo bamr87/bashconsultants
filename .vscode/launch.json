@@ -1,145 +1,21 @@
+// bashconsultants · .vscode/launch.json — fleet-vscode/v1 · 2026-09-09. Convention + vocabulary: .vscode/README.md.
+// webRoot is the served build output (_site), so breakpoints in served files bind; the server on :4042 comes from the Serve task.
 {
-  // ==================================================
-  // VS CODE LAUNCH CONFIGURATION - Docker-First
-  // BASH Consultants — Jekyll static site, served from _site/ at http://localhost:4042
-  // ==================================================
-  // Maintainer notes:
-  //  - webRoot points at the SERVED build output (_site/), NOT the repo root, so
-  //    breakpoints in served files (e.g. /assets/js/particles.js) bind correctly.
-  //    The preLaunchTask builds/serves the site first, so _site/ existing only at
-  //    debug time is expected and safe. The whole served tree (HTML + /assets/*)
-  //    lives under _site/, so no custom pathMapping is needed.
-  //  - js-debug manages the browser debug transport itself; do NOT add
-  //    --remote-debugging-port to runtimeArgs on these managed launches (it is
-  //    ignored / can interfere). The Attach config below targets a browser you
-  //    start MANUALLY with that flag.
-  //  - The Docker launch configs run "Docker: Down" on debug end, which tears the
-  //    whole stack down when you close the browser. Swap to the "Docker: Compose
-  //    Stop" task if you'd rather keep containers warm for a fast restart.
-  //  - Browser is Microsoft Edge (msedge). Change "type" to "chrome" on any config
-  //    to debug in Google Chrome instead — both are installed.
-
   "version": "0.2.0",
   "configurations": [
-
-    // ==========================================
-    // DOCKER DEVELOPMENT
-    // ==========================================
     {
-      "name": "🐳 Debug BASH Consultants (Docker)",
+      "name": "Debug: site in Edge (:4042)",
       "type": "msedge",
       "request": "launch",
       "url": "http://localhost:4042",
       "webRoot": "${workspaceFolder}/_site",
-      "preLaunchTask": "Jekyll: Serve (Docker)",
-      "postDebugTask": "Docker: Down",
-      "runtimeArgs": [
-        "--disable-features=VizDisplayCompositor"
-      ],
-      "sourceMaps": false,
-      "internalConsoleOptions": "openOnSessionStart",
-      "trace": {
-        "logFile": "${workspaceFolder}/logs/debug-trace.log"
-      }
+      "preLaunchTask": "Serve"
     },
-
     {
-      // Attaches to a BROWSER's DevTools endpoint on port 9222 — NOT to Jekyll/Docker
-      // (Jekyll exposes only 4042 + 35730). Requires a browser already running with
-      // --remote-debugging-port=9222; the js-debug-managed launches above do NOT
-      // open that port, so start the browser manually with the flag to use this.
-      "name": "🔗 Attach to Browser DevTools (port 9222)",
-      "type": "msedge",
-      "request": "attach",
-      "port": 9222,
-      "webRoot": "${workspaceFolder}/_site",
-      "urlFilter": "http://localhost:4042/*",
-      "sourceMaps": false,
-      "internalConsoleOptions": "openOnSessionStart",
-      "trace": {
-        "logFile": "${workspaceFolder}/logs/debug-attach-trace.log"
-      }
-    },
-
-    {
-      "name": "🔄 Docker Rebuild & Debug",
+      "name": "Debug: live site (bash-365.com)",
       "type": "msedge",
       "request": "launch",
-      "url": "http://localhost:4042",
-      "webRoot": "${workspaceFolder}/_site",
-      "preLaunchTask": "Docker: Rebuild (Force)",
-      "postDebugTask": "Docker: Down",
-      "runtimeArgs": [
-        "--auto-open-devtools-for-tabs"
-      ],
-      "sourceMaps": false,
-      "internalConsoleOptions": "openOnSessionStart",
-      "trace": {
-        "logFile": "${workspaceFolder}/logs/debug-rebuild-trace.log"
-      }
-    },
-
-    // ==========================================
-    // LOCAL DEVELOPMENT (NON-DOCKER)
-    // ==========================================
-    {
-      "name": "🖥️ Debug BASH Consultants (Local)",
-      "type": "msedge",
-      "request": "launch",
-      "url": "http://localhost:4042",
-      "webRoot": "${workspaceFolder}/_site",
-      "preLaunchTask": "Jekyll: Serve (Local)",
-      "runtimeArgs": [
-        "--disable-features=VizDisplayCompositor"
-      ],
-      "sourceMaps": false,
-      "internalConsoleOptions": "openOnSessionStart",
-      "trace": {
-        "logFile": "${workspaceFolder}/logs/debug-local-trace.log"
-      }
-    },
-
-    // ==========================================
-    // MOBILE & RESPONSIVE TESTING
-    // ==========================================
-    {
-      "name": "📱 Mobile Debug (Docker)",
-      "type": "msedge",
-      "request": "launch",
-      "url": "http://localhost:4042",
-      "webRoot": "${workspaceFolder}/_site",
-      "preLaunchTask": "Jekyll: Serve (Docker)",
-      "postDebugTask": "Docker: Down",
-      "runtimeArgs": [
-        "--device-scale-factor=2",
-        "--force-device-scale-factor=2",
-        "--user-agent=Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
-      ],
-      "sourceMaps": false,
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-
-    // ==========================================
-    // PERFORMANCE DEBUGGING
-    // ==========================================
-    {
-      "name": "🎯 Performance Debug (Docker)",
-      "type": "msedge",
-      "request": "launch",
-      "url": "http://localhost:4042",
-      "webRoot": "${workspaceFolder}/_site",
-      "preLaunchTask": "Jekyll: Serve (Docker)",
-      "postDebugTask": "Docker: Down",
-      "runtimeArgs": [
-        "--enable-logging=stderr",
-        "--log-level=0",
-        "--enable-features=NetworkService"
-      ],
-      "sourceMaps": false,
-      "internalConsoleOptions": "openOnSessionStart",
-      "trace": {
-        "logFile": "${workspaceFolder}/logs/performance-debug.log"
-      }
+      "url": "https://bash-365.com"
     }
   ]
 }
