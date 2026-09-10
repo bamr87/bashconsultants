@@ -25,7 +25,7 @@ For the full overview see [`.github/copilot-instructions.md`](./.github/copilot-
 | File-scoped instructions | `.github/instructions/*.instructions.md` | Auto-loaded when files match `applyTo` |
 | Reusable prompts | `.github/prompts/*.prompt.md` | When asked to run a multi-step task that matches a prompt |
 | Claude-native primitives | `.claude/` (skills, agents, commands, memory, hooks) | In Claude Code — see `.claude/README.md` |
-| Workflows | `.github/workflows/` | When changing CI |
+| Workflows | `.github/workflows/` | When changing CI (the content loop's design lives in `docs/content-loop.md`) |
 
 ### Claude Code layer (`.claude/`)
 
@@ -34,8 +34,8 @@ Claude Code has native primitives that specialize this cross-tool guidance. Map 
 | Primitive | Location | Use for |
 |---|---|---|
 | Skills | `.claude/skills/*/SKILL.md` | Governed procedures (editorial gate, toolkit-doc authoring, wikilinks, brand) |
-| Subagents | `.claude/agents/*.md` | Delegated jobs (article review, build validation, brand audit, the weekly `preacher` doctrine enforcer, the weekly `content-curator` reviewer — see `docs/the-preacher.md`, `docs/automation.md`) |
-| Commands | `.claude/commands/*.md` | `/`-triggers: `/lint-content`, `/new-toolkit-doc`, `/brand-check` |
+| Subagents | `.claude/agents/*.md` | Delegated jobs (article review, build validation, brand audit, the weekly `preacher` doctrine enforcer, the weekly `content-curator` reviewer, the daily `loop-writer` — see `docs/the-preacher.md`, `docs/content-loop.md`, `docs/automation.md`) |
+| Commands | `.claude/commands/*.md` | `/`-triggers: `/lint-content`, `/new-toolkit-doc`, `/brand-check`, `/loop-run` |
 
 ### File-scoped instruction map
 

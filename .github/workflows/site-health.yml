@@ -81,6 +81,8 @@ jobs:
       # <a> tags (3). Ignore those theme/context shapes until tag and archive
       # index pages exist; everything else still fails the check.
       - name: Link check built site (internal only)
+        # The pinned theme emits tag/archive navigation and fragment-only
+        # filters, but this site does not publish those archive routes.
         run: |
           bundle exec htmlproofer _site \
             --checks Links \
@@ -88,14 +90,9 @@ jobs:
             --allow-hash-href \
             --allow-missing-href \
             --no-enforce-https \
-            --ignore-files "/\/(CLAUDE|AGENTS)\//" \
-            --ignore-urls "/^\/api\//,/^\/tags\//,/^\/archives\//,/^#/"
+            --ignore-urls "/(^#|^\/api\/|^\/tags\/?($|#)|^\/archives\/?($|#))/"
 
-      # Issues are disabled on this fork, so the old `gh issue create` alert
-      # died every night ("repository has disabled issues") and told no one.
-      # Annotate + summarize instead; restore an issue alert only if Issues
-      # are ever enabled (Settings → General → Features).
-      - name: Report failure in the run summary
+      - name: Open or update site-health issue
         if: failure()
         run: |
           set -euo pipefail

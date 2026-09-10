@@ -4,7 +4,7 @@ description: "A 2,400-year-old argument about power explains vendor case studies
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-08-19T10:00:00.000Z
-lastmod: 2026-08-19T10:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [muses]
 tags: [strategy, vendor-lock-in, smb, total-cost-of-ownership, denver-smb]
@@ -45,7 +45,7 @@ Plato's rebuttal to Thrasymachus is the most useful sentence in the whole exchan
 
 That is the cleanest test of advice ever written, and it converts directly into a procurement standard: never ask whether an adviser is smart; ask whom the advice *structurally* serves. Not their intentions — their incentives. A consultant paid a reseller margin on the software they recommend is not lying to you, but their craft has a second client. A proposal whose every option lands inside one vendor's ecosystem was not written by your side of the table, whatever the letterhead says.
 
-You cannot fix this with trust. You fix it with arrangements — advice whose interests are inspectable. Recommendations in writing, with reasoning, so they can be argued with. Disclosure of what the adviser earns from each path. Deliverables you own outright: documentation, credentials, the data model, the export scripts. It's the reason our own doctrine is vendor-neutral [[IT strategy]] and systems a client can own and leave with — including leaving us. An exit that stays cheap is the only guarantee that keeps everyone's craft honest, ours included.
+You cannot fix this with trust. You fix it with arrangements — advice whose interests are inspectable. Recommendations in writing, with reasoning, so they can be argued with. Disclosure of what the adviser earns from each path. Deliverables you own outright: documentation, credentials, the data model, the export scripts. It is the reason our own practice is built on vendor-neutral [[IT strategy]] and on systems a client can own and leave with — including leaving us. An exit that stays cheap is the only guarantee that keeps everyone's craft honest, ours included.
 
 ## Five questions that shift the power
 

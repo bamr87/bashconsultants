@@ -4,14 +4,14 @@ description: "A field guide to running work, play, and dev as background jobs, a
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-06-20T10:00:00.000Z
-lastmod: 2026-06-21T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [muses]
 tags: [work-life-balance, bash, shell, parenting, productivity, developer-life]
 keywords: [work life balance for developers, job control bash background jobs, context switching cost, running side projects with a toddler, time management for technologists]
 preview: /images/previews/work-play-dev-job-control-for-the-sleep-deprived.png
 featured: false
-excerpt: "You think your life runs `work && play && dev`. You actually try to run `work & play & dev &`, and then a child process forks into the foreground at nice -20. Job control for the sleep-deprived."
+excerpt: "You think your life runs work && play && dev. It actually runs work & play & dev &, until a child process forks into the foreground at nice -20."
 ---
 
 ## The fantasy
@@ -26,7 +26,7 @@ $ work & play & dev &
 $
 ```
 
-Three jobs. One ampersand each. All backgrounded, all running at once, prompt returned instantly, hands free. You lean back. You will earn a living, be a whole person, *and* finally ship the side project — concurrently, like a real machine. The dream of every overcommitted human is the same dream Unix sold us in 1973: throw an `&` on the end and walk away.
+Three jobs. One ampersand each. All backgrounded, all running at once, prompt returned instantly, hands free. You lean back. You will earn a living, be a whole person, *and* finally ship the side project — concurrently, like a real machine. The dream of every overcommitted human is the same dream Unix sold us in the 1970s: throw an `&` on the end and walk away.
 
 Then `jobs` reports the truth.
 
@@ -45,7 +45,7 @@ Let's talk about job control.
 
 Here is the lie at the center of modern adult life: that you are running these things in parallel. You are not. You have one core. One. A single execution unit doing what single cores have always done — *time-slicing* so fast it produces the convincing illusion of simultaneity. The central processing unit (CPU) you bought in 2019 fakes multitasking by switching between processes thousands of times a second. You fake it by answering a Slack message at a playground.
 
-The catch is the context switch. When a real CPU switches processes it has to dump the registers, flush part of the cache, load the next process's state, and warm everything back up. It's cheap in silicon and ruinous in wetware. When *you* switch from `dev` to `work` to "why is the toddler quiet," you pay a context-switch tax measured not in nanoseconds but in the time it takes to remember what the function you were writing was supposed to return. The often-cited [University of California, Irvine study on workplace interruptions](https://ics.uci.edu/~gmark/chi08-mark.pdf) found it takes people an average of about 23 minutes to return to an interrupted task. Your scheduler is running at maybe forty productive minutes an hour, and that's on a good day with no SIGCHLD storm. (We'll get to SIGCHLD.)
+The catch is the context switch. When a real CPU switches processes it has to dump the registers, flush part of the cache, load the next process's state, and warm everything back up. It's cheap in silicon and ruinous in wetware. When *you* switch from `dev` to `work` to "why is the toddler quiet," you pay a context-switch tax measured not in nanoseconds but in the time it takes to remember what the function you were writing was supposed to return. The often-cited figure from Gloria Mark's University of California, Irvine interruption research is about 23 minutes to get back to an interrupted task; her [study on the cost of interrupted work](https://ics.uci.edu/~gmark/chi08-mark.pdf) found people finish interrupted tasks faster and pay for it in stress and effort. Your scheduler is running at maybe forty productive minutes an hour, and that's on a good day with no SIGCHLD storm. (We'll get to SIGCHLD.)
 
 So the goal was never true parallelism. It was a tolerable time-slicing policy. Most of us are running the worst one available: switch on every interrupt, prioritize whatever screamed loudest, and let the lowest-priority job starve.
 
@@ -145,7 +145,7 @@ So: protect `play`. Detach `dev`. `cron` the rest. And when the small process si
 
 Strip the parenting jokes and this is the scheduler running most small businesses we walk into. There's a `work` daemon that renice's itself to `-5` and eats every interrupt — the loudest customer, the squeakiest invoice, the integration that broke this morning. There's a `dev` job that never gets a focused block, so the migration off QuickBooks or the reporting cleanup sits Stopped for two years. And there's a `play` process — the strategic project with no screaming deadline and no obvious business case — that the OOM killer reaps first every quarter, because nobody pinned it.
 
-The teams that ship the strategic work are not working more hours. They've just stopped letting the loudest process and the kernel's lazy default decide the schedule. They give the load-bearing project a guaranteed slice, batch the interrupts into windows, and detach the long-running work so a single interruption doesn't cost a full restart. The fix is a policy, not a person grinding harder.
+The teams that ship the strategic work are not working more hours. They've just stopped letting the loudest process and the kernel's lazy default decide the schedule. They give the load-bearing project a guaranteed slice, batch the interrupts into windows, chunk it to a size one slice can carry — the argument in [[Three is the magic number for automation that holds]] — and detach the long-running work so a single interruption doesn't cost a full restart. The fix is a policy, not a person grinding harder.
 
 ## exit 0
 

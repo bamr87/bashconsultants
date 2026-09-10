@@ -4,12 +4,13 @@ description: "How Denver SMBs break the fix-outsource-rework software loop with 
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2025-11-19T10:00:00.000Z
-lastmod: 2026-07-06T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [muses]
 tags: [software-development, outsourcing, agile, devops-culture, project-management]
 featured: false
-excerpt: "A frantic ensemble sings its way around the never-ending bug-fix-outsource-rework loop, plus the three things that actually break the cycle."
+keywords: [why software bugs keep coming back, regression testing for small business, software outsourcing quality problems, requirements and acceptance criteria, continuous integration for small teams, software project ownership, cost of fixing bugs late]
+excerpt: "We outsource the patch, they outsource the blame, and the wheel turns again — requirements, ownership, and automated tests are what stop it."
 preview: /images/previews/the-circle-of-fix-how-to-escape-the-bug-rework-loo.png
 ---
 
@@ -53,7 +54,7 @@ Circle of Fix, modulating pain! Every tritone resolved births a bug once again! 
 
 Round and round in the Circle of Fix, The bugs go marching four by four, hurrah? Hurrah? We modulate up but the quality dips, And the circle keeps spinning… *(whisper)* …send it to the Philippines.
 
-### Blackout on a single unresolved dominant seventh chord. A lone support rep from the dark:
+*(Blackout on a single unresolved dominant seventh chord. A lone support rep, from the dark.)*
 
 "Have you tried turning it off and on again?"
 
@@ -61,7 +62,7 @@ Round and round in the Circle of Fix, The bugs go marching four by four, hurrah?
 
 ## Why the wheel keeps spinning
 
-It's funny because it's true. A lot of small and medium businesses (SMBs) in the Denver metro find themselves humming some version of this song: a feature gets built, it breaks something else, the fix gets handed to whoever is cheapest and available, and three weeks later you're back where you started with a new bug and a thinner budget.
+Nobody sings it out loud. Plenty of small and medium businesses (SMBs) in the Denver metro hum some version of it anyway: a feature gets built, it breaks something else, the fix gets handed to whoever is cheapest and available, and three weeks later you're back where you started with a new bug and a thinner budget.
 
 The wheel isn't a vendor problem, an offshore problem, or a "bad developers" problem. It's a process problem, and it gets very expensive very fast. The longer a defect survives before someone catches it, the more it costs to fix. A bug caught while you're still writing the requirement is a five-minute conversation. The same bug caught in production, after a customer hits it, can cost orders of magnitude more to unwind, a relationship Barry Boehm documented decades ago and the U.S. National Institute of Standards and Technology (NIST) put hard numbers behind in its [report on the economic impacts of inadequate software testing](https://www.nist.gov/system/files/documents/director/planning/report02-3.pdf). Every loop around the Circle of Fix is you paying the late-stage price over and over.
 
@@ -83,7 +84,7 @@ You do not need a 40-page specification. You need enough that two different peop
 
 ### 2. Give every piece of work one owner
 
-The song's funniest line is the truest: "We outsource the patch, they outsource the blame." When responsibility is shared across an onshore team, an offshore team, and a product manager, it is owned by no one, and the bug just keeps getting passed around the stage.
+The chorus says it plainly: "We outsource the patch, they outsource the blame." When responsibility is shared across an onshore team, an offshore team, and a product manager, it is owned by no one, and the bug just keeps getting passed around the stage.
 
 Pick one person, internal or external, who owns each feature end to end and is accountable for it working in production. Cheaper hands on the keyboard are fine. Diffuse ownership is what kills you.
 
@@ -118,5 +119,3 @@ What your team has to do: name the owner, tell us which transactions actually ma
 ## Next step
 
 If your software life feels like a chord that never resolves, the fix is process, not panic. Our [[Software development]] work helps Denver SMBs put requirements, ownership, and automated testing in place so the wheel finally stops turning.
-
-*Tired of singing the same chorus on loop? Let's help you step off the wheel.*

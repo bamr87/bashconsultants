@@ -4,7 +4,7 @@ description: "A 4-week, low-cost test framework Denver SMBs can run to tell a st
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2025-08-12T10:00:00.000Z
-lastmod: 2026-06-21T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [muses]
 tags: [innovation, strategy, leadership, smb]
@@ -20,7 +20,7 @@ Take a Denver construction firm of about 30 people with field crews — the kind
 
 In cases like this, the "downgrade" can cut daily admin time across the crew by a couple of hours and stop the office from chasing field updates at 9 PM — while the expensive software stays installed and nobody opens it.
 
-That's the innovation paradox: a bad idea and a breakthrough idea look identical the moment someone says them out loud. For an SMB owner, the useful question isn't *which one is this?* — you usually can't know yet. It's *how do I find out cheaply enough that being wrong doesn't hurt?* This post is the framework we use to answer that, plus the Denver examples behind it.
+That's the innovation paradox: a bad idea and a breakthrough idea look identical the moment someone says them out loud. For the owner of a small or medium business (SMB), the useful question isn't *which one is this?* — you usually can't know yet. It's *how do I find out cheaply enough that being wrong doesn't hurt?* What follows is the framework we use to answer it, and the Denver examples behind it.
 
 ## Why good ideas look bad at first
 
@@ -43,7 +43,7 @@ Forget the full rollout. Ask one question: what is the cheapest version that pro
 - **Write the core assumption as a sentence you can be wrong about.** Not "field reporting could be better," but "field crews will log job updates same-day if it takes under 30 seconds." That sentence is the thing you're testing.
 - **Set a hard budget ceiling for the test itself** — often a few hundred dollars and a slice of one person's week. If proving the idea costs more than that, you've scoped the test too big.
 
-*Denver example:* a 25-seat accounting firm wondered whether AI-assisted document intake would cut data-entry hours at tax season. The full version is a workflow platform and a six-figure conversation. The week-1 version: route 50 real client documents through one off-the-shelf tool and have one staffer time the before-and-after.
+*Denver example:* a 25-seat accounting firm wondered whether artificial intelligence (AI) document intake would cut data-entry hours at tax season. The full version is a workflow platform and a six-figure conversation. The week-1 version: route 50 real client documents through one off-the-shelf tool and have one staffer time the before-and-after.
 
 ### Week 2 — pick one team and one number
 
@@ -69,7 +69,7 @@ One decision, made on the data, with no fourth option.
 - **Kill** if it didn't — cleanly, and thank the person who proposed it so the next idea still gets proposed.
 - **Iterate** only with a specific change and a new one-month clock. "Let's keep watching" is not iterating.
 
-This is the same loop we run when a client is weighing a move from QuickBooks to a full Enterprise Resource Planning (ERP) system, a cloud-provider switch, or a new ticketing tool. Most ideas die in week 2 — cheaply, before they ever become a line item. The few that survive have earned the full investment.
+This is the same loop we run when a client is weighing a cloud-provider switch, a new ticketing tool, or a move from QuickBooks to a full Enterprise Resource Planning (ERP) system — the decision [[Outgrowing QuickBooks: is it time for ERP?]] works through end to end. Most ideas die in week 2 — cheaply, before they ever become a line item. The few that survive have earned the full investment.
 
 ## Watch-outs
 

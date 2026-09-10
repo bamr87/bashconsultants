@@ -33,10 +33,12 @@
 overrides:
   - path: "_layouts/landing.html"
     reason: >-
-      Bespoke marketing homepage: particles hero, services grid rendered from
-      _data/entity/services.yml, plus industries / process / AI-practice /
-      stats / FAQ sections driven by index.md front matter. Replaces the
-      theme's generic _data/landing.yml-driven template entirely.
+      Bespoke marketing homepage: the interactive B-mark hero
+      (_includes/bash-mark.html, a canvas particle rendering of the logo on
+      a dark band), services grid rendered from _data/entity/services.yml,
+      plus industries / process / AI-practice / stats / FAQ sections driven
+      by index.md front matter. Replaces the theme's generic
+      _data/landing.yml-driven template entirely.
 
   - path: "_includes/analytics/google-tag-manager-head.html"
     reason: >-

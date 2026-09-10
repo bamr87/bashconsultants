@@ -1,0 +1,9 @@
+# The homepage mark. Geometry comes from the inline shape the include renders
+# (_includes/brand/mark-shape.svg); colors from theme_color via the include.
+# Every key here overrides a default in assets/js/constellation.js.
+hint: "Drag to rotate · click to ripple"
+scene:
+  source: svg
+  depth: 0.26        # slab thickness, as a fraction of the mark's half-size
+  edgeBand: 14       # SVG units either side of the outline that count as edge
+  edgeShare: 0.46    # share of stars placed on the edge band

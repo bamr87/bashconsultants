@@ -3,7 +3,7 @@ title: How an AI-augmented practice runs
 description: How BASH Consulting runs on AI every day — governed prompts, written rules, and human-approved agent workflows a Denver SMB can copy
 excerpt: The operating model behind this practice — governed prompts, instruction files as editorial law, agents that draft, and humans who approve.
 layout: default
-preview: /assets/images/previews/prompts-the-new-command-line.png
+preview: /assets/images/previews/prompts-are-the-new-command-line.png
 sidebar:
   nav: dynamic
 keywords:

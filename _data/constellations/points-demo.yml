@@ -1,0 +1,18 @@
+# A 3D point cloud from a built-in generator. Swap `generator: helix` for
+# `url: /assets/data/constellations/<name>.json` to load a sampled mesh
+# (scripts/sample_mesh_points.py turns an OBJ into that file).
+label: "A helix of stars. Drag to rotate; click to send a wave"
+particles: 2200
+look:
+  halo: { accent: 2, alpha: 0.10, scale: 2.8 }
+  point: { size: [0.008, 0.016], alpha: 0.85 }
+camera: { restTilt: 0.35, startYaw: 0.4 }
+motion: { spin: 0.45, nod: 0.12 }
+interaction:
+  click: { ringSpeed: 2.0, ringForce: 1.4 }
+scene:
+  source: points
+  generator: helix
+  turns: 5
+  count: 1800
+  depth: 1

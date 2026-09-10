@@ -1,0 +1,16 @@
+# Any text, rasterized with a font and sampled. Two lines, crisper dots.
+label: "The word BASH drawn in stars. Drag to rotate; click to send a wave"
+particles: 2600
+look:
+  glow: point
+  halo: { accent: 1, alpha: 0.12, scale: 2.4 }
+  text: { size: [0.008, 0.015], alpha: 0.95 }
+camera: { restTilt: 0.10, startYaw: -0.25 }
+motion: { spin: 0.12 }
+scene:
+  source: text
+  text: "BASH\nConsulting"
+  font: "bold 150px system-ui, -apple-system, 'Segoe UI', sans-serif"
+  width: 1.9
+  density: 5
+  depth: 0.18

@@ -12,22 +12,27 @@ Start at the root [`CLAUDE.md`](../CLAUDE.md). This file maps what lives here an
 │   ├── toolkit-doc/         Author a business- or partner-track toolkit doc end to end
 │   ├── wikilinks/           Obsidian [[wikilink]] discipline (the kramdown/index foot-guns)
 │   ├── linkedin-share/      Draft on-brand LinkedIn company-page copy, staged for approval
-│   └── brand/               Apply the BASH verbal + visual identity
+│   ├── brand/               Apply the BASH verbal + visual identity
+│   └── content-loop/        One cycle of the content loop: plan → write from real work → gate → ledger → one PR
 ├── agents/              # Subagents — delegate a bounded job to a fresh context
 │   ├── article-reviewer-editor.md   Editorial + SEO + frontmatter review (has project memory)
 │   ├── jekyll-build-validator.md    Validate the build across dev / Pages / Azure stacks
 │   ├── brand-guardian.md            Audit copy + assets against the brand SSOT
 │   ├── preacher.md                  Weekly doctrine enforcement — or mechanize a check (docs/the-preacher.md)
-│   └── content-curator.md           Weekly content review — expand an article or write a new one
+│   ├── content-curator.md           Weekly content review — expand an article or write a new one
+│   └── loop-writer.md               The content loop's writer — one piece from the practice's own work (docs/content-loop.md)
 ├── commands/            # Slash commands — discoverable entry points to common workflows
 │   ├── lint-content.md      /lint-content   → run the editorial gate on changed content
 │   ├── new-toolkit-doc.md   /new-toolkit-doc → scaffold a new toolkit doc
 │   ├── linkedin-draft.md    /linkedin-draft → draft + stage a LinkedIn share
-│   └── brand-check.md       /brand-check    → run the brand audit
+│   ├── brand-check.md       /brand-check    → run the brand audit
+│   └── loop-run.md          /loop-run       → run one cycle of the content loop
 ├── agent-memory/        # Per-agent memory that persists decisions across sessions
 │   └── article-reviewer-editor/
+├── loop/                # (gitignored) the SessionEnd hook's local session-trace queue
 └── hooks/               # Policy enforced automatically on tool events
-    └── pr-review-comments.sh   PostToolUse(Bash): require PR-comment review after gh pr create
+    ├── pr-review-comments.sh   PostToolUse(Bash): require PR-comment review after gh pr create
+    └── session-trace.sh        SessionEnd: record what the session touched for the content loop (scripts/loop/trace.py)
 ```
 
 ## Which primitive do I use?

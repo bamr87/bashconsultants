@@ -1,355 +1,182 @@
+// bashconsultants · .vscode/tasks.json — fleet-vscode/v1 · 2026-09-09. Convention + vocabulary: .vscode/README.md.
+// The Jekyll tasks run in Docker because the host Ruby is newer than the github-pages gem supports; Docker Desktop must be RUNNING (`docker info` hangs rather than errors when it is down, so a task that sits silent means: start Docker first).
+// `docker compose` (v2) everywhere, never `docker-compose`.
+// The `Preview images: … (xAI)` tasks call scripts/features/xai-login, which arrives with the preview-image work still unpushed on the author's local main — they are inert until that lands.
 {
-  // ==================================================
-  // UNIFIED VS CODE TASKS - Docker-First Development
-  // ==================================================
-  // Optimized for BASH Consultants Jekyll development
-  // Last Updated: 2026-01-24
-  
   "version": "2.0.0",
   "tasks": [
-    
-    // ==========================================
-    // CORE DOCKER OPERATIONS
-    // ==========================================
     {
-      "label": "Docker: Compose Up (Detached)",
+      "label": "Serve",
+      "detail": "Docker. The Jekyll dev stack (_config.yml,_config_dev.yml) on http://localhost:4042 with livereload on :35730 — the only stack where _plugins/ execute. Runs until Stop.",
       "type": "shell",
-      "command": "docker-compose",
-      "args": ["up", "-d"],
-      "options": { "cwd": "${workspaceFolder}" },
+      "command": "docker compose up",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": {
+        "owner": "serve",
+        "pattern": {
+          "regexp": "^(never-matches)$",
+          "message": 1
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Server (running|address)|Container \\S+\\s+Running"
+        }
+      }
+    },
+    {
+      "label": "Stop",
+      "detail": "Stops and removes the dev stack (docker compose down).",
+      "type": "shell",
+      "command": "docker compose down",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build",
+      "detail": "Docker. The GitHub Pages stack build exactly as build-validate.yml runs it (_config.yml alone, remote theme, safe mode, → _site-pages). The Azure stack needs Gemfile.azure and stays CI-only.",
+      "type": "shell",
+      "command": "docker compose up -d && docker compose exec -T jekyll bundle exec jekyll build --trace --config _config.yml --destination _site-pages",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
       "group": {
         "kind": "build",
         "isDefault": true
+      }
+    },
+    {
+      "label": "Build: dev stack",
+      "detail": "Docker. The local-dev build from CLAUDE.md operating rule 2 — a developer check CI never runs; a change that builds only under _config_dev.yml can still be broken in production.",
+      "type": "shell",
+      "command": "docker compose up -d && docker compose exec -T jekyll bundle exec jekyll build --config _config.yml,_config_dev.yml",
+      "options": {
+        "cwd": "${workspaceFolder}"
       },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint",
+      "detail": "Host python. The editorial gate (self-test, then the whole repo; exit 1 on errors) — the same two steps build-validate.yml runs first.",
+      "type": "shell",
+      "command": "python3 scripts/content_lint.py --self-test && python3 scripts/content_lint.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [],
-      "detail": "Start Docker containers in detached mode"
+      "group": "test"
     },
-
     {
-      "label": "Jekyll: Serve (Docker)",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["up"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "isBackground": true,
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      },
-      "problemMatcher": [
-        {
-          "owner": "jekyll",
-          "fileLocation": ["relative", "${workspaceFolder}"],
-          "severity": "error",
-          "pattern": {
-            "regexp": "^(?:[\\w.-]+\\s*\\|\\s*)?\\s*(?:Liquid )?(?:Exception|Error):\\s+(.*)$",
-            "message": 1
-          },
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": "(Regenerating|Generating\\.\\.\\.|Auto-regeneration)",
-            "endsPattern": "(done in [\\d.]+ seconds|Server running)"
-          }
-        },
-        {
-          "owner": "jekyll",
-          "fileLocation": ["relative", "${workspaceFolder}"],
-          "severity": "warning",
-          "pattern": {
-            "regexp": "^(?:[\\w.-]+\\s*\\|\\s*)?\\s*(?:Liquid )?Warning:\\s+(.*)$",
-            "message": 1
-          }
-        }
+      "label": "Verify",
+      "detail": "Lint, then the Pages-stack Build — the required build-validate check minus the Azure stack.",
+      "dependsOn": [
+        "Lint",
+        "Build"
       ],
-      "detail": "Start Jekyll site via Docker Compose (foreground)"
+      "dependsOrder": "sequence",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
     },
-
     {
-      "label": "Docker: Compose Stop",
-      "type": "shell", 
-      "command": "docker-compose",
-      "args": ["stop"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
+      "label": "Extension: lint + compile",
+      "detail": "Host node. CLAUDE.md operating rule 2 for extension/ changes.",
+      "type": "shell",
+      "command": "npm run lint && npm run compile",
+      "options": {
+        "cwd": "${workspaceFolder}/extension"
       },
       "problemMatcher": [],
-      "detail": "Stop running Docker containers"
+      "group": "test"
     },
-
     {
-      "label": "Docker: Down",
+      "label": "Preview images: list missing",
+      "detail": "Host. Posts/docs without a preview image — no API calls.",
       "type": "shell",
-      "command": "docker-compose", 
-      "args": ["down"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
+      "command": "./scripts/generate-preview-images.sh --list-missing",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Preview images: dry run",
+      "detail": "Host. What would be generated, prompts included — no API spend.",
+      "type": "shell",
+      "command": "./scripts/generate-preview-images.sh --dry-run --verbose",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Preview images: generate",
+      "detail": "Host. Generates previews for the chosen collection — costs API credits.",
+      "type": "shell",
+      "command": "./scripts/generate-preview-images.sh --collection ${input:collection} --verbose",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Preview images: xAI login",
+      "detail": "Host. Mints the xAI subscription OAuth token (device-code flow) that --provider xai reads. Run once; the token is reused until it expires.",
+      "type": "shell",
+      "command": "./scripts/features/xai-login",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Preview images: generate (xAI)",
+      "detail": "Host. Generates previews through xAI Imagine on the subscription token — run the xAI login task first.",
+      "type": "shell",
+      "command": "./scripts/generate-preview-images.sh --provider xai --collection ${input:collection} --verbose",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude: session",
+      "detail": "Interactive Claude Code in this repo with its .claude/agents + skills, on your logged-in credentials. House rules still apply: branch from main, open a PR, a human merges.",
+      "type": "shell",
+      "command": "claude",
+      "options": {
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [],
-      "detail": "Stop and remove Docker containers, networks"
-    },
-
-    {
-      "label": "Docker: Rebuild (Force)",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["up", "--build", "--force-recreate", "-d"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": true
-      },
-      "problemMatcher": [],
-      "detail": "Force rebuild and recreate all Docker containers"
-    },
-
+        "panel": "new",
+        "focus": true
+      }
+    }
+  ],
+  "inputs": [
     {
-      "label": "Docker: Logs (Follow)",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["logs", "-f", "jekyll"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      },
-      "isBackground": true,
-      "problemMatcher": [
-        {
-          "owner": "jekyll",
-          "fileLocation": ["relative", "${workspaceFolder}"],
-          "severity": "error",
-          "pattern": {
-            "regexp": "^(?:[\\w.-]+\\s*\\|\\s*)?\\s*(?:Liquid )?(?:Exception|Error):\\s+(.*)$",
-            "message": 1
-          },
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": "(Regenerating|Generating\\.\\.\\.|Auto-regeneration)",
-            "endsPattern": "(done in [\\d.]+ seconds|Server running)"
-          }
-        },
-        {
-          "owner": "jekyll",
-          "fileLocation": ["relative", "${workspaceFolder}"],
-          "severity": "warning",
-          "pattern": {
-            "regexp": "^(?:[\\w.-]+\\s*\\|\\s*)?\\s*(?:Liquid )?Warning:\\s+(.*)$",
-            "message": 1
-          }
-        }
+      "id": "collection",
+      "type": "pickString",
+      "description": "Which collection?",
+      "options": [
+        "posts",
+        "all"
       ],
-      "detail": "Follow Jekyll container logs in real-time"
-    },
-
-    // ==========================================
-    // LOCAL DEVELOPMENT (NON-DOCKER)
-    // ==========================================
-    {
-      "label": "Jekyll: Serve (Local)",
-      "type": "shell",
-      "command": "bundle",
-      "args": ["exec", "jekyll", "serve", "--config", "_config.yml,_config_dev.yml", "--livereload", "--port", "4042"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "isBackground": true,
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      },
-      "problemMatcher": [
-        {
-          "owner": "jekyll",
-          "fileLocation": ["relative", "${workspaceFolder}"],
-          "severity": "error",
-          "pattern": {
-            "regexp": "^(?:[\\w.-]+\\s*\\|\\s*)?\\s*(?:Liquid )?(?:Exception|Error):\\s+(.*)$",
-            "message": 1
-          },
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": "(Regenerating|Generating\\.\\.\\.|Auto-regeneration)",
-            "endsPattern": "(done in [\\d.]+ seconds|Server running)"
-          }
-        },
-        {
-          "owner": "jekyll",
-          "fileLocation": ["relative", "${workspaceFolder}"],
-          "severity": "warning",
-          "pattern": {
-            "regexp": "^(?:[\\w.-]+\\s*\\|\\s*)?\\s*(?:Liquid )?Warning:\\s+(.*)$",
-            "message": 1
-          }
-        }
-      ],
-      "detail": "Start Jekyll site locally with live reload on port 4042"
-    },
-
-    // ==========================================
-    // JEKYLL SPECIFIC TASKS
-    // ==========================================
-    {
-      "label": "Jekyll: Build Site",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["exec", "jekyll", "bundle", "exec", "jekyll", "build"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "dependsOn": "Docker: Compose Up (Detached)",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "clear": false
-      },
-      "problemMatcher": [],
-      "detail": "Build Jekyll site inside Docker container"
-    },
-
-    {
-      "label": "Jekyll: Build (Local)",
-      "type": "shell",
-      "command": "bundle",
-      "args": ["exec", "jekyll", "build", "--config", "_config.yml,_config_dev.yml"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "clear": false
-      },
-      "problemMatcher": [],
-      "detail": "Build Jekyll site locally"
-    },
-
-    // ==========================================
-    // MAINTENANCE TASKS
-    // ==========================================
-    {
-      "label": "Docker: Clean Up",
-      "type": "shell",
-      "command": "docker",
-      "args": ["system", "prune", "-f"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "clear": false
-      },
-      "problemMatcher": [],
-      "detail": "Clean up Docker system (containers, networks, images)"
-    },
-
-    {
-      "label": "Dependencies: Update Jekyll",
-      "type": "shell",
-      "command": "docker-compose",
-      "args": ["exec", "jekyll", "bundle", "update"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "dependsOn": "Docker: Compose Up (Detached)",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": [],
-      "detail": "Update Jekyll dependencies in Docker container"
-    },
-
-    // ==========================================
-    // AI PREVIEW IMAGE GENERATOR (zer0-mistakes)
-    // ==========================================
-    {
-      "label": "🖼️ Preview Images: List Missing",
-      "type": "shell",
-      "command": "./scripts/generate-preview-images.sh",
-      "args": ["--list-missing"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "test",
-      "problemMatcher": [],
-      "detail": "List posts/docs missing a preview image (no API calls)"
-    },
-
-    {
-      "label": "🖼️ Preview Images: Dry Run",
-      "type": "shell",
-      "command": "./scripts/generate-preview-images.sh",
-      "args": ["--dry-run", "--verbose"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "test",
-      "problemMatcher": [],
-      "detail": "Show what would be generated, including prompts (no API spend)"
-    },
-
-    {
-      "label": "🖼️ Preview Images: Generate for Posts",
-      "type": "shell",
-      "command": "./scripts/generate-preview-images.sh",
-      "args": ["--collection", "posts", "--verbose"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "problemMatcher": [],
-      "detail": "Generate previews for posts via OpenAI gpt-image-2 (costs API credits)"
-    },
-
-    {
-      "label": "🖼️ Preview Images: Generate All",
-      "type": "shell",
-      "command": "./scripts/generate-preview-images.sh",
-      "args": ["--verbose"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "group": "build",
-      "problemMatcher": [],
-      "detail": "Generate previews for all configured collections (costs API credits)"
+      "default": "posts"
     }
   ]
 }

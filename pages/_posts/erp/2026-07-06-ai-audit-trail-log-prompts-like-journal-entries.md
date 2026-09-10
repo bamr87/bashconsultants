@@ -5,7 +5,7 @@ description: "If AI touches your financial workflows, its actions need the same 
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-07-06T12:00:00.000Z
-lastmod: 2026-07-06T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [erp, ai]
 tags: [audit-trail, internal-controls, ai, financial-close, compliance, segregation-of-duties]
@@ -13,7 +13,7 @@ keywords: [ai audit trail financial systems, ai internal controls, logging ai in
 preview: /images/previews/the-ai-audit-trail-log-prompts-like-journal-entrie.png
 ---
 
-No controller would post a journal entry with no date, no preparer, no source document, and no approval. Yet that's exactly what an unlogged artificial intelligence (AI) step in a financial workflow is — an action inside your accounting process with none of the evidence attached.
+No controller would post a journal entry with no date, no preparer, no source document, and no approval. Yet that's exactly what an unlogged artificial intelligence (AI) step in a financial workflow is — an action inside your accounting process that nobody signed for.
 
 ## Why this is a 2026 problem
 
@@ -42,7 +42,7 @@ If you can produce those five fields for any AI-assisted step, you have a contro
 - **Keep an AI register.** One row per AI-assisted action, five fields per row. For a small finance team, a structured spreadsheet in a permission-controlled folder is a legitimate starting point; an append-only log table is better. Reference the row ID in the journal entry memo field ("prepared with AI, ref 2026-041") so the trail runs in both directions — from the entry to the evidence and back.
 - **Log at the workflow, not the chat.** Capture the step where output enters the books — the bank-feed import, the journal entry batch — rather than the whole conversation. And always pair the output with its input snapshot; a prompt without its data can't reproduce anything.
 - **Match retention to the records.** If the entry lives seven years, its evidence lives seven years. Export the register and snapshots to storage you control, on your schedule, not the vendor's.
-- **Separate the prompter from the approver.** The person who runs the prompt isn't the person who approves the posting — the same segregation of duties you already apply to manual entries. In a one-person finance function, use the same compensating control you would anywhere else: the owner reviews an exception report on a set cadence.
+- **Separate the prompter from the approver.** The person who runs the prompt isn't the person who approves the posting — the same segregation of duties you already apply to manual entries, and the same gap a one-person override opens in [[ERP Survivor, episode 2: the great chart of accounts debate]]. In a one-person finance function, use the same compensating control you would anywhere else: the owner reviews an exception report on a set cadence.
 - **Version the prompts.** A reusable categorization prompt is a control. Editing it mid-period is a control change: date it, note who approved it, and keep the prior version. Your auditor will care whether the logic changed between Q1 and Q3.
 
 ## What the auditor will actually ask
@@ -59,7 +59,7 @@ Walking into fieldwork with a register that answers all five is the difference b
 
 ## How it plays out
 
-For a typical SMB finance team, standing this up takes 2–4 weeks of part-time effort. Week one is scoping: list every place AI currently touches a financial workflow — the inventory is usually longer than the controller expects. Week two, define the register and the preparer/approver split for the highest-volume touchpoint, which is almost always bank-feed categorization. Weeks three and four, run it live, tune the exception process, and fold the rules into your broader AI use policy so the register's scope and [[An AI acceptable-use policy your team will actually follow]] agree on what counts as touching the books.
+For a typical SMB finance team, standing this up takes 2–4 weeks of part-time effort. Week one is scoping: list every place AI currently touches a financial workflow — the inventory is usually longer than the controller expects. Week two, define the register and the preparer/approver split for the highest-volume touchpoint, which is almost always bank-feed categorization. Weeks three and four, run it live, tune the exception process, and reconcile the register's scope with [[An AI acceptable-use policy your team will actually follow]] so both documents agree on what counts as touching the books.
 
 ## Watch-outs
 

@@ -1,0 +1,9 @@
+{%- comment -%}
+  bash-mark.html — the BASH B mark as an interactive cloud of light.
+
+  A thin wrapper: the scene is _data/constellations/bash-mark.yml, the
+  geometry is _includes/brand/mark-shape.svg (generated from the favicon by
+  scripts/generate_mark_shape.py), and the engine is assets/js/constellation.js
+  through _includes/constellation.html. Pass `size` to change the stage width.
+{%- endcomment -%}
+{%- include constellation.html scene="bash-mark" shape="brand/mark-shape.svg" fallback=site.logo alt="BASH Consulting logo" label="Drag or use arrow keys to rotate the BASH mark; click to send a wave" background="none" size=include.size -%}

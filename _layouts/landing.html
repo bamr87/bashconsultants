@@ -3,6 +3,7 @@ layout: root
 ---
 {%- comment -%}
   Landing page layout — data-driven marketing page.
+  The hero is the interactive B mark (_includes/bash-mark.html) on a dark band.
   Copy lives in index.md frontmatter (hero_tagline, industries, process,
   ai_practice, stats, faq_items) and _data/entity/{info,services}.yml.
   This layout only loops and renders. Form endpoints come from site.forms.*
@@ -19,22 +20,26 @@ layout: root
 
 {% assign info = site.data.entity.info %}
 
-<!-- Hero -->
-<header class="position-relative overflow-hidden px-4 py-5">
-  <!-- particles.js background — fills the hero (theme ships /assets/js/particles*.js
-       + /assets/particles.json). Absolute-fill behind the content, which sits at a
-       higher z-index; the library sizes its canvas to this element's box. -->
-  <div id="particles-js" class="position-absolute top-0 start-0 w-100 h-100" style="z-index: 0;" aria-hidden="true"></div>
-  <div class="container text-center position-relative" style="z-index: 1;">
-    <img class="d-block mx-auto mb-4" src="{{ site.logo }}" alt="BASH Consulting logo" width="72" height="57">
-    <p class="text-uppercase fw-semibold text-primary mb-2">{{ info.name }} &mdash; {{ info.subtitle }}</p>
+<!-- Hero — the interactive B mark (_includes/bash-mark.html) on a dark band, the
+     copy beneath it. The band is always dark whatever the visitor's color mode:
+     the scoped data-bs-theme="dark" flips Bootstrap's body/emphasis/secondary text
+     colors for this section only, so the same utility classes keep working. -->
+<style>
+  /* Bootstrap's scoped dark theme only redefines the variables, so the inherited
+     text color has to be re-applied here for plain text (.lead, the drag hint). */
+  .bash-hero { background: radial-gradient(120% 90% at 50% 0%, #10294a 0%, #071628 45%, #030811 100%); color: var(--bs-body-color); }
+</style>
+<header class="bash-hero position-relative overflow-hidden px-4 py-5" data-bs-theme="dark">
+  <div class="container text-center position-relative">
+    {% include bash-mark.html %}
+    <p class="text-uppercase fw-semibold text-primary mt-4 mb-2">{{ info.name }} &mdash; {{ info.subtitle }}</p>
     <h1 class="display-5 fw-bold text-body-emphasis">{{ page.title }}</h1>
     <div class="col-lg-8 mx-auto">
       <p class="lead mb-2">{{ page.sub-title }}</p>
       <p class="text-body-secondary mb-4">{{ page.hero_tagline }}</p>
       <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
         <a href="/contact/" class="btn btn-primary btn-lg px-4">Book a free consultation</a>
-        <a href="/services/" class="btn btn-outline-secondary btn-lg px-4">Explore our services</a>
+        <a href="/services/" class="btn btn-outline-light btn-lg px-4">Explore our services</a>
       </div>
     </div>
   </div>
@@ -228,7 +233,3 @@ layout: root
     </div>
   </div>
 </section>
-
-<!-- particles.js (theme-provided) -->
-<script src="/assets/js/particles-source.js"></script>
-<script src="/assets/js/particles.js"></script>
