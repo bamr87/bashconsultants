@@ -23,9 +23,7 @@ blob = b'\n'.join(
 )
 txt = b' '.join(re.findall(rb'\((?:\\.|[^\\()])*\)', blob))
 ```
-Kerning splits words across `(...)` runs, so search the whitespace-stripped string
-(`s.replace(' ', '')`) for `COBOL`, `dwindling`, etc., then read the surrounding ±400 chars.
-`pdftotext` and `pypdf` are not installed in the remote session.
+Kerning splits words across `(...)` runs, so search the whitespace-stripped string (`s.replace(' ', '')`) for `COBOL`, `dwindling`, etc., then read the surrounding ±400 chars. `pdftotext` and `pypdf` are not installed in the remote session.
 
 **House rule that constrains all of this:** external links go only to vendor docs, primary sources, or regulators — never a blog or news outlet. So when the only available source for a claim is journalism, the fix is to attribute it in-text and ship it unlinked, not to link the news story. See the New Jersey COBOL trap in [[reference-post-standards]].
 
