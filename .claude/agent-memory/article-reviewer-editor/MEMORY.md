@@ -8,3 +8,4 @@
 - [Content style rules](reference_content-style.md) — voice, banned phrases, heading case, acronym rule, CTA rule
 - [Recurring issues to watch](feedback_recurring-issues.md) — title-case headings, undefined acronyms, FAQ duplication
 - [AI vendor claim checks](reference_ai-vendor-claims.md) — what the NANDA, Codex CLI, and Intelligent Terminal pages actually say
+- [Source verification](reference_source-verification.md) — hosts that block WebFetch (ACM, Nature, GAO PDFs) and how to read them anyway
