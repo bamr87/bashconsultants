@@ -5,7 +5,7 @@ description: "Your legacy systems are artifacts of people who have retired, and 
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-09-14T10:00:00.000Z
-lastmod: 2026-09-14T10:00:00.000Z
+lastmod: 2026-09-14T22:30:00.000Z
 draft: false
 categories: [muses]
 tags: [legacy-systems, strategy, systems-thinking, change-management, smb, denver-smb]
@@ -66,7 +66,7 @@ The test works in reverse, too. If you cannot produce a bilingual artifact for a
 
 ## What to do before the next retirement party
 
-Archaeology is a practice, not a mood, and the practical version fits a small business. Five moves, roughly in order:
+Archaeology is a practice, not a mood, and the practical version fits a small business. Here are five moves, roughly in order; [[Reviving a legacy system without losing what it knows]] walks each one through in full, with the four questions to put to any vendor who proposes the work.
 
 1. **Map the strata.** One page per system: its age, who built each layer, who can still read it, and what depends on it. The "who can still read it" column is your real risk register. Wherever the answer is one name, and that name is within a few years of retirement or a few months of boredom, that row is a project, whatever the roadmap says. For what the map looks like when it has six interfaces from four decades on it, see [Frankenstein's ERP](/news/erp/frankenstein-erp-legacy-fragmentation/).
 2. **Interview the elders while they are still on payroll.** Two or three recorded afternoons with the person who built the thing. Ask for the *why*, not the *how*; the how is in the artifact. What would break if this ran an hour later? Which fields are lies? What did you decide not to build, and why? Write the answers in plain text and store them next to the system's configuration, under version control. This costs days and is irreplaceable the week after they leave. It is also a courtesy: it says their judgment mattered, which it did.
