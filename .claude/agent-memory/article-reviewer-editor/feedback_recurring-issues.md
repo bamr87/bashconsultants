@@ -33,4 +33,12 @@ Recurring issues found in bashconsultants content review (first observed on `pag
 17. **Authoring/brief language leaking into prose** — "the thing under your brief". Grep for "brief", "per the prompt", "as requested".
 18. **`# comment` lines inside fenced bash blocks look like stray H1s** to naive checks — verify fence state before "fixing" one. All muses shell comments are legitimate.
 
+**Additionally observed in `pages/_posts/muses/` (2026-09-14, "IT is the new finance department"):**
+19. **A wikilink introduced with structural scaffolding that names the wrong section** — "already written down in this section: [[The AI audit trail…]]" where that post is `categories: [erp, ai]`, not muses. Two faults at once: the claim is false, and the siblings never scaffold a link (they inline it: "which is the route [[…]] walks through step by step"). Always check the linked doc's own `categories:`/folder before a post says "in this section" / "elsewhere in this series".
+20. **Regulatory claims that omit "public company"** — a Sarbanes-Oxley / Section 404 / ICFR sentence written as if it applied to every audited company. SOX 404 and PCAOB IT-general-controls testing reach SEC registrants; private SMBs meet the same logic through cyber-insurance questionnaires and customer due diligence, not statute. Scope the sentence; it also reads better.
+21. **An "actually" tic** — 5 uses in 1,866 words. Keep the ones doing real work (actual-vs-nominal: "who *actually* does", "one backup is *actually* restored", "what's *actually* on the card statements"); cut the filler ones ("where its power actually comes from").
+22. **A chiasmus that eats its own tail at the essay's climax** — "a function that can see everything deserves to be run like one that can." The muses closer is the highest-leverage sentence in the piece; if a mirrored construction doesn't resolve its predicate, replace it rather than tune it.
+23. **Expanding an acronym inside a possessive** — "a managed service provider's (MSP's) ticket queue". Recast so the expansion sits in a plain noun phrase: "the ticket queue of a managed service provider (MSP)".
+24. **Rhetorical specifics that read as data** — "on corporate cards in six departments", "it takes a week to build and an hour a month to keep true". House style wants ranges when there is no audited number, even when the figure is obviously illustrative.
+
 See [[reference-content-style]] and [[reference-post-standards]] for the authoritative rules.
