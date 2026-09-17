@@ -4,20 +4,21 @@ description: "Turn one-off AI prompts into repeatable, reviewable workflows insi
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2025-11-19T09:00:00.000Z
-lastmod: 2026-07-06T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [tech, ai]
 tags: [prompt-engineering, ai, vscode, agents, automation]
+keywords: [agentic ai workflows, vs code ai extension, prompt files in git, ai code review process, repeatable ai development workflow, small business software development, denver ai consultant]
 preview: /images/previews/from-prompts-to-pipelines-agentic-ai-in-vs-code.png
 ---
 
-If your team already uses an Artificial Intelligence (AI) assistant to explain code or draft a function, you have seen the ceiling: every task starts from a blank chat box, and the quality depends on whoever happens to be typing that day. The next step is turning those one-off prompts into saved, repeatable workflows that run inside the editor your developers already live in.
+If your team already uses an artificial intelligence (AI) assistant to explain code or draft a function, you have seen the ceiling: every task starts from a blank chat box, and the quality depends on whoever happens to be typing that day. The next step is turning those one-off prompts into saved, repeatable workflows that run inside the editor your developers already live in.
 
 A quick vocabulary check before we go further, because two terms get thrown around loosely. **Prompt engineering** is the practice of writing the instructions you give an AI model carefully enough that the output is consistent and trustworthy. **Agentic** means the AI doesn't just answer — it takes actions: reading files, editing them, running tests, opening a pull request. We covered the first idea in [[Prompts are the new command line]]. This post is about the second: what happens when you wire those prompts together into a pipeline.
 
 ## Why this matters now
 
-For a small or medium business, the expensive part of software work has never been writing the code. It is the surrounding effort: turning a vague client request into requirements, sketching a design, writing tests, updating documentation, and keeping it all consistent across a team of two or three people. That overhead is exactly what drives a 40-person Denver firm to either over-pay a contractor or skip the project entirely.
+For a small or medium business (SMB), the expensive part of software work has never been writing the code. It is the surrounding effort: turning a vague client request into requirements, sketching a design, writing tests, updating documentation, and keeping it all consistent across a team of two or three people. That overhead is exactly what drives a 40-person Denver firm to either over-pay a contractor or skip the project entirely.
 
 A single AI chat shaves a little off each of those steps. An **agentic workflow** — a saved sequence of prompts that act on your real files — shaves off the handoffs between them, which is where most of the time and most of the errors actually hide. The payoff is not "the AI writes the code." It is that the same request produces the same quality of output whether your senior developer or your newest hire kicks it off.
 

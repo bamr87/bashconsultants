@@ -5,14 +5,14 @@ description: "The spreadsheet your month-end close runs on is software, and the 
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-08-15T09:00:00.000Z
-lastmod: 2026-08-15T09:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [muses]
-tags: [smb, legacy-systems, software-development, strategy, productivity]
+tags: [smb, legacy-systems, software-development, accounting, strategy, productivity]
 keywords: [spreadsheet risk small business, excel to database migration, when to replace excel with a database, power query sql skills, business intelligence for smb, month-end close spreadsheet errors, key person risk finance]
 preview: /images/previews/your-best-programmer-thinks-they-re-just-good-at-e.png
 featured: false
-excerpt: "The most fluent programmer in your company may have never opened a terminal. They have a workbook with eleven tabs, a formula the whole quarter depends on, and no idea they've been writing software for years."
+excerpt: "The most fluent programmer in your company may have never opened a terminal — they maintain a workbook with eleven tabs and a formula your quarter depends on."
 ---
 
 Somewhere in your company there is a workbook. It has eleven tabs, one of which is named `Sheet1 (final)(v3)(USE THIS ONE)`, and a formula in cell `M14` that the entire month-end close depends on. The person who maintains it does not call themselves a programmer. They call themselves someone who is good at Excel.
@@ -54,13 +54,13 @@ Calling it "just a spreadsheet" doesn't make the risk smaller. It only makes the
 
 The honest version of this argument also names the walls, because Excel's limits are published, not mysterious. A worksheet tops out at 1,048,576 rows — [Microsoft's own specifications page](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3) lists the ceilings — and a model gets miserable long before that, when every recalculation takes a coffee break. Repeatability fails next: a workbook can't be meaningfully tested or diffed. Integration fails last: Excel can be bullied into calling an application programming interface (API) or scheduling a nightly job, but at that point someone is writing a program inside a spreadsheet to avoid admitting they should write a program.
 
-None of those walls proves your Excel person isn't a programmer. The opposite: the person who looks at a wheezing 400,000-row workbook and says "this wants to be a database" has just made a senior engineering judgment. They only need someone to confirm they were right and hand them the tools — usually a small reporting database and a business intelligence (BI) layer like Power BI, which is exactly the shape of work our [data and BI practice](/services/data/) does for Denver SMBs that have outgrown the grid.
+None of those walls proves your Excel person isn't a programmer. The opposite: the person who looks at a wheezing 400,000-row workbook and says "this wants to be a database" has just made a senior engineering judgment. They only need someone to confirm they were right and hand them the tools — usually a small reporting database and a business intelligence (BI) layer like Power BI, which is the route [[From spreadsheets to dashboards]] walks through step by step.
 
 ## What to do with this
 
 Three moves, in order of urgency:
 
-1. **Inventory the load-bearing workbooks.** Ask one question of your finance and operations leads: "Which spreadsheets, if their author left tomorrow, would hurt the close?" That list is your shadow software portfolio. Most SMBs find three to six files on it.
+1. **Inventory the load-bearing workbooks.** Ask one question of your finance and operations leads: "Which spreadsheets, if their author left tomorrow, would hurt the close?" That list is your shadow software portfolio. In the shops we walk into it usually runs three to six files.
 2. **Treat the top of the list like software.** A second person who can maintain each model. Input validation on the cells humans touch. Dated, versioned copies instead of `(final)(v3)`. A one-page note on what the model assumes. This costs days, not months, and removes the scariest single point of failure in your reporting.
 3. **Graduate the ones past the wall.** The models that are too big, too shared, or too integration-hungry belong in a small database with a BI front end — and your Excel person belongs at the front of that project, because they already own the logic. Teach them SQL first; it lands in weeks, not years, because pivot tables were SQL all along.
 

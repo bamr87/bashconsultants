@@ -135,6 +135,51 @@ preview_images:
     about:
       style              : 'refined, minimal corporate technology illustration: an orderly operations console of configuration panels, dashboards and connected systems; calm, trustworthy professional IT aesthetic'
       style_modifiers    : *professional_modifiers
+  # xAI Imagine (--provider xai). Credentials are resolved OAuth-first at run
+  # time: XAI_OAUTH_TOKEN, then the Grok CLI store (~/.grok/auth.json), then
+  # Kilo's xAI login, then XAI_API_KEY last. See docs/preview-images.md.
+  xai_model              : 'grok-imagine-image-2.0'
+  xai_aspect_ratio       : '3:2'              # matches the 1536x1024 house banners
+  xai_resolution         : '1k'               # 1k or 2k
+  xai_quality            : 'medium'           # low or medium
+  # Collections walked by a bare run or `--collection all`. Only `posts`
+  # carries generated banners; services and toolkit docs use hand-picked art.
+  collections:
+    - posts
+  # Per-collection and per-section style overrides, resolved most-specific-wins
+  # by scripts/features/lib/preview_styles.py:
+  #   global → collection_styles[<collection>] → section_styles[<section>]
+  # A collection is the nearest _<name> directory, a section the directory
+  # inside it (pages/_posts/erp/x.md → collection `posts`, section `erp`).
+  # Each block may set style, style_modifiers, size, quality, or model.
+  #
+  # House rule: every section is pixel art. The medium is the brand's visual
+  # identity and is not a section's to change; the GENRE of pixel art is, and
+  # that is what carries the editorial voice. Each section below therefore
+  # names its own pixel-art tradition, and a test asserts that each one still
+  # says "pixel art". The four map onto the section voice profiles in
+  # _data/taxonomy.yml. Changing a block only affects images generated after it.
+  section_styles:
+    # corp — sharp and strategic, for owners and CFOs: the register of a
+    # business-strategy sim. Authoritative, orderly, no whimsy.
+    corp:
+      style: '16-bit isometric strategy game pixel art, architectural and infographic, crisp orthogonal pixel grid, restrained and authoritative'
+      style_modifiers: 'limited palette of deep navy, slate grey, warm gold and off-white, isometric towers, ledgers, charts and city blocks, orderly composition with generous negative space, sharp unblurred pixel edges, any figures small and anonymous, no clutter'
+    # erp — performed comedy with a real lesson underneath: the register of a
+    # point-and-click adventure, where the scene and the cast carry the joke.
+    erp:
+      style: '1990s point-and-click adventure game pixel art, chunky expressive character sprites on a painted interior stage set, comedic staging'
+      style_modifiers: 'saturated palette of teal, amber and oxblood, warm practical light from desk lamps and monitors, characters mid-gesture around a counter, desk or shared screen, prop-rich foreground, hand-dithered shading, theatrical composition'
+    # muses — reflective and essayistic: the register of an atmospheric pixel
+    # landscape. Quiet, wide, one small figure for scale.
+    muses:
+      style: 'atmospheric pixel-art landscape, heavy dithered gradients, wide cinematic vista, contemplative lo-fi dusk mood'
+      style_modifiers: 'muted palette of violet, deep teal, rust and pale amber, layered parallax silhouettes against a long horizon, a single small figure or lone object for scale, large areas of open sky, soft dithered light bloom, restrained detail'
+    # tech — crisp actionable how-to: the register of a phosphor terminal and
+    # an engineering drawing. Diagrammatic, precise, nothing decorative.
+    tech:
+      style: 'technical schematic pixel art, phosphor terminal and blueprint aesthetic, exploded isometric diagrams, precise and diagrammatic'
+      style_modifiers: 'tight palette of dark slate, phosphor green, cyan and a single warning amber, scanline glow, wireframe connectors and empty callout boxes carrying no lettering, a workbench or console seen head-on or in clean isometric, engineering-drawing clarity, no decorative flourish'
 
 breadcrumbs              : true # true, false (default)
 words_per_minute         : 200

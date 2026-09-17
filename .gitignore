@@ -28,6 +28,10 @@ logs/
 .venv/
 __pycache__/
 
+# xAI OAuth credentials minted by scripts/features/xai-login — rotating
+# subscription tokens, never source
+.xai/
+
 # Pre-enhance backup images (originals before AI enhancement)
 *_pre-enhance.png
 

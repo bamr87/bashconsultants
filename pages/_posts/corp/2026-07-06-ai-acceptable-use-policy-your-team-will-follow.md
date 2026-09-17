@@ -1,10 +1,10 @@
 ---
 title: "An AI acceptable-use policy your team will actually follow"
-description: "What a 20-100-person business should allow, ban, and log when staff use AI, with a copy-paste policy skeleton you can adapt in an afternoon"
+description: "An AI acceptable-use policy a 20-100-person business will follow: what to allow, what to ban, what to log, and a skeleton you can adapt in an afternoon"
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-07-06T12:00:00.000Z
-lastmod: 2026-07-06T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [corp, ai]
 tags: [ai-policy, acceptable-use, governance, shadow-it, denver-smb, compliance]
@@ -20,7 +20,7 @@ When we inventory software at small and medium businesses (SMBs), we typically f
 
 That exposure lands differently by industry. For a Denver law or accounting firm, a paralegal pasting a client matter into a personal chatbot account may have just stretched a confidentiality duty past its limit. For a dental clinic, patient details in a consumer AI tool are a Health Insurance Portability and Accountability Act (HIPAA) problem whether or not anything bad happens next. And on many free consumer tiers, the vendor's terms allow your inputs to be used for model training — which means "just delete it" may not be an option later.
 
-The instinct is to ban everything. That fails within a month: the staff who found these tools useful keep using them on personal devices, and now you carry the same exposure with zero visibility. The policy that works gives people a sanctioned way to do what they were already doing.
+The instinct is to ban everything. That fails quickly: the staff who found these tools useful keep using them on personal devices, and now you carry the same exposure with zero visibility. The policy that works gives people a sanctioned way to do what they were already doing.
 
 ## The three lists: allow, ban, log
 
@@ -32,7 +32,7 @@ A workable SMB policy fits on one page and answers three questions.
 
 **What gets logged.** Which tools are approved and who holds the accounts. Who reviewed AI-assisted work before it left the building. And for material decisions — pricing, hiring, anything that touches the books — the tool, the prompt, the output, and the reviewer.
 
-If you want a framework behind those choices, the National Institute of Standards and Technology's (NIST) [AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) is the reference we use. In plain terms it asks for four things: govern (someone owns the policy), map (know where AI is actually used), measure (check the outputs), and manage (fix what the checks find). A one-page policy, a tool inventory, and a quarterly review cover all four at SMB scale.
+If you want a framework behind those choices, the National Institute of Standards and Technology (NIST) publishes the [AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework), and that is the reference we use. In plain terms it asks for four things: govern (someone owns the policy), map (know where AI is actually used), measure (check the outputs), and manage (fix what the checks find). A one-page policy, a tool inventory, and a quarterly review cover all four at SMB scale.
 
 ## A skeleton you can copy
 
@@ -79,7 +79,7 @@ Effective [date] | Owner: [name, role] | Reviewed: quarterly
 3. **Week 3 — roll out.** Set up business accounts for the approved tools, walk the team through the one-pager in a single meeting, and name the owner people ask when unsure.
 4. **Quarterly — review.** New tools appear, models change, and someone will request an exception. Fifteen minutes a quarter keeps the policy real.
 
-For most firms this size, the whole cycle is 2–4 weeks of part-time effort, and most of it is conversation rather than paperwork.
+For most firms this size, the whole cycle is 2–4 weeks of part-time effort, and most of it is conversation rather than paperwork. The wider version of the same work — inventory, guardrails, and where AI actually pays — is laid out in [[Adopting AI in your business without losing control]].
 
 ## Watch-outs
 

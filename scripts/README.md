@@ -115,15 +115,27 @@ Shared helpers: a strict YAML-subset reader/writer for `_data/loop/*.yml` (no bl
 
 ### `features/generate-preview-images` (canonical)
 
-AI preview image generator for posts and configured collections. Reads defaults from the `preview_images` section of `_config.yml` (provider `openai`, model `gpt-image-2`, size `1536x1024`, quality `high`), detects content missing a `preview:` image, generates images via the OpenAI Images API (Stability AI and a `local` placeholder provider are also supported), and writes them to `assets/images/previews/`.
+AI preview image generator for posts and configured collections. Reads defaults from the `preview_images` section of `_config.yml` (provider `openai`, model `gpt-image-2`, size `1536x1024`, quality `high`), detects content missing a `preview:` image, generates images via the OpenAI Images API (xAI Imagine via `--provider xai`, Stability AI, and a `local` placeholder provider are also supported), and writes them to `assets/images/previews/`.
 
-Requires `OPENAI_API_KEY` (or `STABILITY_API_KEY`) — see `.env.example`. API keys are passed to `curl` via mode-600 config files, never on the command line.
+Requires `OPENAI_API_KEY` — or, for `--provider xai`, an xAI OAuth token (read directly from the `grok login` or Kilo stores, or set as `XAI_OAUTH_TOKEN`) with `XAI_API_KEY` as the last resort; or `STABILITY_API_KEY` — see `.env.example` and `docs/preview-images.md`. Credentials are passed to `curl` via mode-600 config files, never on the command line.
 
 ```bash
 ./scripts/features/generate-preview-images --list-missing        # no API calls
 ./scripts/features/generate-preview-images --dry-run --verbose   # show prompts
 ./scripts/features/generate-preview-images --collection posts    # generate
 ```
+
+### `features/xai-login`
+
+Mints the subscription OAuth token behind `--provider xai` (ported from bamr87/law-ai spec 050): an RFC 8628 device-code grant by default, a loopback PKCE grant with `--loopback`, plus `--status`, `--check`, `--refresh`, and `--logout`. Writes `.xai/credentials.json` (gitignored, mode 0600); the refresh token rotates on every use. Never prints token values.
+
+### `features/lib/preview_styles.py`
+
+Resolves per-collection and per-section style overrides for one content file (`python3 scripts/features/lib/preview_styles.py <file>`), printing `key<TAB>value` lines the generator applies to that file only. Order is global → `collection_styles[<collection>]` → `section_styles[<section>]`, most specific winning key by key; the override keys match zer0-image-generator's, so blocks stay portable. A lookup that cannot answer exits 0 with no output rather than failing a run. Tests: `python3 -m unittest scripts/features/lib/test_preview_styles.py`.
+
+### `features/lib/xai_auth.py`
+
+The credential chain the generator calls (`python3 scripts/features/lib/xai_auth.py resolve`): explicit `XAI_OAUTH_TOKEN`, then the repo store above (refreshed under a cross-process lock), then the Grok CLI and Kilo stores, then `XAI_API_KEY`. Standard library only. Tests: `python3 -m unittest scripts/features/lib/test_xai_auth.py` (no network).
 
 ### `generate-preview-images.sh`
 

@@ -24,6 +24,8 @@
       url: /tools/business/spreadsheets-to-dashboards/
     - title: Making your software talk
       url: /tools/business/system-integrations/
+    - title: Reviving a legacy system
+      url: /tools/business/legacy-system-revival/
     - title: Building a 12-month IT roadmap
       url: /tools/business/it-roadmap/
     - title: The security baseline
@@ -43,6 +45,8 @@
       url: /tools/partners/deterministic-first/
     - title: Running an AI-native practice
       url: /tools/partners/ai-native-practice/
+    - title: The preview image pipeline
+      url: /tools/partners/preview-image-pipeline/
     - title: "Production AI: RAG, agents, evals"
       url: /tools/partners/production-ai/
     - title: Building a native Claude context framework

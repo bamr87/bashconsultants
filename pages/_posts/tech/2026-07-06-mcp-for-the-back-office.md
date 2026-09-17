@@ -1,11 +1,11 @@
 ---
 title: "MCP for the back office"
 sub-title: "A standard plug between the assistant your team uses and the systems your business runs on"
-description: "What the Model Context Protocol means for small business back offices, and how to wire an AI assistant to your systems without losing control"
+description: "Wire an AI assistant into your file share, ticket queue, and accounting exports with the Model Context Protocol, read-only first and every call logged"
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-07-06T12:00:00.000Z
-lastmod: 2026-07-06T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [tech, ai]
 tags: [mcp, ai, integration, automation, guardrails, back-office]
@@ -37,7 +37,7 @@ The value isn't in exotic new systems. It's in the ones you already run.
 
 ## The deterministic foundation
 
-Here's the framing that keeps these projects safe. A language model is probabilistic: the same question can produce two different answers. Your general ledger, your job-costing system, and your ticket queue are deterministic: the same query returns the same record every time. Good architecture keeps the facts in the deterministic systems and the judgment in the model.
+Here's the framing that keeps these projects safe. A language model is probabilistic: the same question can produce two different answers. Your general ledger, your job-costing system, and your ticket queue are deterministic: the same query returns the same record every time. Good architecture keeps the facts in the deterministic systems and the judgment in the model — the same split we lay out in [[The deterministic-first doctrine]].
 
 MCP enforces that split at the connector. Each tool the server exposes is a defined operation against a system of record — the assistant decides which tool to call and how to phrase the answer, but the number comes from the export and the ticket status comes from the queue. The model can't invent an operation you didn't expose. When a wrong answer would cost money, the thing that prevents it is a permission, not a clever prompt. This is the same trust discipline we laid out in [[Prompts are the new command line]], pushed down into the plumbing.
 
@@ -46,7 +46,7 @@ MCP enforces that split at the connector. Each tool the server exposes is a defi
 - **Read-only first.** Every connection starts as read-only. Write access is a separate, later decision made per operation.
 - **Least-privilege service accounts.** The MCP server connects with its own account scoped to exactly the folders and records it serves — never an administrator login.
 - **Approval gates on anything that writes.** Draft the ticket reply, propose the categorization — a person commits it.
-- **Log every call.** Who asked, which tool ran, with what parameters, and what came back. If AI touches financial workflows, that log needs real evidence discipline behind it.
+- **Log every call.** Who asked, which tool ran, with what parameters, and what came back — retained as long as you retain the records it touched. When AI reaches financial workflows, that log needs the same discipline as your books: [[The AI audit trail: log prompts like journal entries]].
 - **Treat documents as untrusted input.** A file in the share can contain text that tries to instruct the assistant — the reason gated writes and scoped permissions matter even for "just documents."
 
 ## How it plays out

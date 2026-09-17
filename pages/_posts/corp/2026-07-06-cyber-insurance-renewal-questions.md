@@ -4,7 +4,7 @@ description: "The security questions on this year's cyber insurance application,
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-07-06T12:00:00.000Z
-lastmod: 2026-07-06T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [corp]
 tags: [cyber-insurance, security, mfa, edr, backups, offboarding, denver-smb]
@@ -18,7 +18,7 @@ The cyber insurance renewal application that lands in your inbox this year is lo
 
 A few years ago, a small and medium business (SMB) cyber application was a page of yes/no questions. Today it's a multi-page attestation, and your answers do three jobs at once: they set your premium, they set your exclusions, and they become evidence if you ever file a claim. An answer you guessed at — "sure, we have multi-factor on everything" — can void coverage at the exact moment you need it, because carriers investigate the attestation after an incident, not before.
 
-Four controls carry most of the weight: multi-factor authentication, endpoint detection, backups, and offboarding. They also happen to track closely with the U.S. Cybersecurity and Infrastructure Security Agency's (CISA) [Cyber Essentials guidance](https://www.cisa.gov/cyber-essentials), which is a useful free reference whether or not an insurer is asking.
+Four controls carry most of the weight: multi-factor authentication, endpoint detection, backups, and offboarding. They also track closely with the [Cyber Essentials guidance](https://www.cisa.gov/cyber-essentials) the U.S. Cybersecurity and Infrastructure Security Agency (CISA) publishes, which is a useful free reference whether or not an insurer is asking.
 
 ## The four questions that move the number
 

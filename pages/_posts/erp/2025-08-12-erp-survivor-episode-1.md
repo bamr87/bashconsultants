@@ -4,13 +4,14 @@ description: "How a stalled ERP rollout teaches Denver controllers to retire spr
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2025-08-12T13:00:00.000Z
-lastmod: 2026-06-21T12:00:00.000Z
+lastmod: 2026-09-07T12:00:00.000Z
 draft: false
 categories: [erp]
-tags: [erp-implementation, change-management, business-systems, organizational-dynamics]
+tags: [erp-implementation, change-management, business-systems, organizational-dynamics, denver-smb]
+keywords: [erp implementation change management, why erp projects fail, spreadsheet to erp migration, denver erp consultant, erp requirements gathering, erp user adoption, erp phased rollout, erp go-live checklist]
 preview: /images/previews/erp-survivor-episode-1-alliance-of-the-spreadsheet.png
 featured: true
-excerpt: "Can a Denver back office survive an Enterprise Resource Planning rollout without losing its spreadsheets or its sanity? Episode 1, where the survival lessons hide inside every commercial break."
+excerpt: "Retiring a wall of spreadsheets for one ERP system is a people problem long before it is a software problem. Episode 1, where the lessons arrive at the commercial breaks."
 ---
 
 ## Previously on ERP Survivor
@@ -19,11 +20,11 @@ excerpt: "Can a Denver back office survive an Enterprise Resource Planning rollo
 
 **Narrator**: "Twelve departments. One Enterprise Resource Planning (ERP) system. A six-month timeline that nobody believes. Only the strongest business processes will survive."
 
-The pain is real. If you are a controller or operations manager about to retire a wall of spreadsheets for a single system, you are the contestant. Here is the survival guide, with the actual lessons in plain English at each commercial break.
+The pain is real. If you are the controller, the operations manager, or the information technology (IT) lead about to retire a wall of spreadsheets for a single system, you are the contestant. Here is the survival guide, with the lessons in plain English at each commercial break.
 
 ## Why this season matters now
 
-ERP projects fail at a rate that should scare any owner signing the check. Independent surveys such as the [Panorama Consulting ERP report](https://www.panorama-consulting.com/resource-center/erp-statistics/) put cost or schedule overruns on a large share of implementations, and the usual culprit is not the software. It is change management: people quietly keeping their old spreadsheets running in parallel until the new system starves.
+Most ERP projects run over on time or budget. Independent surveys such as the [Panorama Consulting ERP report](https://www.panorama-consulting.com/resource-center/erp-statistics/) have found cost or schedule overruns on a large share of implementations year after year, and the usual culprit is not the software. It is change management: people quietly keeping their old spreadsheets running in parallel until the new system starves.
 
 For a Denver SMB (5-200 employees), that failure has a price tag you can feel. A stalled rollout means paying for software you do not use, a finance team doing the work twice, and a month-end close that gets slower instead of faster. The win is the opposite: a single source of truth, a close that drops from two weeks to a few days, and audit-ready numbers without a fire drill.
 
@@ -41,11 +42,11 @@ For a Denver SMB (5-200 employees), that failure has a price tag you can feel. A
 - **Carol, the Custom Code Queen** — has written 47 workarounds for the current system
 - **Mike, Migration Mike** — certain the data conversion will work perfectly on the first try
 
-### The ERP Evangelists (IT — Information Technology — tribe)
+### The ERP Evangelists (IT tribe)
 
 - **Jennifer, Integration Jenny** — believes ERP will solve world hunger
 - **Tom, Best Practices Tom** — has memorized the vendor methodology and quotes it at parties
-- **Alex, API (Application Programming Interface) Alex** — thinks every gap closes with the right connector
+- **Alex, API Alex** — thinks every gap closes with the right application programming interface (API) connector
 
 ## Episode 1: the alliance of the spreadsheet people
 
@@ -57,7 +58,7 @@ For a Denver SMB (5-200 employees), that failure has a price tag you can feel. A
 
 **Linda**: "The new system needs to do everything our spreadsheets do, but faster."
 
-**Dave**: "And auto-generate month-end reports, quarterly forecasts, budget variance, and that special report Linda built for the CEO (Chief Executive Officer) that shows profit by phase of the moon."
+**Dave**: "And auto-generate month-end reports, quarterly forecasts, budget variance, and that special report Linda built for the chief executive that shows profit by phase of the moon."
 
 **Sarah** *(typing frantically)*: "I'm documenting all 247 of our templates. Should I include the backup copies of the backup copies?"
 
@@ -145,4 +146,4 @@ Facing your own implementation reality check? See our [[ERP consulting]], includ
 
 *Based on patterns observed across dozens of ERP implementations. The characters are fictional. The struggles are not. No spreadsheets were harmed in the making of this episode — though several were, mercifully, retired.*
 
-*Next episode: "The great chart of accounts debate," where Linda discovers the new system does not support her 47 project codes, and Bob learns that best practices do not include his legendary emergency override procedure.*
+Next episode: [[ERP Survivor, episode 2: the great chart of accounts debate]], where Linda discovers the new system does not support her 47 project codes, and Bob learns that best practices do not include his legendary emergency override procedure.

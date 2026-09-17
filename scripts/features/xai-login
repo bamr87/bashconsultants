@@ -1,0 +1,233 @@
+#!/usr/bin/env python3
+"""xai-login: mint the subscription OAuth token the preview generator's xAI provider uses.
+
+Exchanges a SuperGrok / X Premium+ subscription for an OAuth token set and
+writes it to the repo store (``.xai/credentials.json``, gitignored, mode 0600).
+``scripts/features/generate-preview-images --provider xai`` reads that store
+first, refreshing it under a cross-process lock as the access token expires.
+
+    scripts/features/xai-login                # device-code flow (the default)
+    scripts/features/xai-login --loopback     # browser PKCE flow on 127.0.0.1:56121
+    scripts/features/xai-login --status       # report what is stored, change nothing
+    scripts/features/xai-login --check        # resolve a token and probe api.x.ai
+    scripts/features/xai-login --refresh      # rotate the stored token now
+    scripts/features/xai-login --logout       # delete the stored token
+
+Device-code is the default because it needs no inbound path to this process:
+it prints a URL and a short code, you approve in any browser, and the script
+polls until xAI says yes. Ported from bamr87/law-ai's ``xai_login`` management
+command (spec 050, ADR 0007). Token values are never printed.
+
+Exit codes: 0 ok, 1 the flow failed, 2 usage, 3 no credential (``--check``).
+"""
+
+from __future__ import annotations
+
+import argparse
+import sys
+import time
+import webbrowser
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+
+import xai_auth  # noqa: E402
+
+EXIT_FAILED = 1
+EXIT_NO_CREDENTIAL = 3
+
+
+def _say(message: str = "") -> None:
+    print(message, flush=True)
+
+
+def _minutes(seconds: float) -> int:
+    return max(0, int(seconds)) // 60
+
+
+def _report_success(creds: xai_auth.Credentials) -> None:
+    remaining = _minutes(creds.expires_at - time.time())
+    _say()
+    _say(
+        f"Authorised. Credentials written to {xai_auth.credentials_path()} "
+        f"(access token valid ~{remaining} min)."
+    )
+    _say("The refresh token rotates on every use: keep this file, do not copy it.")
+    _say("Verify with: scripts/features/xai-login --check")
+    _say("Then paint:  ./scripts/generate-preview-images.sh --provider xai --collection posts")
+
+
+def device_code_flow(open_browser: bool) -> int:
+    _say("xAI OAuth, device-code flow (RFC 8628)")
+    try:
+        device = xai_auth.request_device_code()
+    except xai_auth.XaiAuthError as err:
+        _say(f"ERROR: {err}")
+        return EXIT_FAILED
+
+    _say()
+    _say(f"  1. Open:       {device.browser_url}")
+    _say(f"  2. Enter code: {device.user_code}")
+    _say("  3. Approve access for the Grok CLI client.")
+    _say()
+    if open_browser:
+        try:
+            webbrowser.open(device.browser_url)
+        except Exception:  # pragma: no cover - browser launch is best effort
+            pass
+    _say("Waiting for approval... (Ctrl-C to abort)")
+
+    try:
+        creds = xai_auth.poll_device_token(device)
+    except KeyboardInterrupt:
+        _say("\nAborted.")
+        return EXIT_FAILED
+    except xai_auth.XaiAuthError as err:
+        _say(f"ERROR: {err}")
+        return EXIT_FAILED
+    _report_success(creds)
+    return 0
+
+
+def loopback_flow(open_browser: bool) -> int:
+    _say("xAI OAuth, loopback PKCE flow")
+    _say(f"Listening on {xai_auth.REDIRECT_URI} for the authorization callback.")
+    _say(
+        "If this process runs in Docker, that address is the container's loopback, "
+        "not yours: use the device-code flow instead."
+    )
+
+    def _open(url: str) -> None:
+        _say(f"\nAuthorization URL:\n  {url}\n")
+        if open_browser:
+            try:
+                webbrowser.open(url)
+            except Exception:  # pragma: no cover - browser launch is best effort
+                pass
+
+    try:
+        _url, creds = xai_auth.loopback_login(open_browser=_open)
+    except KeyboardInterrupt:
+        _say("\nAborted.")
+        return EXIT_FAILED
+    except xai_auth.XaiAuthError as err:
+        _say(f"ERROR: {err}")
+        return EXIT_FAILED
+    _report_success(creds)
+    return 0
+
+
+def print_status() -> int:
+    report = xai_auth.status()
+    _say("xAI credential status")
+    _say(f"  path            : {report['path']}")
+    _say(f"  file present    : {report['file_present']}")
+    if not report["configured"]:
+        _say(f"  configured      : no ({report.get('reason')})")
+        return 0
+    # Token values are never printed; only their shape.
+    _say("  configured      : yes")
+    _say(f"  access present  : {report['access_present']}")
+    due = " (refresh due)" if report["refresh_due"] else ""
+    _say(f"  expires in      : {report['expires_in_s']}s{due}")
+    return 0
+
+
+def refresh_now() -> int:
+    creds = xai_auth.load_credentials()
+    if creds is None:
+        _say(f"ERROR: {xai_auth.unconfigured_reason()}")
+        return EXIT_NO_CREDENTIAL
+    try:
+        fresh = xai_auth.refresh_credentials(creds, stale_access=creds.access)
+    except xai_auth.XaiAuthError as err:
+        _say(f"ERROR: {err}")
+        return EXIT_FAILED
+    _say(
+        f"Refreshed. Access token valid ~{_minutes(fresh.expires_at - time.time())} min; "
+        f"store at {xai_auth.credentials_path()}."
+    )
+    return 0
+
+
+def check() -> int:
+    _say("xAI credential check")
+    try:
+        info = xai_auth.resolve()
+    except xai_auth.XaiAuthError as err:
+        _say(f"  credential      : none ({err})")
+        return EXIT_NO_CREDENTIAL
+    _say(f"  credential      : {info['mode']} via {info['source']}")
+    base = xai_auth.api_base_url()
+    report = xai_auth.probe_models(info["token"])
+    seen: list[str] = []
+    for name, path in (("models", "/models"), ("image_models", "/image-generation-models")):
+        row = report.get(name) or {}
+        if row.get("status") is None:
+            _say(f"  GET {base}{path}: unreachable ({row.get('error')})")
+            continue
+        ids = row.get("ids") or []
+        seen.extend(ids)
+        summary = ", ".join(ids) if ids else "(none listed)"
+        _say(f"  GET {base}{path}: HTTP {row['status']} {summary}")
+    configured = xai_auth.configured_image_model()
+    _say(f"  xai_model       : {configured}")
+    if seen and configured not in seen:
+        _say("  note            : that id is not in the lists above; check _config.yml or XAI_IMAGE_MODEL")
+    statuses = [row.get("status") for row in report.values() if isinstance(row, dict)]
+    if any(code == 200 for code in statuses):
+        _say("\nxAI connection validated.")
+        return 0
+    if any(code in (401, 403) for code in statuses):
+        _say("\nxAI rejected the credential (401/403). Run scripts/features/xai-login again.")
+        return EXIT_FAILED
+    _say("\nCould not confirm the connection; see the statuses above.")
+    return EXIT_FAILED
+
+
+def logout() -> int:
+    if xai_auth.delete_credentials():
+        _say(f"Deleted {xai_auth.credentials_path()}.")
+    else:
+        _say("No stored xAI credentials to delete.")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="xai-login",
+        description="Authorise the preview generator's xAI provider via subscription OAuth.",
+    )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--loopback",
+        action="store_true",
+        help="use the browser PKCE flow on 127.0.0.1:56121 instead of the device-code flow",
+    )
+    mode.add_argument("--status", action="store_true", help="report the stored credential state and exit")
+    mode.add_argument("--check", action="store_true", help="resolve a token and probe api.x.ai")
+    mode.add_argument("--refresh", action="store_true", help="rotate the stored token now")
+    mode.add_argument("--logout", action="store_true", help="delete the stored credentials")
+    parser.add_argument(
+        "--no-browser",
+        action="store_true",
+        help="print the URL instead of opening a browser",
+    )
+    args = parser.parse_args(argv)
+    xai_auth.load_dotenv()
+
+    if args.status:
+        return print_status()
+    if args.check:
+        return check()
+    if args.refresh:
+        return refresh_now()
+    if args.logout:
+        return logout()
+    if args.loopback:
+        return loopback_flow(open_browser=not args.no_browser)
+    return device_code_flow(open_browser=not args.no_browser)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
