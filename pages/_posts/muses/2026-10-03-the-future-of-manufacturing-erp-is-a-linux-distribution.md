@@ -5,7 +5,7 @@ description: "Manufacturers can cut lock-in and cloud data costs with open-sourc
 author: "Amr Abdel-Motaleb"
 layout: article
 date: 2026-10-03T19:45:00.000Z
-lastmod: 2026-10-03T21:00:00.000Z
+lastmod: 2026-10-04T15:45:00.000Z
 draft: false
 categories: [muses]
 tags: [open-source, manufacturing, linux, edge-computing, erp-implementation, vendor-lock-in, total-cost-of-ownership, agentic-ai]
@@ -100,7 +100,7 @@ Keep the claim the right size. I'm not offering a productivity multiplier, becau
 
 The limits are where most of the risk lives:
 
-- **A human owner still reviews and merges.** Every agent change should arrive as a pull request that a named person who understands the plant reads, tests, and approves. That's the governance pattern from our earlier post, [ERP customizations should be the default](/posts/2026/09/13/erp-customizations-should-be-the-default/), applied to the shop floor. An agent with no reviewing owner is not a team. It's an unattended commit history.
+- **A human owner still reviews and merges.** Every agent change should arrive as a pull request that a named person who understands the plant reads, tests, and approves. That's the governance pattern from our earlier post, [[ERP customizations should be the default]], applied to the shop floor. An agent with no reviewing owner is not a team. It's an unattended commit history.
 - **Agents get shop-floor safety logic wrong.** A model doesn't know that a guard interlock exists, what your lockout procedure is, or why the line has to stop when a sensor goes quiet. Control and safety logic stay on the PLC, under the people and standards that already govern it. The agent's work ends where machine events become transactions. It writes to the ERP, never to the controller.
 - **Security and supply chain.** A [2024 study of 16 code-generating models and 576,000 code samples](https://arxiv.org/abs/2406.10279) found that, on average, at least 5.2% of the packages suggested by commercial models and 21.7% of those suggested by open-source models did not exist. Each fake name is an opening for an attacker who registers it. Pin dependencies, review every new package, run agents with least privilege, and keep them away from production credentials and the plant network.
 - **Agents don't replace process knowledge.** An agent doesn't know why you backflush at the operation instead of at completion, or which customer's lot rules live in a contract rather than in the system. That knowledge is the business, and it still lives in people. Agents shrink the coding, not the knowing.
@@ -125,7 +125,7 @@ You don't have to bet the plant on my prediction to act on it. These steps pay o
 - **Measure your offline tolerance.** Ask operations: if the internet connection dropped at 6 a.m. Friday, what stops, and when? Compare the answer with what your current or proposed ERP can actually do offline, in writing.
 - **Price egress against your own volumes.** Use the cloud vendor's pricing page, not a sales estimate. Count data leaving the cloud, not just data entering it.
 - **Ask every ERP vendor four questions.** What runs at the plant when the link is down? What open protocols, such as OPC UA or MQTT with Sparkplug, does it speak natively? Under what license are the edge components? In what format, and at what cost, do we get all our data out?
-- **Stand up a sandbox.** Put an open-source ERP (Odoo publishes [packaged installers for Debian and Ubuntu](https://www.odoo.com/documentation/18.0/administration/on_premise/packages.html), and ERPNext's Frappe Framework [officially supports Debian and Ubuntu](https://docs.frappe.io/framework/user/en/installation)) on a spare Linux box, load one product line's bill of materials, and see how far you get in a few weeks. Then ask an AI coding agent to write one small connector or report against that open code, and have someone review the pull request it produces. That review will tell you more about your real staffing need than any vendor's estimate. The point is to see what's possible and to build your negotiating position, not to replace your system. For what happens when that kind of evaluation never takes place, see [Frankenstein's ERP](/news/erp/frankenstein-erp-legacy-fragmentation/).
+- **Stand up a sandbox.** Put an open-source ERP (Odoo publishes [packaged installers for Debian and Ubuntu](https://www.odoo.com/documentation/18.0/administration/on_premise/packages.html), and ERPNext's Frappe Framework [officially supports Debian and Ubuntu](https://docs.frappe.io/framework/user/en/installation)) on a spare Linux box, load one product line's bill of materials, and see how far you get in a few weeks. Then ask an AI coding agent to write one small connector or report against that open code, and have someone review the pull request it produces. That review will tell you more about your real staffing need than any vendor's estimate. The point is to see what's possible and to build your negotiating position, not to replace your system. For what happens when that kind of evaluation never takes place, see [[Frankenstein's ERP: the monster you already own]].
 
 ## Next step
 
