@@ -269,9 +269,16 @@ jobs:
           RG="${AZURE_RESOURCE_GROUP:-rg-bash365-prod}"
           APP="${AZURE_STATIC_WEB_APP_NAME:-swa-bash365-prod}"
           ENV_NAME="pr${PR}"
-          if az staticwebapp environment show --name "$APP" --resource-group "$RG" --environment-name "$ENV_NAME" >/dev/null 2>&1; then
-            az staticwebapp environment delete --name "$APP" --resource-group "$RG" --environment-name "$ENV_NAME" --yes
-            echo "Deleted staging environment ${ENV_NAME}."
+          if ENV_ID="$(az staticwebapp environment show --name "$APP" --resource-group "$RG" --environment-name "$ENV_NAME" --query id -o tsv 2>/dev/null)" && [ -n "$ENV_ID" ]; then
+            # Issue the ARM DELETE directly rather than `az staticwebapp
+            # environment delete`: that command polls the long-running
+            # operation at the subscription-scoped
+            # Microsoft.Web/locations/staticSitesOperationStatuses endpoint,
+            # which this resource-group-scoped identity cannot read, so the
+            # accepted (202) delete was reported as AuthorizationFailed.
+            # `az rest` returns on the 202 without polling.
+            az rest --method delete --url "https://management.azure.com${ENV_ID}?api-version=2022-09-01"
+            echo "Requested deletion of staging environment ${ENV_NAME}."
           else
             echo "No staging environment ${ENV_NAME} to delete."
           fi
