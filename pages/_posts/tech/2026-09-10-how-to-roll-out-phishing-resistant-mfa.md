@@ -12,8 +12,6 @@ keywords: [phishing-resistant mfa, mfa push bombing, passkeys for business, fido
 preview: /images/previews/how-to-roll-out-phishing-resistant-mfa.png
 ---
 
-<!-- TODO: add preview image at /images/previews/how-to-roll-out-phishing-resistant-mfa.png (1200×630) -->
-
 Your team enabled multi-factor authentication (MFA) last year, checked the box on the cyber-insurance form, and moved on. Then an employee's phone lit up with twenty login approval prompts at 11 p.m. — not because anyone was trying to log in from home, but because an attacker already had the password and was betting someone would tap "approve" just to make the notifications stop.
 
 ## Why it matters now

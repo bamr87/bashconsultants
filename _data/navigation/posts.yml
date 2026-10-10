@@ -2,23 +2,36 @@
 # Used by: News layout, section pages, and article navigation
 # Purpose: Section-based navigation for news content
 # Note: Sections match folders in pages/_posts/
+#
+# `category` is the category token posts are matched on; `title` is only the
+# label. The theme defaults category to title, and our labels are prose
+# ("ERP Stories") while our categories are the slugs in _data/taxonomy.yml
+# ("erp"), so every entry MUST carry its own category — without it the news
+# homepage counts zero articles per section and drops the whole "posts by
+# section" area. Keep each `category` byte-identical to the matching
+# `slug` under taxonomy.yml's categories.primary, and to the post folder
+# under pages/_posts/.
 
 - title: Muses
+  category: muses
   icon: bi-globe
   url: /news/muses/
   description: "Editorial musings, cultural commentary, and creative perspectives"
 
 - title: Corporate News
+  category: corp
   icon: bi-building
   url: /news/corp/
   description: "Business updates, corporate strategy, and enterprise insights"
 
 - title: Tech News
+  category: tech
   icon: bi-cpu
   url: /news/tech/
   description: "Technology trends, tools, and software development updates"
 
 - title: ERP Stories
+  category: erp
   icon: bi-emoji-laughing
   url: /news/erp/
   description: "Sideways looks at ERP systems, enterprise software, and consulting culture"

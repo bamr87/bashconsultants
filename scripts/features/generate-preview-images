@@ -446,9 +446,18 @@ validate_environment() {
     if command -v yq &> /dev/null; then
         YAML_PARSER="yq"
         debug "Using yq for YAML parsing"
-    elif command -v python3 &> /dev/null; then
+    elif command -v python3 &> /dev/null && python3 -c 'import yaml' &> /dev/null; then
         YAML_PARSER="python"
         debug "Using python for YAML parsing"
+    elif command -v python3 &> /dev/null; then
+        # python3 present but PyYAML absent. get_yaml_value's python branch
+        # catches everything and returns "", so the ImportError reads as an
+        # empty front matter block on EVERY file: no title, no preview, and
+        # therefore "missing". --list-missing then reports every post rather
+        # than the few without banners, and a real run would regenerate all of
+        # them under blank-title filenames, burning credit and overwriting good
+        # art. Refuse rather than parse everything as empty.
+        error "python3 found but PyYAML is not installed — every front matter block would read as empty. Run: python3 -m pip install pyyaml (or install yq)."
     else
         error "No YAML parser found. Install yq or python3."
     fi
