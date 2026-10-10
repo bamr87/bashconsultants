@@ -1,5 +1,8 @@
-# Opens (and keeps) a pull request from this fork up to the repository it was
-# forked from — amr-bash/bash-365.com — checked weekly.
+# Opens (and keeps) a pull request from this fork up to the upstream repository
+# — bash-365/bash-365.com — checked weekly.
+#
+# The upstream moved from bash-365/bash-365.com. REST calls follow that rename,
+# but `gh pr list` (GraphQL) does not, so UPSTREAM must name the current repo.
 #
 # Once the PR is open it tracks main and updates itself on every push, so a
 # per-push trigger only re-confirms a PR that GitHub already keeps fresh. A
@@ -12,19 +15,19 @@
 # cleanly (it never fails the build).
 #
 # Setup (one time):
-#   1. Create a token that can open PRs on amr-bash/bash-365.com:
-#      - Fine-grained PAT scoped to amr-bash/bash-365.com with
+#   1. Create a token that can open PRs on bash-365/bash-365.com:
+#      - Fine-grained PAT scoped to bash-365/bash-365.com with
 #        "Pull requests: Read and write" + "Contents: Read", OR a classic PAT
 #        with the `repo` scope.
 #   2. Add it here as a secret named UPSTREAM_PR_TOKEN
 #      (Settings → Secrets and variables → Actions → New repository secret).
 #
-# The PR is from bamr87:main → amr-bash:main. Because bamr87/main carries
+# The PR is from bamr87:main → bash-365:main. Because bamr87/main carries
 # upstream/main in its history (see the reconcile merge), that PR is a clean,
 # conflict-free superset. Once open, it tracks main and updates on its own, so
 # this workflow only needs to open it when one isn't already there.
 
-name: PR to upstream (amr-bash)
+name: PR to upstream (bash-365)
 
 on:
   schedule:
@@ -45,7 +48,7 @@ jobs:
       - name: Open or confirm the PR to the upstream fork parent
         env:
           GH_TOKEN: ${{ secrets.UPSTREAM_PR_TOKEN }}
-          UPSTREAM: amr-bash/bash-365.com
+          UPSTREAM: bash-365/bash-365.com
           FORK_OWNER: bamr87
           BRANCH: main
         run: |
