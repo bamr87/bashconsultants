@@ -30,7 +30,7 @@ name: Content review (weekly)
 
 on:
   schedule:
-    - cron: '37 14 * * 4' # Thursdays 14:37 UTC (~7–8 AM Denver)
+    - cron: '40 21 * * 4'  # staggered AI cron (bamr87/bamr87#348); was 37 14 * * 4
   workflow_dispatch:
     inputs:
       mode:
