@@ -39,7 +39,7 @@ name: Content loop
 
 on:
   schedule:
-    - cron: '11 14 * * *' # daily 14:11 UTC (~7–8 AM Denver); the planner decides new / improve / idle
+    - cron: '40 23 * * *'  # staggered AI cron (bamr87/bamr87#348); was 11 14 * * *
   workflow_dispatch:
     inputs:
       mode:
