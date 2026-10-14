@@ -39,7 +39,7 @@ name: Content loop
 
 on:
   schedule:
-    - cron: '14 20 * * *'  # staggered AI cron (bamr87/bamr87#348); was 11 14 * * *
+    - cron: '40 23 * * *'  # staggered AI cron (bamr87/bamr87#348); was 11 14 * * *
   workflow_dispatch:
     inputs:
       mode:

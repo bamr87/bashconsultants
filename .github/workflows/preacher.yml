@@ -30,7 +30,7 @@ name: Preacher (weekly doctrine)
 
 on:
   schedule:
-    - cron: '23 22 * * 6'  # staggered AI cron (bamr87/bamr87#348); was 42 14 * * 6
+    - cron: '10 1 * * 6'  # staggered AI cron (bamr87/bamr87#348); was 42 14 * * 6
   workflow_dispatch:
     inputs:
       focus:
