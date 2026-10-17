@@ -1,5 +1,11 @@
 # bashconsultants
 
+> Source of bash-365.com, BASH Consulting's IT consulting site (Jekyll), plus a Prompt Orchestrator VS Code extension.
+
+[![License](https://img.shields.io/github/license/bamr87/bashconsultants)](LICENSE) [![Live site](https://img.shields.io/badge/live-bash--365.com-2ea44f)](https://bash-365.com)
+
+## Overview
+
 The source for **[bash-365.com](https://bash-365.com)** — the site of BASH Consulting (Bourne Again Solutions Hero), a Denver-based IT consulting practice for small and medium businesses. This is a dual-purpose repository:
 
 1. **Jekyll site** (repo root) — the marketing and content site, built on the [`bamr87/zer0-mistakes`](https://github.com/bamr87/zer0-mistakes) remote theme and deployed on every push to `main`.
@@ -59,8 +65,7 @@ Every push to `main` triggers two deploys, gated by CI:
 
 This site is a consumer of the zer0 stack: the [`zer0-mistakes`](https://github.com/bamr87/zer0-mistakes) theme (`remote_theme` in `_config.yml`, with every deliberate fork declared in [`.theme-overrides.yml`](.theme-overrides.yml)), the [`zer0-image-generator`](https://github.com/bamr87/zer0-image-generator) gem for preview banners (root `Gemfile`, configured by the one `preview_images:` block in `_config.yml`), and [zer0-CMS](https://github.com/bamr87/zer0-CMS), which reads [`zer0.json`](zer0.json) for the content folders and the required front matter. `.github/workflows/zer0-doctor.yml` runs zer0-CMS's report-only contract check every week, or on demand from the Actions tab; from a zer0-CMS checkout, run it locally with `ruby -I rails/lib rails/bin/zer0-cms doctor /path/to/bash-365.com`.
 
-## Repository layout
-
+## Project structure
 ```
 _config.yml            Production config (GitHub Pages, remote theme)
 _config_dev.yml        Local dev overrides (gem theme, port 4042)
@@ -79,6 +84,10 @@ extension/             VS Code extension (independent sub-project)
 docs/                  Internal operations docs (excluded from the build)
 ```
 
+## Development
+
+Full commands, conventions and gotchas for humans and AI agents live in [AGENTS.md](AGENTS.md).
+
 ## Contributing conventions
 
 - **Read the guidance first.** [`AGENTS.md`](AGENTS.md) is the entry point for AI agents; [`.github/instructions/`](.github/instructions/) holds the authoritative editorial and code rules per file path.
@@ -91,6 +100,15 @@ docs/                  Internal operations docs (excluded from the build)
 
 **BASH Consulting** — Denver, Colorado Email: [info@bashconsultants.com](mailto:info@bashconsultants.com) · Phone: [720-352-4641](tel:+17203524641) · Web: [bash-365.com](https://bash-365.com)
 
+## Changelog
+
+Notable changes are recorded in [CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+<!-- bamr87-portfolio-footer -->
+<sub>Part of the [bamr87 portfolio](https://github.com/bamr87) — browse every project on [Amr's GitHub profile](https://github.com/bamr87).</sub>
